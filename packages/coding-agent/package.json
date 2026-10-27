@@ -22,7 +22,9 @@
 	},
 	"files": [
 		"dist",
+		"!dist/**/*.map",
 		"docs",
+		"!docs/images",
 		"examples",
 		"schemas",
 		"containerization.md",

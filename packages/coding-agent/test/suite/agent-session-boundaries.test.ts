@@ -128,7 +128,8 @@ describe("AgentSession actionable boundaries", () => {
 	it("keeps a boundary replacement verbatim through threshold compaction", async () => {
 		let handled = false;
 		const requests: string[] = [];
-		const instruction = "EXACT-REPLACEMENT-INSTRUCTION ".repeat(100);
+		// Must push the context past the 2_000-token window; sized with margin so prompt-size tuning cannot flip it.
+		const instruction = "EXACT-REPLACEMENT-INSTRUCTION ".repeat(200);
 		const harness = await createHarness({
 			models: [{ id: "faux-1", contextWindow: 2_000, maxTokens: 100 }],
 			settings: { compaction: { enabled: true, keepRecentTokens: 1, reserveTokens: 0 } },

@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import type { Skill } from "../src/core/skills.ts";
 import { createSyntheticSourceInfo } from "../src/core/source-info.ts";
 import { buildSystemPrompt } from "../src/core/system-prompt.ts";
+import { editToolSystemPromptContribution } from "../src/core/tools/edit.ts";
 
 const testSkill: Skill = {
 	name: "test-skill",
@@ -116,9 +117,30 @@ describe("buildSystemPrompt", () => {
 			});
 
 			expect(prompt).toContain(
-				"- When reading so docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory",
+				"Resolve docs/... and examples/... against these paths, not the current working directory",
 			);
-			expect(prompt).toContain("environment variables (docs/environment-variables.md), MCP servers (docs/mcp.md)");
+			expect(prompt).toContain("environment-variables, mcp, codemode");
+			expect(prompt).toContain("Read the relevant .md files completely and follow their cross-references");
+		});
+
+		test("keeps the default prompt and tool declarations within a size budget", () => {
+			// Guards the per-turn token cost of the fixed prefix (see docs/EFFICIENCY.md).
+			const prompt = buildSystemPrompt({
+				selectedTools: ["read", "bash", "edit", "write"],
+				toolSnippets: {
+					read: "Read file contents",
+					bash: "Execute bash commands (ls, grep, find, etc.)",
+					edit: editToolSystemPromptContribution.snippet,
+					write: "Create or overwrite files",
+				},
+				toolGuidelines: { edit: [...editToolSystemPromptContribution.guidelines] },
+				contextFiles: [],
+				skills: [],
+				cwd: "/tmp/project",
+			});
+			expect(prompt.length).toBeLessThan(2300);
+			// each edit rule is stated once
+			expect(prompt.match(/overlap/g)?.length ?? 0).toBeLessThanOrEqual(1);
 		});
 	});
 

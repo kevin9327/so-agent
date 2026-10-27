@@ -57,9 +57,17 @@ export interface ResourceLoaderReloadOptions {
 
 const HOST_PROVIDED_EXTENSION_PACKAGES = new Set([
 	"@so-agent/agent-core",
+	"@earendil-works/pi-agent-core",
 	"@so-agent/ai",
+	"@earendil-works/pi-ai",
 	"@so-agent/coding-agent",
+	"@earendil-works/pi-coding-agent",
 	"@so-agent/tui",
+	"@earendil-works/pi-tui",
+	"@mariozechner/pi-agent-core",
+	"@mariozechner/pi-ai",
+	"@mariozechner/pi-coding-agent",
+	"@mariozechner/pi-tui",
 	"@sinclair/typebox",
 	"typebox",
 ]);

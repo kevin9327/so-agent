@@ -21,9 +21,10 @@ import { wrapToolDefinition } from "./tool-definition-wrapper.ts";
 const replaceEditSchema = Type.Object(
 	{
 		oldText: Type.String({
-			description: "Exact text to replace. Unique in the original file; must not overlap other edits.",
+			description:
+				"Exact text for one targeted replacement. It must be unique in the original file and must not overlap with any other edits[].oldText in the same call.",
 		}),
-		newText: Type.String({ description: "Replacement text." }),
+		newText: Type.String({ description: "Replacement text for this targeted edit." }),
 	},
 	{},
 );
@@ -33,7 +34,7 @@ const editSchema = Type.Object(
 		path: Type.String({ description: "Path to the file to edit (relative or absolute)" }),
 		edits: Type.Array(replaceEditSchema, {
 			description:
-				"Targeted replacements, each matched against the original file (not incrementally). Merge nearby changes into one edit.",
+				"One or more targeted replacements. Each edit is matched against the original file, not incrementally. Do not include overlapping or nested edits. If two changes touch the same block or nearby lines, merge them into one edit instead.",
 		}),
 	},
 	{},
@@ -42,8 +43,10 @@ const editSchema = Type.Object(
 export const editToolSystemPromptContribution = {
 	snippet: "Make precise file edits with exact text replacement, including multiple disjoint edits in one call",
 	guidelines: [
-		"Use edit for precise changes: put every change to one file in a single call as entries of edits[]",
-		"Keep each edits[].oldText as small as possible while still unique in the file, with no padding and no overlap",
+		"Use edit for precise changes (edits[].oldText must match exactly)",
+		"When changing multiple separate locations in one file, use one edit call with multiple entries in edits[] instead of multiple edit calls",
+		"Each edits[].oldText is matched against the original file, not after earlier edits are applied. Do not emit overlapping or nested edits. Merge nearby changes into one edit.",
+		"Keep edits[].oldText as small as possible while still being unique in the file. Do not pad with large unchanged regions.",
 	],
 } as const;
 
@@ -146,7 +149,7 @@ export function createEditToolDefinition(
 		name: "edit",
 		label: "edit",
 		description:
-			"Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. Merge changes to the same block or nearby lines into one edit.",
+			"Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. If two changes affect the same block or nearby lines, merge them into one edit instead of emitting overlapping edits. Do not include large unchanged regions just to connect distant changes.",
 		promptSnippet: editToolSystemPromptContribution.snippet,
 		promptGuidelines: [...editToolSystemPromptContribution.guidelines],
 		parameters: editSchema,

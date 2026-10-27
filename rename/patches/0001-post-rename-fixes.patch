@@ -1,0 +1,3050 @@
+From ffabf8fa5789cb8c3f83a7d81c1274ebbcb4fd7d Mon Sep 17 00:00:00 2001
+From: kevin9327 <kevin9327@users.noreply.github.com>
+Date: Tue, 27 Oct 2026 14:22:15 +0900
+Subject: [PATCH] fix: post-rename fixes: docs/README, decouple from
+ upstream-hosted services, drop upstream announcement, biome format
+
+- update checks, remote model catalog and install ping are off unless SO_UPDATE_URL / SO_CATALOG_URL are set
+- new ATTRIBUTION-aware README, SECURITY, CONTRIBUTING; docs/UPSTREAM-ENDPOINTS.md
+- format after rename (biome)
+---
+ CONTRIBUTING.md                               | 109 +-----
+ README.md                                     | 103 ++----
+ SECURITY.md                                   |   8 +-
+ docs/UPSTREAM-ENDPOINTS.md                    |  18 +
+ packages/agent/examples/mcp-codemode/tools.ts |   7 +-
+ packages/agent/package.json                   |   2 +-
+ packages/ai/package.json                      |   2 +-
+ packages/ai/src/utils/identity.ts             |   6 +-
+ packages/chord/package.json                   |   2 +-
+ packages/chord/src/host.ts                    |   4 +-
+ packages/chord/test/boundary.test.ts          |   7 +-
+ packages/codemode/package.json                |   2 +-
+ packages/coding-agent/CHANGELOG.md            |   2 +
+ packages/coding-agent/README.md               |  58 +--
+ packages/coding-agent/docs/quickstart.md      |  28 +-
+ .../examples/extensions/gondolin/index.ts     |   2 +-
+ .../examples/extensions/question.ts           |  10 +-
+ .../examples/extensions/questionnaire.ts      |  10 +-
+ .../examples/sdk/03-custom-prompt.ts          |   7 +-
+ .../examples/sdk/06-extensions.ts             |   7 +-
+ .../examples/sdk/07-context-files.ts          |   7 +-
+ .../install-lock/package-lock.json            | 346 +++++++++---------
+ packages/coding-agent/package.json            |   2 +-
+ packages/coding-agent/src/cli/startup-ui.ts   |   8 +-
+ packages/coding-agent/src/config.ts           |   2 +-
+ .../src/core/extensions/loader.ts             |   5 +-
+ .../coding-agent/src/core/model-resolver.ts   |   8 +-
+ .../coding-agent/src/core/package-manager.ts  |   2 +-
+ .../src/core/remote-catalog-provider.ts       |  17 +-
+ .../interactive/components/easter-egg-3d.ts   |   9 +-
+ .../interactive/components/model-selector.ts  |  11 +-
+ .../interactive/components/oauth-selector.ts  |  10 +-
+ .../src/modes/interactive/interactive-mode.ts |  39 +-
+ .../coding-agent/src/package-manager-cli.ts   |  15 +-
+ .../coding-agent/src/utils/version-check.ts   |   8 +-
+ .../test/agent-session-stats.test.ts          |   8 +-
+ packages/coding-agent/test/config.test.ts     |   9 +-
+ .../rpc-prompt-response-semantics.test.ts     |   7 +-
+ .../test/sdk-client-identity.test.ts          |   2 +-
+ ...89-context-handler-system-messages.test.ts |   7 +-
+ packages/durable/package.json                 |   2 +-
+ packages/durable/src/codemode/codemode.ts     |   3 +-
+ packages/durable/src/codemode/models.ts       |  11 +-
+ packages/durable/src/harness/compaction.ts    |   2 +-
+ packages/durable/src/harness/context.ts       |   2 +-
+ packages/durable/src/harness/define.ts        |   2 +-
+ packages/durable/src/harness/events.ts        |  10 +-
+ packages/durable/src/harness/generation.ts    |   2 +-
+ packages/durable/src/harness/harness.ts       |   4 +-
+ packages/durable/src/harness/live.ts          |   2 +-
+ .../durable/src/harness/partial-changes.ts    |   5 +-
+ packages/durable/src/harness/prompt.ts        |   2 +-
+ packages/durable/src/harness/provider.ts      |   2 +-
+ packages/durable/src/harness/scheduler.ts     |   2 +-
+ packages/durable/src/harness/tool.ts          |   4 +-
+ packages/durable/src/harness/types.ts         |   2 +-
+ packages/durable/src/harness/usage.ts         |   2 +-
+ packages/durable/src/types.ts                 |   2 +-
+ packages/durable/test/chat-support.ts         |   2 +-
+ packages/durable/test/codemode-bench.ts       |   2 +-
+ packages/durable/test/codemode-models.test.ts |   2 +-
+ packages/durable/test/codemode.test.ts        |   2 +-
+ packages/durable/test/examples/05-harness.ts  |   3 +-
+ .../durable/test/examples/06-configuration.ts |   3 +-
+ .../test/examples/07-harness-conversations.ts |   3 +-
+ packages/durable/test/examples/08-context.ts  |   3 +-
+ .../test/examples/09-registry-reload.ts       |   3 +-
+ .../test/examples/10-extension-state.ts       |   3 +-
+ packages/durable/test/examples/11-tasks.ts    |   3 +-
+ packages/durable/test/examples/12-recovery.ts |   2 +-
+ packages/durable/test/examples/13-chat.ts     |   3 +-
+ .../durable/test/examples/14-system-prompt.ts |   3 +-
+ .../durable/test/examples/15-real-model.ts    |   3 +-
+ .../durable/test/examples/16-coding-tools.ts  |   2 +-
+ packages/durable/test/examples/17-print.ts    |   3 +-
+ packages/durable/test/examples/18-json.ts     |   2 +-
+ packages/durable/test/examples/19-inbox.ts    |   3 +-
+ .../durable/test/examples/20-late-join.ts     |   3 +-
+ .../test/examples/21-subagent-foreground.ts   |   5 +-
+ .../test/examples/22-subagent-background.ts   |   2 +-
+ .../durable/test/examples/23-child-tasks.ts   |   2 +-
+ .../durable/test/examples/24-compaction.ts    |   3 +-
+ .../durable/test/examples/25-coding-agent.ts  |   2 +-
+ .../durable/test/examples/26-plan-mode.ts     |   2 +-
+ packages/durable/test/examples/27-reviewer.ts |   2 +-
+ .../examples/28-sandbox-per-conversation.ts   |   2 +-
+ .../durable/test/examples/29-tool-override.ts |   2 +-
+ .../test/examples/30-reload-and-restart.ts    |   2 +-
+ .../test/harness-cancellation-barrier.test.ts |   9 +-
+ packages/durable/test/harness-context.test.ts |   2 +-
+ .../test/harness-deferred-progress.test.ts    |   3 +-
+ packages/durable/test/harness-events.test.ts  |   2 +-
+ .../durable/test/harness-generation.test.ts   |   2 +-
+ packages/durable/test/harness-inbox.test.ts   |   2 +-
+ .../durable/test/harness-lifecycle.test.ts    |   2 +-
+ .../durable/test/harness-live-deltas.test.ts  |   2 +-
+ .../test/harness-nested-tools-restart.test.ts |   2 +-
+ .../durable/test/harness-nested-tools.test.ts |   4 +-
+ .../test/harness-partial-changes.test.ts      |   4 +-
+ .../test/harness-scheduler-retention.test.ts  |   9 +-
+ .../test/harness-storage-failure.test.ts      |   2 +-
+ .../test/harness-structured-output.test.ts    |   2 +-
+ .../durable/test/harness-structured.test.ts   |   9 +-
+ .../test/harness-tasks-recovery.test.ts       |   2 +-
+ packages/durable/test/harness-tasks.test.ts   |   2 +-
+ .../durable/test/harness-telemetry.test.ts    |   2 +-
+ .../test/harness-tools-recovery.test.ts       |   2 +-
+ packages/durable/test/harness-tools.test.ts   |   2 +-
+ packages/durable/test/harness-view.test.ts    |   2 +-
+ packages/durable/test/nested-images-bench.ts  |   2 +-
+ packages/durable/test/nested-tools-bench.ts   |   2 +-
+ .../durable/test/scheduler-fanout-bench.ts    |   3 +-
+ .../durable/test/scheduler-memory-bench.ts    |   2 +-
+ .../durable/test/session-adoption.test.ts     |   8 +-
+ .../session-checkpoints-migrations.test.ts    |   8 +-
+ .../test/session-document-cache-bench.ts      |   2 +-
+ .../test/session-document-retention.test.ts   |   3 +-
+ .../durable/test/session-documents.test.ts    |   8 +-
+ packages/durable/test/spec-usage.test.ts      |   3 +-
+ packages/durable/test/tool-output-bench.ts    |   2 +-
+ packages/durable/test/tools-images.test.ts    |   4 +-
+ packages/durable/test/tools.test.ts           |   7 +-
+ packages/env/package.json                     |   2 +-
+ packages/evals/test/report.test.ts            |   2 +-
+ packages/mcp/package.json                     |   2 +-
+ packages/telemetry/package.json               |   2 +-
+ packages/tui/package.json                     |   2 +-
+ 127 files changed, 418 insertions(+), 768 deletions(-)
+ create mode 100644 docs/UPSTREAM-ENDPOINTS.md
+
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 9aa2389..38cf113 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -1,102 +1,11 @@
+-# Contributing to so
++# Contributing to so agent
+ 
+-This guide exists to save both sides time.
++so agent is a fork of [Pi](https://github.com/earendil-works/pi). Its core stays minimal: if a feature does not
++belong in the core, make it an extension.
+ 
+-## Philosophy
+-
+-First things first: **so's core is minimal**.
+-
+-If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
+-
+-So's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.
+-
+-## The One Rule
+-
+-**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
+-
+-Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
+-
+-If you use an agent, run it from the `so` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
+-
+-## Contribution Gate
+-
+-All issues and PRs from new contributors are auto-closed by default.
+-
+-Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx
+-
+-Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.
+-
+-Approval happens through maintainer replies on issues:
+-
+-- `lgtmi`: your future issues will not be auto-closed
+-- `lgtm`: your future issues and PRs will not be auto-closed
+-
+-The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.
+-
+-## Quality Bar For Issues
+-
+-If you open an issue, you must use one of the two GitHub issue templates.
+-
+-If you open an issue, keep it short, concrete, and worth reading.
+-
+-- Keep it concise. If it does not fit on one screen, it is too long.
+-- Write in your own voice (do not use an LLM to generate text, if you must, follow up with a clearly AI labeled comment).
+-- State the bug or request clearly.
+-- Explain why it matters.
+-- If you want to implement the change yourself, say so.
+-
+-If the issue is real and written well, a maintainer may reopen it or reply with `lgtmi` or `lgtm` in the command position described above.
+-
+-## Blocking
+-
+-If you ignore this document twice, or if you spam the tracker with agent-generated issues, your GitHub account will be permanently blocked.
+-
+-If you send a large volume of issues through automation, your GitHub account will be permanently blocked. No taksies backsies.
+-
+-## Before Submitting a PR
+-
+-Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.
+-
+-Before submitting a PR:
+-
+-```bash
+-npm run check
+-./test.sh
+-```
+-
+-Both must pass.
+-
+-Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
+-
+-If you are adding a new provider to `packages/ai`, see `AGENTS.md` for required tests.
+-
+-## Questions?
+-
+-Ask on [Discord](https://discord.com/invite/nKXTsAcmbT).
+-
+-## FAQ
+-
+-### Why are new issues and PRs auto-closed?
+-
+-so receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
+-
+-### Why are weekend issues lower priority?
+-
+-We triage the tracker during working hours. That means more issues can accumulate over the weekend. Anything submitted Friday through Sunday may be missed or given lower priority in the Monday review queue. If a problem is urgent, ask on Discord and include the short version, a repro, and the relevant logs.
+-
+-### Why do some issues get no reply?
+-
+-A reply is maintenance work too. Low-signal issues, unclear reports, duplicates, and issues that do not follow this guide may be closed without discussion. This keeps time available for reproducible bugs, thoughtful requests, and contributors who have done the work to make their report actionable.
+-
+-### Why not let AI triage everything?
+-
+-AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.
+-
+-### Is this hostile to contributors?
+-
+-No. It is a guardrail against burnout and tracker spam. Short, concrete, reproducible issues are welcome. Thoughtful contributions are welcome. Automated slop, entitlement, and large volumes of low-effort reports are not.
+-
+-## Where can I learn about plans?
+-
+-Earendil uses RFCs to discuss larger changes.  Not all of them are public, but
+-quite a few are.  They can be found at [rfc.earendil.com](https://rfc.earendil.com/keyword/pi/).
++- You must understand your code. If you cannot explain what a change does and how it interacts with the rest of
++  the system, it will not be merged.
++- AI-assisted code is fine. Unreviewed AI output is not. Agents working in this repo must follow [AGENTS.md](AGENTS.md).
++- Keep changes small and tested. Run `npm run check` and `./test.sh` before committing.
++- Do not send issues, pull requests, or comments to the upstream Pi repository about so agent. Bugs in code that
++  also exists upstream should be reproduced against upstream Pi first.
+diff --git a/README.md b/README.md
+index e8b60f1..845605e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,73 +1,39 @@
+-<p align="center">
+-  <a href="https://pi.dev">
+-    <img alt="so logo" src="https://pi.dev/logo-auto.svg" width="128">
+-  </a>
+-</p>
+-<p align="center">
+-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
+-  <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square" /></a>
+-</p>
++# so agent
+ 
+-> New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
++**so agent** (`so`) is a minimal, extensible terminal coding agent. It is a fork of
++[Pi](https://github.com/earendil-works/pi) by Mario Zechner and contributors (MIT), renamed and tuned
++for lower startup cost and smaller prompts. See [ATTRIBUTION.md](ATTRIBUTION.md) and
++[docs/EFFICIENCY.md](docs/EFFICIENCY.md).
+ 
+-# So
++Customize `so` with [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), and [themes](packages/coding-agent/docs/themes.md). Bundle them as [so packages](packages/coding-agent/docs/packages.md) and share via npm or git.
+ 
+-So is a minimal, extensible agent harness that you can make your own.
+-
+-Adapt So to your workflows, not the other way around. Customize So with [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), and [themes](packages/coding-agent/docs/themes.md). Bundle them as [So packages](packages/coding-agent/docs/packages.md) and share via npm or git.
+-
+-So ships with powerful defaults but skips features like sub-agents and plan mode. Ask So to build what you want, or install a package that does it your way.
+-
+-Use So [interactively](packages/coding-agent/docs/usage.md), automate it in [print or JSON mode](packages/coding-agent/docs/cli.md), control it over [RPC](packages/coding-agent/docs/rpc.md), or build apps with the [So TypeScript SDK](packages/coding-agent/docs/sdk.md). See [OpenClaw](https://github.com/OpenClaw/OpenClaw) for a real-world integration.
++Use `so` [interactively](packages/coding-agent/docs/usage.md), automate it in [print or JSON mode](packages/coding-agent/docs/cli.md), control it over [RPC](packages/coding-agent/docs/rpc.md), or build apps with the [TypeScript SDK](packages/coding-agent/docs/sdk.md).
+ 
+ ## Getting started
+ 
+-Install the command-line interface:
++so agent is not published to npm or any installer host yet. Build it from source (Node.js 22.19 or newer):
+ 
+ ```bash
+-curl -fsSL https://pi.dev/install.sh | sh
+-```
+-
+-On Windows:
+-
+-```shell
+-powershell -c "irm https://pi.dev/install.ps1 | iex"
++git clone <your so-agent repository> so-agent && cd so-agent
++npm ci --ignore-scripts
++npm run build
++node packages/coding-agent/dist/bundle/cli.js        # or: ./so-test.sh
+ ```
+ 
+-The installer pins all dependencies and updates So with `so update`. Alternatively, install directly with npm, which does not pin transitive dependencies:
+-
+-```bash
+-npm install -g --ignore-scripts @so-agent/coding-agent
+-```
+-
+-So requires Node.js 22.19 or newer. The macOS, Linux, and Windows installers can install it if needed. So does not require dependency lifecycle scripts for a normal npm installation.
+-
+-Start So in the directory where you want it to work:
++Link the `so` command globally:
+ 
+ ```bash
++npm link --ignore-scripts ./packages/coding-agent    # provides the `so` binary
+ cd /path/to/project
+ so
+ ```
+ 
+-For a built-in AI provider, run `/login` inside So to connect a subscription or API key. Then give So a task.
+-
+-See the [documentation](https://pi.dev/docs/latest) for full setup and usage instructions, or [visit pi.dev](https://pi.dev) for demos.
++Run `/login` inside `so` to connect a subscription or API key. Configuration lives in `~/.so/agent/`
++(project-local files in `.so/`), and environment variables use the `SO_` prefix
++(see [environment variables](packages/coding-agent/docs/environment-variables.md)).
+ 
+-## Run with Nix
+-
+-```bash
+-nix run github:earendil-works/pi/stable
+-```
+-
+-`stable` points at the latest release. Install it with `nix profile add github:earendil-works/pi/stable` and update with `nix profile upgrade so`. Use a release tag such as `github:earendil-works/pi/v1.0.0` to pin a version, or `github:earendil-works/pi` for unreleased changes on `main`. Nix builds So from source.
+-
+-Supports ARM64 and x86-64 on Linux and macOS. Use `nix build .` or `nix run .` to build or run your checkout.
+-
+-Nix builds are offline, so the bundled model data comes from a pi.dev model catalog revision pinned in `nix/model-catalog.json`. At runtime, So still overlays newer catalog data from pi.dev as usual. The Nix workflow replaces the pin on `main` when it no longer matches the checkout, for example after a provider is added or gains a new model type. To refresh it by hand:
+-
+-```bash
+-npm run update:model-catalog-pin
+-```
++so agent does not contact any so-specific hosted service. Update checks, the remote model catalog,
++and install reporting are off unless you opt in. See [docs/UPSTREAM-ENDPOINTS.md](docs/UPSTREAM-ENDPOINTS.md).
+ 
+ ## Packages
+ 
+@@ -83,8 +49,6 @@ This monorepo contains the So CLI and its supporting libraries.
+ | **[@so-agent/coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
+ | **[@so-agent/tui](packages/tui)** | Terminal UI library with differential rendering |
+ 
+-For Slack/chat automation and workflows see [earendil-works/so-chat](https://github.com/earendil-works/pi-chat).
+-
+ ## Permissions & Containerization
+ 
+ So does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.
+@@ -97,7 +61,7 @@ If you need stronger boundaries, containerize or sandbox So. See [packages/codin
+ 
+ ## Contributing
+ 
+-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Longer term plans for So can also be found in [RFCs](https://rfc.earendil.com/keyword/pi/).
++See [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) for project rules (for both humans and agents).
+ 
+ ## Development
+ 
+@@ -173,34 +137,17 @@ We treat npm dependency changes as reviewed code changes.
+ - `.npmrc` sets `save-exact=true` and `min-release-age=2` to avoid same-day dependency releases during npm resolution.
+ - `package-lock.json` is the dependency ground truth. Pre-commit blocks accidental lockfile commits unless `SO_ALLOW_LOCKFILE_CHANGE=1` is set.
+ - `npm run check` verifies pinned direct deps, native TypeScript import compatibility, and the generated coding-agent install lock.
+-- The pi.dev installer installs from `packages/coding-agent/install-lock/`, generated from the root lockfile, to pin transitive deps. The npm package does not pin transitive deps.
++- The managed installer (not shipped by so agent) would install from `packages/coding-agent/install-lock/`, generated from the root lockfile, to pin transitive deps. The npm package does not pin transitive deps.
+ - Local release smoke tests and npm publication use the same tarball packer; npm publishes the validated tarballs rather than repacking workspace directories.
+ - Local release installs, documented npm installs, and `so update --self` use `--ignore-scripts` where supported.
+ - CI installs with `npm ci --ignore-scripts`, and a scheduled GitHub workflow runs `npm audit --omit=dev` plus `npm audit signatures --omit=dev`.
+ - Install lock generation has an explicit allowlist for dependency lifecycle scripts; new lifecycle-script deps fail checks until reviewed.
+ 
+-## Share your OSS coding agent sessions
++## Renaming and upstream updates
+ 
+-If you use So or other coding agents for open source work, please share your sessions.
+-
+-Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks.
+-
+-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
+-
+-To publish sessions, use [`badlogic/so-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `so-share-hf`.
+-
+-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `so-agent` sessions.
+-
+-I regularly publish my own `so-agent` work sessions here:
+-
+-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
++The whole rename from Pi is reproducible: run `rename/rename.sh` on a fresh upstream checkout.
++See [rename/README.md](rename/README.md).
+ 
+ ## License
+ 
+-MIT
+-
+-<p align="center">
+-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by
+-  <br /><br />
+-  <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
+-</p>
++MIT. The original copyright notice (Mario Zechner) is kept in [LICENSE](LICENSE).
+diff --git a/SECURITY.md b/SECURITY.md
+index d393c7f..0bf4985 100644
+--- a/SECURITY.md
++++ b/SECURITY.md
+@@ -26,8 +26,8 @@ coding agent trivially and this cannot be protected against.
+ If you believe you found a security vulnerability in so or another package in
+ this repository, please report it privately by either:
+ 
+-- Emailing `security@earendil.com`, or
+-- Opening a private report through GitHub Security Advisories for this repository
++- Opening a private report through GitHub Security Advisories for this repository, or
++- Contacting the maintainer of this fork directly
+ 
+ Please include:
+ 
+@@ -42,8 +42,8 @@ reports and coordinate disclosure as appropriate.
+ ## Scope
+ 
+ Security issues in the distributed packages, command-line tools, APIs, and
+-repository code are in scope as well as earendil operated infrastructure
+-on `pi.dev`.
++repository code are in scope. Infrastructure operated by the upstream Pi project
++(for example `pi.dev`) is out of scope for this fork; report it upstream.
+ 
+ ## Out Of Scope
+ 
+diff --git a/docs/UPSTREAM-ENDPOINTS.md b/docs/UPSTREAM-ENDPOINTS.md
+new file mode 100644
+index 0000000..b8fa0ab
+--- /dev/null
++++ b/docs/UPSTREAM-ENDPOINTS.md
+@@ -0,0 +1,18 @@
++# Upstream endpoints
++
++so agent inherits a few URLs that point at services run by the upstream Pi project. so agent does not rely on them.
++
++| Endpoint | Used for | so agent behavior |
++|---|---|---|
++| `https://pi.dev/api/latest-version` | update check, `so update self` | Off. Set `SO_UPDATE_URL` to your own JSON feed `{ "version": "x.y.z", "packageName"?, "note"? }` to enable. |
++| `https://pi.dev/api/report-install` | anonymous install ping | Removed. |
++| `https://pi.dev/api/models` | remote model catalog overlay | Off. Bundled model data is used. Set `SO_CATALOG_URL` to opt in. |
++| `https://pi.dev/api/installer/releases`, `install.sh`, `install.ps1` | managed installer | Not used. Install hints were removed. |
++| `https://pi.dev/session/` | `/share` viewer | Unchanged. Override with `SO_SHARE_VIEWER_URL`. |
++| `https://pi.dev/oauth/*/client.json` | MCP OAuth client metadata (`clientRegistration: "cimd"`, opt-in) | Unchanged. Default is dynamic client registration. |
++| `https://radius.pi.dev` | Radius provider gateway | Unchanged. Only used with Radius credentials. |
++| `https://pi.dev/schemas/*.schema.json` | `$schema` hints in JSON files | Unchanged. Cosmetic. |
++| Upstream issue and PR links, `github.com/earendil-works/pi` | comments, changelogs | Kept as history and attribution. |
++
++`scripts/model-catalog-protocol.ts` is the wire protocol shared with the upstream server and keeps the upstream names
++(`pi-version`, `pi/<version>` user agent).
+diff --git a/packages/agent/examples/mcp-codemode/tools.ts b/packages/agent/examples/mcp-codemode/tools.ts
+index bed4b7e..aee3085 100644
+--- a/packages/agent/examples/mcp-codemode/tools.ts
++++ b/packages/agent/examples/mcp-codemode/tools.ts
+@@ -11,12 +11,7 @@ import {
+ 	runToolCall,
+ } from "@so-agent/agent-core";
+ import type { ImageContent, JsonObject, JsonValue, TextContent } from "@so-agent/ai";
+-import {
+-	type CodemodeJsonSchema,
+-	CodemodeSandbox,
+-	type CodemodeTool,
+-	renderDeclarations,
+-} from "@so-agent/codemode";
++import { type CodemodeJsonSchema, CodemodeSandbox, type CodemodeTool, renderDeclarations } from "@so-agent/codemode";
+ import { type McpClient, toLlmContent } from "@so-agent/mcp";
+ import { Type } from "typebox";
+ 
+diff --git a/packages/agent/package.json b/packages/agent/package.json
+index 28d295b..a40fa95 100644
+--- a/packages/agent/package.json
++++ b/packages/agent/package.json
+@@ -37,7 +37,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/agent"
+ 	},
+ 	"engines": {
+diff --git a/packages/ai/package.json b/packages/ai/package.json
+index d6af526..df76431 100644
+--- a/packages/ai/package.json
++++ b/packages/ai/package.json
+@@ -92,7 +92,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/ai"
+ 	},
+ 	"engines": {
+diff --git a/packages/ai/src/utils/identity.ts b/packages/ai/src/utils/identity.ts
+index 7deecfc..21c6c3f 100644
+--- a/packages/ai/src/utils/identity.ts
++++ b/packages/ai/src/utils/identity.ts
+@@ -21,7 +21,11 @@ export interface ClientAttribution {
+ }
+ 
+ /** so's attribution, used by so-agent-core, so-durable, and the coding agent. */
+-export const SO_ATTRIBUTION: ClientAttribution = { name: "so", url: "https://pi.dev", categories: ["cli-agent"] };
++export const SO_ATTRIBUTION: ClientAttribution = {
++	name: "so",
++	url: "https://github.com/kevin9327/so-agent",
++	categories: ["cli-agent"],
++};
+ 
+ /**
+  * How so-ai identifies the calling app to providers. Every field is optional; absent fields use so-ai's defaults:
+diff --git a/packages/chord/package.json b/packages/chord/package.json
+index a2f8856..c0ec06d 100644
+--- a/packages/chord/package.json
++++ b/packages/chord/package.json
+@@ -78,7 +78,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/chord"
+ 	},
+ 	"engines": {
+diff --git a/packages/chord/src/host.ts b/packages/chord/src/host.ts
+index fa7dda7..574589b 100644
+--- a/packages/chord/src/host.ts
++++ b/packages/chord/src/host.ts
+@@ -424,9 +424,7 @@ export class HostImpl implements Host, HostCore {
+ 	async resolve(plugins: readonly PluginRef[]): Promise<Facet[]> {
+ 		const modules = plugins.filter((ref): ref is string | URL => !isFacet(ref));
+ 		if (modules.length > 0 && this.#loader === undefined) {
+-			throw new Error(
+-				"loading modules needs createHost({ loader }), e.g. nodeLoader from @so-agent/chord/node",
+-			);
++			throw new Error("loading modules needs createHost({ loader }), e.g. nodeLoader from @so-agent/chord/node");
+ 		}
+ 		const loaded = modules.length > 0 && this.#loader !== undefined ? await this.#loader(modules) : [];
+ 		return plugins.map((ref) => (isFacet(ref) ? ref : loaded.shift()!));
+diff --git a/packages/chord/test/boundary.test.ts b/packages/chord/test/boundary.test.ts
+index 65355cd..6fc64f8 100644
+--- a/packages/chord/test/boundary.test.ts
++++ b/packages/chord/test/boundary.test.ts
+@@ -16,9 +16,7 @@ describe("package boundary", () => {
+ 			dependencies?: Record<string, string>;
+ 		};
+ 		expect(
+-			Object.keys(manifest.dependencies ?? {}).filter(
+-				(name) => name.startsWith("@so-agent/") && !ALLOWED.has(name),
+-			),
++			Object.keys(manifest.dependencies ?? {}).filter((name) => name.startsWith("@so-agent/") && !ALLOWED.has(name)),
+ 		).toEqual([]);
+ 
+ 		const paths = (await readdir(sourceDirectory, { recursive: true })).filter((path) => path.endsWith(".ts")).sort();
+@@ -29,8 +27,7 @@ describe("package boundary", () => {
+ 			for (const match of source.matchAll(IMPORT_SPECIFIER)) {
+ 				const specifier = match[1]!;
+ 				const pkg = specifier.split("/").slice(0, 2).join("/");
+-				if (specifier.startsWith("@so-agent/") && !ALLOWED.has(pkg))
+-					violations.push(`${path}: ${specifier}`);
++				if (specifier.startsWith("@so-agent/") && !ALLOWED.has(pkg)) violations.push(`${path}: ${specifier}`);
+ 				if (specifier.startsWith(".") && !resolve(dirname(file), specifier).startsWith(`${sourceDirectory}/`)) {
+ 					violations.push(`${path}: ${specifier}`);
+ 				}
+diff --git a/packages/codemode/package.json b/packages/codemode/package.json
+index 0cc6ce0..1fe33bc 100644
+--- a/packages/codemode/package.json
++++ b/packages/codemode/package.json
+@@ -60,7 +60,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/codemode"
+ 	},
+ 	"engines": {
+diff --git a/packages/coding-agent/CHANGELOG.md b/packages/coding-agent/CHANGELOG.md
+index 59827b2..0a4aa22 100644
+--- a/packages/coding-agent/CHANGELOG.md
++++ b/packages/coding-agent/CHANGELOG.md
+@@ -1,5 +1,7 @@
+ # Changelog
+ 
++> so agent fork notice: entries below are the upstream Pi project's history, kept verbatim (names, commands and links refer to Pi). so agent changes are listed in `docs/EFFICIENCY.md` and the git log.
++
+ ## [Unreleased]
+ 
+ ### Added
+diff --git a/packages/coding-agent/README.md b/packages/coding-agent/README.md
+index 14846e9..e9462e2 100644
+--- a/packages/coding-agent/README.md
++++ b/packages/coding-agent/README.md
+@@ -1,48 +1,13 @@
+-<p align="center">
+-  <a href="https://pi.dev">
+-    <img alt="So logo" src="https://pi.dev/logo-auto.svg" width="128">
+-  </a>
+-</p>
+-<p align="center">
+-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
+-  <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square&logo=npm&logoColor=white" /></a>
+-</p>
++# so agent (coding-agent)
+ 
+-> New issues and PRs from new contributors are closed automatically. Maintainers review closed submissions daily. See [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md).
++`so` is a minimal, extensible terminal coding agent, a fork of [Pi](https://github.com/earendil-works/pi) (MIT).
++See the [repository README](../../README.md) and [ATTRIBUTION.md](../../ATTRIBUTION.md).
+ 
+-# So
+-
+-So is a minimal, extensible agent harness that you can make your own.
+-
+-Adapt So to your workflows, not the other way around. Customize So with [extensions](docs/extensions.md), [skills](docs/skills.md), [prompt templates](docs/prompt-templates.md), and [themes](docs/themes.md). Bundle them as [So packages](docs/packages.md) and share via npm or git.
+-
+-So ships with powerful defaults but skips features like sub-agents and plan mode. Ask So to build what you want, or install a package that does it your way.
+-
+-Use So [interactively](docs/usage.md), automate it in [print or JSON mode](docs/cli.md), control it over [RPC](docs/rpc.md), or build apps with the [So TypeScript SDK](docs/sdk.md). See [OpenClaw](https://github.com/OpenClaw/OpenClaw) for a real-world integration.
++Adapt `so` to your workflows with [extensions](docs/extensions.md), [skills](docs/skills.md), [prompt templates](docs/prompt-templates.md), and [themes](docs/themes.md). Bundle them as [so packages](docs/packages.md) and share via npm or git.
+ 
+ ## Getting started
+ 
+-Install the command-line interface:
+-
+-```bash
+-curl -fsSL https://pi.dev/install.sh | sh
+-```
+-
+-On Windows:
+-
+-```shell
+-powershell -c "irm https://pi.dev/install.ps1 | iex"
+-```
+-
+-The installer pins all dependencies and updates So with `so update`. Alternatively, install directly with npm, which does not pin transitive dependencies:
+-
+-```bash
+-npm install -g --ignore-scripts @so-agent/coding-agent
+-```
+-
+-So requires Node.js 22.19 or newer. The macOS, Linux, and Windows installers can install it if needed. So does not require dependency lifecycle scripts for a normal npm installation.
+-
+-On macOS and Linux, Nix users can install the latest release with `nix profile add github:earendil-works/pi/stable`. See the [quickstart](docs/quickstart.md#1-install-so) for updating and pinning releases.
++Build from source (see the repository README), then:
+ 
+ Start So in the directory where you want it to work:
+ 
+@@ -55,19 +20,6 @@ For a built-in AI provider, run `/login` inside So to connect a subscription or
+ 
+ See the [documentation](docs/index.md) for full setup and usage instructions.
+ 
+-## Share your OSS coding agent sessions
+-
+-If you use So for open source work, please share your coding agent sessions.
+-
+-Public OSS session data helps improve models, prompts, tools, and evaluations using real development workflows.
+-
+-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
+-
+-To publish sessions, use [`badlogic/so-share-hf`](https://github.com/badlogic/pi-share-hf) using a Hugging Face account and the Hugging Face CLI.
+-
+-- [Demo video](https://x.com/badlogicgames/status/2041151967695634619) on how to publish So sessions
+-- Published So development sessions: [`badlogicgames/pi-mono` on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono).
+-
+ ## Development
+ 
+ Clone the repository, install its dependencies, and run So from source:
+diff --git a/packages/coding-agent/docs/quickstart.md b/packages/coding-agent/docs/quickstart.md
+index 2357bcd..18c4d27 100644
+--- a/packages/coding-agent/docs/quickstart.md
++++ b/packages/coding-agent/docs/quickstart.md
+@@ -6,28 +6,14 @@ For native Windows setup, read [Windows Setup](windows.md). For Android, read [T
+ 
+ ## 1. Install So
+ 
+-On macOS or Linux, you can use the installer:
++so agent is built from source. This requires Node.js 22.19 or newer:
+ 
+ ```bash
+-curl -fsSL https://pi.dev/install.sh | sh
++git clone <your so-agent repository> so-agent && cd so-agent
++npm ci --ignore-scripts && npm run build
++npm link --ignore-scripts ./packages/coding-agent
+ ```
+ 
+-The installer pins all dependencies and updates So with `so update`. Alternatively, install So from npm, which does not pin transitive dependencies. This requires Node.js 22.19 or newer:
+-
+-```bash
+-npm install -g --ignore-scripts @so-agent/coding-agent
+-```
+-
+-So does not require dependency lifecycle scripts for a normal npm installation.
+-
+-With Nix on macOS or Linux, install the latest release from So's flake. Nix builds So from source:
+-
+-```bash
+-nix profile add github:earendil-works/pi/stable
+-```
+-
+-Older Nix versions use `nix profile install` instead. Update with `nix profile upgrade so`; `so update` cannot update a Nix installation. To pin a release, use a tag such as `github:earendil-works/pi/v1.0.0`.
+-
+ Verify the installation:
+ 
+ ```bash
+@@ -121,12 +107,6 @@ If you installed So with npm, run:
+ npm uninstall -g @so-agent/coding-agent
+ ```
+ 
+-If you used the installer, run it again and choose **Uninstall So**:
+-
+-```bash
+-curl -fsSL https://pi.dev/install.sh | sh
+-```
+-
+ If you installed So with Nix, run:
+ 
+ ```bash
+diff --git a/packages/coding-agent/examples/extensions/gondolin/index.ts b/packages/coding-agent/examples/extensions/gondolin/index.ts
+index 8128b4d..79d4d2d 100644
+--- a/packages/coding-agent/examples/extensions/gondolin/index.ts
++++ b/packages/coding-agent/examples/extensions/gondolin/index.ts
+@@ -20,7 +20,6 @@
+  */
+ 
+ import path from "node:path";
+-import { RealFSProvider, VM } from "@so-agent/gondolin";
+ import type { ExtensionAPI, ExtensionContext } from "@so-agent/coding-agent";
+ import {
+ 	type BashOperations,
+@@ -43,6 +42,7 @@ import {
+ 	truncateLine,
+ 	type WriteOperations,
+ } from "@so-agent/coding-agent";
++import { RealFSProvider, VM } from "@so-agent/gondolin";
+ 
+ const GUEST_WORKSPACE = "/workspace";
+ const DEFAULT_GREP_LIMIT = 100;
+diff --git a/packages/coding-agent/examples/extensions/question.ts b/packages/coding-agent/examples/extensions/question.ts
+index b1439a6..11f18c6 100644
+--- a/packages/coding-agent/examples/extensions/question.ts
++++ b/packages/coding-agent/examples/extensions/question.ts
+@@ -5,15 +5,7 @@
+  */
+ 
+ import type { ExtensionAPI } from "@so-agent/coding-agent";
+-import {
+-	Editor,
+-	type EditorTheme,
+-	Key,
+-	matchesKey,
+-	Text,
+-	visibleWidth,
+-	wrapTextWithAnsi,
+-} from "@so-agent/tui";
++import { Editor, type EditorTheme, Key, matchesKey, Text, visibleWidth, wrapTextWithAnsi } from "@so-agent/tui";
+ import { Type } from "typebox";
+ 
+ interface OptionWithDesc {
+diff --git a/packages/coding-agent/examples/extensions/questionnaire.ts b/packages/coding-agent/examples/extensions/questionnaire.ts
+index d0dfd1c..8b5eb83 100644
+--- a/packages/coding-agent/examples/extensions/questionnaire.ts
++++ b/packages/coding-agent/examples/extensions/questionnaire.ts
+@@ -6,15 +6,7 @@
+  */
+ 
+ import type { ExtensionAPI } from "@so-agent/coding-agent";
+-import {
+-	Editor,
+-	type EditorTheme,
+-	Key,
+-	matchesKey,
+-	Text,
+-	visibleWidth,
+-	wrapTextWithAnsi,
+-} from "@so-agent/tui";
++import { Editor, type EditorTheme, Key, matchesKey, Text, visibleWidth, wrapTextWithAnsi } from "@so-agent/tui";
+ import { Type } from "typebox";
+ 
+ // Types
+diff --git a/packages/coding-agent/examples/sdk/03-custom-prompt.ts b/packages/coding-agent/examples/sdk/03-custom-prompt.ts
+index 7bc5c28..1679cf3 100644
+--- a/packages/coding-agent/examples/sdk/03-custom-prompt.ts
++++ b/packages/coding-agent/examples/sdk/03-custom-prompt.ts
+@@ -4,12 +4,7 @@
+  * Shows how to replace or modify the default system prompt.
+  */
+ 
+-import {
+-	createAgentSession,
+-	DefaultResourceLoader,
+-	getAgentDir,
+-	SessionManager,
+-} from "@so-agent/coding-agent";
++import { createAgentSession, DefaultResourceLoader, getAgentDir, SessionManager } from "@so-agent/coding-agent";
+ 
+ const cwd = process.cwd();
+ const agentDir = getAgentDir();
+diff --git a/packages/coding-agent/examples/sdk/06-extensions.ts b/packages/coding-agent/examples/sdk/06-extensions.ts
+index 833c48e..6045c56 100644
+--- a/packages/coding-agent/examples/sdk/06-extensions.ts
++++ b/packages/coding-agent/examples/sdk/06-extensions.ts
+@@ -13,12 +13,7 @@
+  *   export default function (so: ExtensionAPI) { ... }
+  */
+ 
+-import {
+-	createAgentSession,
+-	DefaultResourceLoader,
+-	getAgentDir,
+-	SessionManager,
+-} from "@so-agent/coding-agent";
++import { createAgentSession, DefaultResourceLoader, getAgentDir, SessionManager } from "@so-agent/coding-agent";
+ 
+ // Extensions are discovered automatically from standard locations.
+ // You can also add paths via settings.json or DefaultResourceLoader options.
+diff --git a/packages/coding-agent/examples/sdk/07-context-files.ts b/packages/coding-agent/examples/sdk/07-context-files.ts
+index 60b0551..c9966c4 100644
+--- a/packages/coding-agent/examples/sdk/07-context-files.ts
++++ b/packages/coding-agent/examples/sdk/07-context-files.ts
+@@ -4,12 +4,7 @@
+  * Context files provide project-specific instructions loaded into the system prompt.
+  */
+ 
+-import {
+-	createAgentSession,
+-	DefaultResourceLoader,
+-	getAgentDir,
+-	SessionManager,
+-} from "@so-agent/coding-agent";
++import { createAgentSession, DefaultResourceLoader, getAgentDir, SessionManager } from "@so-agent/coding-agent";
+ 
+ // Disable context files entirely by returning an empty list in agentsFilesOverride.
+ const loader = new DefaultResourceLoader({
+diff --git a/packages/coding-agent/install-lock/package-lock.json b/packages/coding-agent/install-lock/package-lock.json
+index 3d79aac..654b6e1 100644
+--- a/packages/coding-agent/install-lock/package-lock.json
++++ b/packages/coding-agent/install-lock/package-lock.json
+@@ -385,179 +385,6 @@
+ 				"node": ">=6.9.0"
+ 			}
+ 		},
+-		"node_modules/@so-agent/agent-core": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/agent-core/-/so-agent-core-1.4.0.tgz",
+-			"license": "MIT",
+-			"dependencies": {
+-				"@so-agent/ai": "1.4.0",
+-				"typebox": "1.3.27"
+-			},
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+-		"node_modules/@so-agent/ai": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/ai/-/so-ai-1.4.0.tgz",
+-			"license": "MIT",
+-			"dependencies": {
+-				"@anthropic-ai/sdk": "0.129.0",
+-				"@aws-sdk/client-bedrock-runtime": "3.1127.0",
+-				"@so-agent/telemetry": "1.4.0",
+-				"@google/genai": "2.21.0",
+-				"@smithy/node-http-handler": "4.12.1",
+-				"http-proxy-agent": "9.1.0",
+-				"https-proxy-agent": "9.1.0",
+-				"openai": "7.19.0",
+-				"partial-json": "0.1.7",
+-				"typebox": "1.3.27"
+-			},
+-			"bin": {
+-				"so-ai": "dist/cli.js"
+-			},
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+-		"node_modules/@so-agent/ai/node_modules/agent-base": {
+-			"version": "9.0.0",
+-			"resolved": "https://registry.npmjs.org/agent-base/-/agent-base-9.0.0.tgz",
+-			"integrity": "sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==",
+-			"license": "MIT",
+-			"engines": {
+-				"node": ">= 20"
+-			}
+-		},
+-		"node_modules/@so-agent/ai/node_modules/https-proxy-agent": {
+-			"version": "9.1.0",
+-			"resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-9.1.0.tgz",
+-			"integrity": "sha512-ag87y7cJJ9/3+GxFr8Oy4O5faDsGRGnBGsJj/YjOSsSx/5eadKLYTMPlzuR6obgoCDDm0abAAZitXXQkMOPSpA==",
+-			"license": "MIT",
+-			"dependencies": {
+-				"agent-base": "9.0.0",
+-				"debug": "^4.3.4",
+-				"proxy-agent-negotiate": "1.1.0"
+-			},
+-			"engines": {
+-				"node": ">= 20"
+-			}
+-		},
+-		"node_modules/@so-agent/ai/node_modules/openai": {
+-			"version": "7.19.0",
+-			"resolved": "https://registry.npmjs.org/openai/-/openai-7.19.0.tgz",
+-			"integrity": "sha512-MX2s3u2L5racTO0CC/SWpCOasJQBCJrqLKXK+l82cAhdeF8mPMBEe/gxMm0ZFa2xpKpOFLRjxv5afYEZbBXmbQ==",
+-			"license": "Apache-2.0",
+-			"peerDependencies": {
+-				"@aws-sdk/credential-provider-node": ">=3.972.0 <4",
+-				"@smithy/hash-node": ">=4.3.0 <5",
+-				"@smithy/signature-v4": ">=5.4.0 <6",
+-				"undici": ">=5 <9",
+-				"ws": "^8.21.0",
+-				"zod": "^3.25 || ^4.0"
+-			},
+-			"peerDependenciesMeta": {
+-				"@aws-sdk/credential-provider-node": {
+-					"optional": true
+-				},
+-				"@smithy/hash-node": {
+-					"optional": true
+-				},
+-				"@smithy/signature-v4": {
+-					"optional": true
+-				},
+-				"undici": {
+-					"optional": true
+-				},
+-				"ws": {
+-					"optional": true
+-				},
+-				"zod": {
+-					"optional": true
+-				}
+-			},
+-			"engines": {
+-				"node": ">=22.0.0"
+-			}
+-		},
+-		"node_modules/@so-agent/codemode": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/codemode/-/so-codemode-1.4.0.tgz",
+-			"license": "MIT",
+-			"dependencies": {
+-				"quickjs-wasi": "3.6.2"
+-			},
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+-		"node_modules/@so-agent/coding-agent": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/coding-agent/-/so-coding-agent-1.4.0.tgz",
+-			"license": "MIT",
+-			"dependencies": {
+-				"@so-agent/agent-core": "1.4.0",
+-				"@so-agent/ai": "1.4.0",
+-				"@so-agent/codemode": "1.4.0",
+-				"@so-agent/mcp": "1.4.0",
+-				"@so-agent/tui": "1.4.0",
+-				"@silvia-odwyer/photon-node": "0.3.4",
+-				"brace-expansion": "5.0.12",
+-				"chalk": "6.0.0",
+-				"cross-spawn": "7.0.6",
+-				"diff": "8.0.4",
+-				"grok-mermaid": "0.2.3",
+-				"highlight.js": "10.7.3",
+-				"hosted-git-info": "9.0.3",
+-				"ignore": "7.0.8",
+-				"jiti": "2.7.0",
+-				"minimatch": "10.2.6",
+-				"proper-lockfile": "4.1.2",
+-				"quickjs-wasi": "3.6.2",
+-				"semver": "7.8.5",
+-				"typebox": "1.3.27",
+-				"undici": "8.12.3",
+-				"yaml": "2.9.0"
+-			},
+-			"bin": {
+-				"so": "dist/bundle/cli.js"
+-			},
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+-		"node_modules/@so-agent/mcp": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/mcp/-/so-mcp-1.4.0.tgz",
+-			"license": "MIT",
+-			"dependencies": {
+-				"cross-spawn": "7.0.6"
+-			},
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+-		"node_modules/@so-agent/telemetry": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/telemetry/-/so-telemetry-1.4.0.tgz",
+-			"license": "MIT",
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+-		"node_modules/@so-agent/tui": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@so-agent/tui/-/so-tui-1.4.0.tgz",
+-			"license": "MIT",
+-			"dependencies": {
+-				"get-east-asian-width": "1.6.0",
+-				"marked": "18.0.11",
+-				"marked-cjk-friendly": "0.1.2"
+-			},
+-			"engines": {
+-				"node": ">=22.19.0"
+-			}
+-		},
+ 		"node_modules/@google/genai": {
+ 			"version": "2.21.0",
+ 			"resolved": "https://registry.npmjs.org/@google/genai/-/genai-2.21.0.tgz",
+@@ -726,6 +553,179 @@
+ 				"node": ">=18.0.0"
+ 			}
+ 		},
++		"node_modules/@so-agent/agent-core": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/agent-core/-/agent-core-1.4.0.tgz",
++			"license": "MIT",
++			"dependencies": {
++				"@so-agent/ai": "1.4.0",
++				"typebox": "1.3.27"
++			},
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
++		"node_modules/@so-agent/ai": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/ai/-/ai-1.4.0.tgz",
++			"license": "MIT",
++			"dependencies": {
++				"@anthropic-ai/sdk": "0.129.0",
++				"@aws-sdk/client-bedrock-runtime": "3.1127.0",
++				"@so-agent/telemetry": "1.4.0",
++				"@google/genai": "2.21.0",
++				"@smithy/node-http-handler": "4.12.1",
++				"http-proxy-agent": "9.1.0",
++				"https-proxy-agent": "9.1.0",
++				"openai": "7.19.0",
++				"partial-json": "0.1.7",
++				"typebox": "1.3.27"
++			},
++			"bin": {
++				"so-ai": "dist/cli.js"
++			},
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
++		"node_modules/@so-agent/ai/node_modules/agent-base": {
++			"version": "9.0.0",
++			"resolved": "https://registry.npmjs.org/agent-base/-/agent-base-9.0.0.tgz",
++			"integrity": "sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==",
++			"license": "MIT",
++			"engines": {
++				"node": ">= 20"
++			}
++		},
++		"node_modules/@so-agent/ai/node_modules/https-proxy-agent": {
++			"version": "9.1.0",
++			"resolved": "https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-9.1.0.tgz",
++			"integrity": "sha512-ag87y7cJJ9/3+GxFr8Oy4O5faDsGRGnBGsJj/YjOSsSx/5eadKLYTMPlzuR6obgoCDDm0abAAZitXXQkMOPSpA==",
++			"license": "MIT",
++			"dependencies": {
++				"agent-base": "9.0.0",
++				"debug": "^4.3.4",
++				"proxy-agent-negotiate": "1.1.0"
++			},
++			"engines": {
++				"node": ">= 20"
++			}
++		},
++		"node_modules/@so-agent/ai/node_modules/openai": {
++			"version": "7.19.0",
++			"resolved": "https://registry.npmjs.org/openai/-/openai-7.19.0.tgz",
++			"integrity": "sha512-MX2s3u2L5racTO0CC/SWpCOasJQBCJrqLKXK+l82cAhdeF8mPMBEe/gxMm0ZFa2xpKpOFLRjxv5afYEZbBXmbQ==",
++			"license": "Apache-2.0",
++			"peerDependencies": {
++				"@aws-sdk/credential-provider-node": ">=3.972.0 <4",
++				"@smithy/hash-node": ">=4.3.0 <5",
++				"@smithy/signature-v4": ">=5.4.0 <6",
++				"undici": ">=5 <9",
++				"ws": "^8.21.0",
++				"zod": "^3.25 || ^4.0"
++			},
++			"peerDependenciesMeta": {
++				"@aws-sdk/credential-provider-node": {
++					"optional": true
++				},
++				"@smithy/hash-node": {
++					"optional": true
++				},
++				"@smithy/signature-v4": {
++					"optional": true
++				},
++				"undici": {
++					"optional": true
++				},
++				"ws": {
++					"optional": true
++				},
++				"zod": {
++					"optional": true
++				}
++			},
++			"engines": {
++				"node": ">=22.0.0"
++			}
++		},
++		"node_modules/@so-agent/codemode": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/codemode/-/codemode-1.4.0.tgz",
++			"license": "MIT",
++			"dependencies": {
++				"quickjs-wasi": "3.6.2"
++			},
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
++		"node_modules/@so-agent/coding-agent": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/coding-agent/-/coding-agent-1.4.0.tgz",
++			"license": "MIT",
++			"dependencies": {
++				"@so-agent/agent-core": "1.4.0",
++				"@so-agent/ai": "1.4.0",
++				"@so-agent/codemode": "1.4.0",
++				"@so-agent/mcp": "1.4.0",
++				"@so-agent/tui": "1.4.0",
++				"@silvia-odwyer/photon-node": "0.3.4",
++				"brace-expansion": "5.0.12",
++				"chalk": "6.0.0",
++				"cross-spawn": "7.0.6",
++				"diff": "8.0.4",
++				"grok-mermaid": "0.2.3",
++				"highlight.js": "10.7.3",
++				"hosted-git-info": "9.0.3",
++				"ignore": "7.0.8",
++				"jiti": "2.7.0",
++				"minimatch": "10.2.6",
++				"proper-lockfile": "4.1.2",
++				"quickjs-wasi": "3.6.2",
++				"semver": "7.8.5",
++				"typebox": "1.3.27",
++				"undici": "8.12.3",
++				"yaml": "2.9.0"
++			},
++			"bin": {
++				"so": "dist/bundle/cli.js"
++			},
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
++		"node_modules/@so-agent/mcp": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/mcp/-/mcp-1.4.0.tgz",
++			"license": "MIT",
++			"dependencies": {
++				"cross-spawn": "7.0.6"
++			},
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
++		"node_modules/@so-agent/telemetry": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/telemetry/-/telemetry-1.4.0.tgz",
++			"license": "MIT",
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
++		"node_modules/@so-agent/tui": {
++			"version": "1.4.0",
++			"resolved": "https://registry.npmjs.org/@so-agent/tui/-/tui-1.4.0.tgz",
++			"license": "MIT",
++			"dependencies": {
++				"get-east-asian-width": "1.6.0",
++				"marked": "18.0.11",
++				"marked-cjk-friendly": "0.1.2"
++			},
++			"engines": {
++				"node": ">=22.19.0"
++			}
++		},
+ 		"node_modules/@stablelib/base64": {
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/@stablelib/base64/-/base64-1.0.1.tgz",
+diff --git a/packages/coding-agent/package.json b/packages/coding-agent/package.json
+index 2e4c0d9..2f18890 100644
+--- a/packages/coding-agent/package.json
++++ b/packages/coding-agent/package.json
+@@ -89,7 +89,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/coding-agent"
+ 	},
+ 	"engines": {
+diff --git a/packages/coding-agent/src/cli/startup-ui.ts b/packages/coding-agent/src/cli/startup-ui.ts
+index 569b04b..70208a5 100644
+--- a/packages/coding-agent/src/cli/startup-ui.ts
++++ b/packages/coding-agent/src/cli/startup-ui.ts
+@@ -1,10 +1,4 @@
+-import {
+-	ProcessTerminal,
+-	setCapabilityOverrides,
+-	setKeybindings,
+-	type TUI,
+-	TuiMainScreen,
+-} from "@so-agent/tui";
++import { ProcessTerminal, setCapabilityOverrides, setKeybindings, type TUI, TuiMainScreen } from "@so-agent/tui";
+ import { existsSync } from "fs";
+ import { APP_NAME, CONFIG_DIR_NAME, ENV_AGENT_DIR, getAgentDir, getSettingsPath, PACKAGE_NAME } from "../config.ts";
+ import { areExperimentalFeaturesEnabled } from "../core/experimental.ts";
+diff --git a/packages/coding-agent/src/config.ts b/packages/coding-agent/src/config.ts
+index 87b2a97..1ec1d03 100644
+--- a/packages/coding-agent/src/config.ts
++++ b/packages/coding-agent/src/config.ts
+@@ -577,7 +577,7 @@ try {
+ const soConfigName: string | undefined = pkg.soConfig?.name;
+ export const PACKAGE_NAME: string = pkg.name || "@so-agent/coding-agent";
+ export const APP_NAME: string = soConfigName || "so";
+-export const APP_TITLE: string = soConfigName ? APP_NAME : "π";
++export const APP_TITLE: string = soConfigName ? APP_NAME : "so";
+ export const CONFIG_DIR_NAME: string = pkg.soConfig?.configDir || ".so";
+ export const VERSION: string = pkg.version || "0.0.0";
+ 
+diff --git a/packages/coding-agent/src/core/extensions/loader.ts b/packages/coding-agent/src/core/extensions/loader.ts
+index 02dce8d..7c88d6d 100644
+--- a/packages/coding-agent/src/core/extensions/loader.ts
++++ b/packages/coding-agent/src/core/extensions/loader.ts
+@@ -94,10 +94,7 @@ function getAliases(): Record<string, string> {
+ 	const soAiCompatEntry = resolveWorkspaceOrImport("ai/dist/compat.js", "@so-agent/ai/compat");
+ 	const soAiModelsEntry = resolveWorkspaceOrImport("ai/dist/models.js", "@so-agent/ai/models");
+ 	const soAiOauthEntry = resolveWorkspaceOrImport("ai/dist/oauth.js", "@so-agent/ai/oauth");
+-	const soAiProvidersEntry = resolveWorkspaceOrImport(
+-		"ai/dist/providers/all.js",
+-		"@so-agent/ai/providers/all",
+-	);
++	const soAiProvidersEntry = resolveWorkspaceOrImport("ai/dist/providers/all.js", "@so-agent/ai/providers/all");
+ 
+ 	_aliases = {
+ 		"@so-agent/coding-agent": soCodingAgentEntry,
+diff --git a/packages/coding-agent/src/core/model-resolver.ts b/packages/coding-agent/src/core/model-resolver.ts
+index 583ed39..cd00d5e 100644
+--- a/packages/coding-agent/src/core/model-resolver.ts
++++ b/packages/coding-agent/src/core/model-resolver.ts
+@@ -3,13 +3,7 @@
+  */
+ 
+ import type { ThinkingLevel } from "@so-agent/agent-core";
+-import {
+-	type Api,
+-	type AuthOperationOptions,
+-	type KnownProvider,
+-	type Model,
+-	modelsAreEqual,
+-} from "@so-agent/ai";
++import { type Api, type AuthOperationOptions, type KnownProvider, type Model, modelsAreEqual } from "@so-agent/ai";
+ import chalk from "chalk";
+ import { minimatch } from "minimatch";
+ import { isValidThinkingLevel } from "../cli/args.ts";
+diff --git a/packages/coding-agent/src/core/package-manager.ts b/packages/coding-agent/src/core/package-manager.ts
+index 50288f9..6625147 100644
+--- a/packages/coding-agent/src/core/package-manager.ts
++++ b/packages/coding-agent/src/core/package-manager.ts
+@@ -50,8 +50,8 @@ import {
+ } from "../utils/paths.ts";
+ import { stripBom } from "../utils/text.ts";
+ import { isStdoutTakenOver } from "./output-guard.ts";
+-import { type SoManifest, readSoManifest } from "./so-manifest.ts";
+ import type { PackageSource, SettingsManager } from "./settings-manager.ts";
++import { readSoManifest, type SoManifest } from "./so-manifest.ts";
+ import { BUILTIN_PATH_PREFIX } from "./source-info.ts";
+ 
+ const NETWORK_TIMEOUT_MS = 10000;
+diff --git a/packages/coding-agent/src/core/remote-catalog-provider.ts b/packages/coding-agent/src/core/remote-catalog-provider.ts
+index ff92610..04fef6b 100644
+--- a/packages/coding-agent/src/core/remote-catalog-provider.ts
++++ b/packages/coding-agent/src/core/remote-catalog-provider.ts
+@@ -11,7 +11,11 @@ import { VERSION } from "../config.ts";
+ import { fetchWithRetry } from "../utils/management-http.ts";
+ import { getSoUserAgent } from "../utils/so-user-agent.ts";
+ 
+-const DEFAULT_CATALOG_BASE_URL = "https://pi.dev";
++/**
++ * so does not talk to the upstream model catalog service by default. Set `SO_CATALOG_URL` (for example to
++ * the upstream catalog host listed in docs/UPSTREAM-ENDPOINTS.md) to opt in to the remote overlay.
++ */
++const DEFAULT_CATALOG_BASE_URL: string | undefined = process.env.SO_CATALOG_URL?.trim() || undefined;
+ const REMOTE_CATALOG_ATTEMPT_TIMEOUT_MS = 4_000;
+ export const REMOTE_CATALOG_REFRESH_INTERVAL_MS = 4 * 60 * 60 * 1000;
+ /**
+@@ -103,9 +107,10 @@ export type PersonalizeCatalog = (
+ /** Add a persisted pi.dev catalog overlay to a static built-in provider. */
+ export function withRemoteCatalog(
+ 	provider: Provider,
+-	catalogBaseUrl: string = DEFAULT_CATALOG_BASE_URL,
++	catalogBaseUrl: string | undefined = DEFAULT_CATALOG_BASE_URL,
+ 	localGeneratedAt?: number,
+ ): Provider {
++	if (!catalogBaseUrl) return provider;
+ 	let dynamicModels: readonly AnyModel[] = [];
+ 
+ 	return {
+@@ -195,7 +200,7 @@ export function withRemoteCatalog(
+ export function withPersonalizedCatalog(
+ 	provider: Provider,
+ 	personalize: PersonalizeCatalog,
+-	catalogBaseUrl: string = DEFAULT_CATALOG_BASE_URL,
++	catalogBaseUrl: string | undefined = DEFAULT_CATALOG_BASE_URL,
+ 	localGeneratedAt?: number,
+ ): Provider {
+ 	let personalModels: readonly AnyModel[] = [];
+@@ -219,10 +224,12 @@ export function withPersonalizedCatalog(
+ 			}
+ 			if (!context.allowNetwork || context.signal.aborted) return;
+ 
+-			const response = await requestCatalog(provider.id, catalogBaseUrl, context.signal);
++			const response = catalogBaseUrl
++				? await requestCatalog(provider.id, catalogBaseUrl, context.signal)
++				: undefined;
+ 			if (context.signal.aborted) return;
+ 			let remote: readonly AnyModel[] = [];
+-			if (response.status !== 404 && response.status !== 501) {
++			if (response && response.status !== 404 && response.status !== 501) {
+ 				if (!response.ok) throw new Error(`Model catalog request failed for ${provider.id}: ${response.status}`);
+ 				const catalog = await readCatalog(provider.id, response);
+ 				if (isNewer(catalog.lastModified, localGeneratedAt)) remote = catalog.models;
+diff --git a/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts b/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
+index 271e16b..bdb571b 100644
+--- a/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
++++ b/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
+@@ -131,13 +131,12 @@ function createModel(
+ 
+ const CORAL: Rgb = [228, 138, 122];
+ const BLUE: Rgb = [79, 142, 179];
+-const YELLOW: Rgb = [234, 182, 93];
+-const SO_LOGO_PIXELS = ["ccc.", "b.c.", "bb.y", "b..y"];
+-const SO_LOGO_COLORS: Record<string, Rgb> = { c: CORAL, b: BLUE, y: YELLOW };
++const SO_LOGO_PIXELS = ["ccc.bbb", "c...b.b", "ccc.b.b", "..c.b.b", "ccc.bbb"];
++const SO_LOGO_COLORS: Record<string, Rgb> = { c: CORAL, b: BLUE };
+ 
+ function soLogoModel(origin: { column: number; row: number }): Model {
+-	return createModel(4, 4, (column, row) => SO_LOGO_COLORS[SO_LOGO_PIXELS[row]![column]!], {
+-		cameraDistance: 10,
++	return createModel(7, 5, (column, row) => SO_LOGO_COLORS[SO_LOGO_PIXELS[row]![column]!], {
++		cameraDistance: 14,
+ 		widthShare: 0.35,
+ 		puzzleMoves: (random) => (random < 0.4 ? 2 : 1),
+ 		origin,
+diff --git a/packages/coding-agent/src/modes/interactive/components/model-selector.ts b/packages/coding-agent/src/modes/interactive/components/model-selector.ts
+index aa6ee19..1e5f5b2 100644
+--- a/packages/coding-agent/src/modes/interactive/components/model-selector.ts
++++ b/packages/coding-agent/src/modes/interactive/components/model-selector.ts
+@@ -1,14 +1,5 @@
+ import { type Model, modelsAreEqual } from "@so-agent/ai";
+-import {
+-	Container,
+-	type Focusable,
+-	fuzzyFilter,
+-	getKeybindings,
+-	Input,
+-	Spacer,
+-	Text,
+-	type TUI,
+-} from "@so-agent/tui";
++import { Container, type Focusable, fuzzyFilter, getKeybindings, Input, Spacer, Text, type TUI } from "@so-agent/tui";
+ import type { ModelRuntime } from "../../../core/model-runtime.ts";
+ import { refreshModelCatalogs } from "../model-catalog-refresh.ts";
+ import { getDistinctModelName, getModelSelectorSearchText } from "../model-search.ts";
+diff --git a/packages/coding-agent/src/modes/interactive/components/oauth-selector.ts b/packages/coding-agent/src/modes/interactive/components/oauth-selector.ts
+index 5d58feb..f404118 100644
+--- a/packages/coding-agent/src/modes/interactive/components/oauth-selector.ts
++++ b/packages/coding-agent/src/modes/interactive/components/oauth-selector.ts
+@@ -1,13 +1,5 @@
+ import type { ApiKeyAuth, AuthCheck, OAuthAuth } from "@so-agent/ai";
+-import {
+-	Container,
+-	type Focusable,
+-	fuzzyFilter,
+-	getKeybindings,
+-	Input,
+-	Spacer,
+-	TruncatedText,
+-} from "@so-agent/tui";
++import { Container, type Focusable, fuzzyFilter, getKeybindings, Input, Spacer, TruncatedText } from "@so-agent/tui";
+ import { theme } from "../theme/theme.ts";
+ import { DynamicBorder } from "./dynamic-border.ts";
+ 
+diff --git a/packages/coding-agent/src/modes/interactive/interactive-mode.ts b/packages/coding-agent/src/modes/interactive/interactive-mode.ts
+index 5a6da58..91642a7 100644
+--- a/packages/coding-agent/src/modes/interactive/interactive-mode.ts
++++ b/packages/coding-agent/src/modes/interactive/interactive-mode.ts
+@@ -116,7 +116,6 @@ import {
+ import type { FullscreenExitOutput, TuiMode } from "../../core/settings-manager.ts";
+ import { BUILTIN_SLASH_COMMANDS } from "../../core/slash-commands.ts";
+ import type { SourceInfo } from "../../core/source-info.ts";
+-import { isInstallTelemetryEnabled } from "../../core/telemetry.ts";
+ import { withBuiltInRenderers } from "../../core/tools/renderers/index.ts";
+ import type { TruncationResult } from "../../core/tools/truncate.ts";
+ import { hasTrustRequiringProjectResources, ProjectTrustStore } from "../../core/trust-manager.ts";
+@@ -128,7 +127,6 @@ import { extensionForImageMimeType, readClipboardImage } from "../../utils/clipb
+ import { parseGitUrl } from "../../utils/git.ts";
+ import { ensurePngTranscoder } from "../../utils/image-convert.ts";
+ import { getCwdRelativePath } from "../../utils/paths.ts";
+-import { getSoUserAgent } from "../../utils/so-user-agent.ts";
+ import { killTrackedDetachedChildren } from "../../utils/shell.ts";
+ import { loadAllHighlightLanguages } from "../../utils/syntax-highlight.ts";
+ import { ensureTool, type ToolStatus } from "../../utils/tools-manager.ts";
+@@ -144,7 +142,6 @@ import { CustomEditor } from "./components/custom-editor.ts";
+ import { CustomEntryComponent } from "./components/custom-entry.ts";
+ import { CustomMessageComponent } from "./components/custom-message.ts";
+ import { DynamicBorder } from "./components/dynamic-border.ts";
+-import { EarendilAnnouncementComponent } from "./components/earendil-announcement.ts";
+ import { playArmin3d, playSoLogo3d } from "./components/easter-egg-3d.lazy.ts";
+ import { ExtensionEditorComponent } from "./components/extension-editor.ts";
+ import { ExtensionInputComponent } from "./components/extension-input.ts";
+@@ -160,12 +157,12 @@ import {
+ 	formatAuthSelectorProviderType,
+ 	OAuthSelectorComponent,
+ } from "./components/oauth-selector.ts";
+-import { soLogoLines, soWordmark, supportsSoLogo } from "./components/so-logo.ts";
+ import { createLoginMenuSelector } from "./components/radius-login-selector.ts";
+ import { ScopedModelsSelectorComponent } from "./components/scoped-models-selector.ts";
+ import { SessionSelectorComponent } from "./components/session-selector.ts";
+ import { SettingsSelectorComponent } from "./components/settings-selector.ts";
+ import { SkillInvocationMessageComponent } from "./components/skill-invocation-message.ts";
++import { soLogoLines, soWordmark, supportsSoLogo } from "./components/so-logo.ts";
+ import {
+ 	BranchSummaryStatusIndicator,
+ 	CompactionStatusIndicator,
+@@ -1342,41 +1339,20 @@ export class InteractiveMode {
+ 		const entries = parseChangelog(changelogPath);
+ 
+ 		if (!lastVersion) {
+-			// Fresh install - record the version, send telemetry, don't show changelog
++			// Fresh install - record the version, don't show changelog
+ 			this.settingsManager.setLastChangelogVersion(VERSION);
+-			this.reportInstallTelemetry(VERSION);
+ 			return undefined;
+ 		}
+ 
+ 		const newEntries = getNewEntries(entries, lastVersion);
+ 		if (newEntries.length > 0) {
+ 			this.settingsManager.setLastChangelogVersion(VERSION);
+-			this.reportInstallTelemetry(VERSION);
+ 			return newEntries.map((e) => normalizeChangelogLinks(e.content, e)).join("\n\n");
+ 		}
+ 
+ 		return undefined;
+ 	}
+ 
+-	private reportInstallTelemetry(version: string): void {
+-		if (process.env.SO_OFFLINE) {
+-			return;
+-		}
+-
+-		if (!isInstallTelemetryEnabled(this.settingsManager)) {
+-			return;
+-		}
+-
+-		void fetch(`https://pi.dev/api/report-install?version=${encodeURIComponent(version)}`, {
+-			headers: {
+-				"User-Agent": getSoUserAgent(version),
+-			},
+-			signal: AbortSignal.timeout(5000),
+-		})
+-			.then(() => undefined)
+-			.catch(() => undefined);
+-	}
+-
+ 	private getMarkdownThemeWithSettings(): MarkdownTheme {
+ 		return {
+ 			...getMarkdownTheme(),
+@@ -3284,11 +3260,6 @@ export class InteractiveMode {
+ 				this.editor.setText("");
+ 				return;
+ 			}
+-			if (text === "/dementedelves") {
+-				this.handleDementedDelves();
+-				this.editor.setText("");
+-				return;
+-			}
+ 			if (text === "/resume") {
+ 				this.showSessionSelector();
+ 				this.editor.setText("");
+@@ -6974,12 +6945,6 @@ export class InteractiveMode {
+ 		this.ui.requestRender();
+ 	}
+ 
+-	private handleDementedDelves(): void {
+-		this.chatContainer.addChild(new Spacer(1));
+-		this.chatContainer.addChild(new EarendilAnnouncementComponent());
+-		this.ui.requestRender();
+-	}
+-
+ 	private async handleBashCommand(command: string, excludeFromContext = false): Promise<void> {
+ 		const extensionRunner = this.session.extensionRunner;
+ 
+diff --git a/packages/coding-agent/src/package-manager-cli.ts b/packages/coding-agent/src/package-manager-cli.ts
+index 8132772..37bfb6f 100644
+--- a/packages/coding-agent/src/package-manager-cli.ts
++++ b/packages/coding-agent/src/package-manager-cli.ts
+@@ -693,7 +693,7 @@ async function getSelfUpdatePlan(force: boolean): Promise<SelfUpdatePlan> {
+ 		});
+ 	}
+ 	if (!latestRelease) {
+-		throw new Error(`Could not determine latest ${APP_NAME} version.`);
++		throw new Error(`Could not determine latest ${APP_NAME} version. Set SO_UPDATE_URL to a release feed.`);
+ 	}
+ 
+ 	const packageName = latestRelease.packageName ?? PACKAGE_NAME;
+@@ -1125,19 +1125,6 @@ export async function handlePackageCommand(
+ 						return true;
+ 					}
+ 					console.log(chalk.green(`Updated ${APP_NAME} from ${VERSION} to ${selfUpdatePlan.version}`));
+-					// The pi.dev installer migrates global npm installs to a managed install
+-					// that pins all dependencies. It does not migrate pnpm, yarn, or bun installs.
+-					if (installMethod === "npm") {
+-						const installerCommand =
+-							process.platform === "win32"
+-								? 'powershell -c "irm https://pi.dev/install.ps1 | iex"'
+-								: "curl -fsSL https://pi.dev/install.sh | sh";
+-						console.log();
+-						console.log(chalk.yellow(`This npm installation of ${APP_NAME} does not pin its dependencies.`));
+-						console.log(chalk.yellow("Run the installer to migrate to a managed installation that does:"));
+-						console.log();
+-						console.log(`  ${chalk.bold(installerCommand)}`);
+-					}
+ 				}
+ 				return true;
+ 			}
+diff --git a/packages/coding-agent/src/utils/version-check.ts b/packages/coding-agent/src/utils/version-check.ts
+index 792b723..3787ab6 100644
+--- a/packages/coding-agent/src/utils/version-check.ts
++++ b/packages/coding-agent/src/utils/version-check.ts
+@@ -2,7 +2,8 @@ import { compare, valid } from "semver";
+ import { fetchWithRetry } from "./management-http.ts";
+ import { getSoUserAgent } from "./so-user-agent.ts";
+ 
+-const LATEST_VERSION_URL = "https://pi.dev/api/latest-version";
++/** so has no hosted release feed. Set `SO_UPDATE_URL` to a JSON endpoint returning `{ version, packageName?, note? }`. */
++const getLatestVersionUrl = (): string | undefined => process.env.SO_UPDATE_URL?.trim() || undefined;
+ const DEFAULT_VERSION_CHECK_TIMEOUT_MS = 10000;
+ 
+ export interface LatestSoRelease {
+@@ -52,10 +53,11 @@ export async function getLatestSoRelease(
+ 	currentVersion: string,
+ 	options: { timeoutMs?: number; retry?: boolean } = {},
+ ): Promise<LatestSoRelease | undefined> {
+-	if (process.env.SO_OFFLINE) return undefined;
++	const latestVersionUrl = getLatestVersionUrl();
++	if (process.env.SO_OFFLINE || !latestVersionUrl) return undefined;
+ 
+ 	const response = await fetchWithRetry(
+-		LATEST_VERSION_URL,
++		latestVersionUrl,
+ 		{
+ 			headers: {
+ 				"User-Agent": getSoUserAgent(currentVersion),
+diff --git a/packages/coding-agent/test/agent-session-stats.test.ts b/packages/coding-agent/test/agent-session-stats.test.ts
+index a8248fb..c85511b 100644
+--- a/packages/coding-agent/test/agent-session-stats.test.ts
++++ b/packages/coding-agent/test/agent-session-stats.test.ts
+@@ -1,11 +1,5 @@
+ import { Agent } from "@so-agent/agent-core";
+-import {
+-	type AssistantMessage,
+-	getModel,
+-	streamSimple,
+-	type ToolResultMessage,
+-	type Usage,
+-} from "@so-agent/ai/compat";
++import { type AssistantMessage, getModel, streamSimple, type ToolResultMessage, type Usage } from "@so-agent/ai/compat";
+ import { describe, expect, it } from "vitest";
+ import { AgentSession } from "../src/core/agent-session.ts";
+ import { AuthStorage } from "../src/core/auth-storage.ts";
+diff --git a/packages/coding-agent/test/config.test.ts b/packages/coding-agent/test/config.test.ts
+index fbb6e70..c788106 100644
+--- a/packages/coding-agent/test/config.test.ts
++++ b/packages/coding-agent/test/config.test.ts
+@@ -80,7 +80,8 @@ function createPnpmGlobalInstall(): { root: string; packageDir: string } {
+ 			".pnpm",
+ 			"@so-agent+coding-agent@0.0.0",
+ 			"node_modules",
+-			"@so-agent", "coding-agent",
++			"@so-agent",
++			"coding-agent",
+ 			"dist",
+ 			"cli.js",
+ 		),
+@@ -358,11 +359,13 @@ describe("detectInstallMethod", () => {
+ 			"store",
+ 			"v11",
+ 			"links",
+-			"@so-agent", "coding-agent",
++			"@so-agent",
++			"coding-agent",
+ 			"0.75.0",
+ 			"hash",
+ 			"node_modules",
+-			"@so-agent", "coding-agent",
++			"@so-agent",
++			"coding-agent",
+ 		);
+ 		mkdirSync(globalPackageDir, { recursive: true });
+ 		mkdirSync(storePackageDir, { recursive: true });
+diff --git a/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts b/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts
+index a512e01..af7a310 100644
+--- a/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts
++++ b/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts
+@@ -2,12 +2,7 @@ import { existsSync, mkdirSync, rmSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import { Agent } from "@so-agent/agent-core";
+-import {
+-	type AssistantMessage,
+-	createAssistantMessageEventStream,
+-	getModel,
+-	type Model,
+-} from "@so-agent/ai/compat";
++import { type AssistantMessage, createAssistantMessageEventStream, getModel, type Model } from "@so-agent/ai/compat";
+ import { afterEach, describe, expect, it, vi } from "vitest";
+ import { AgentSession } from "../src/core/agent-session.ts";
+ import type { AgentSessionRuntime } from "../src/core/agent-session-runtime.ts";
+diff --git a/packages/coding-agent/test/sdk-client-identity.test.ts b/packages/coding-agent/test/sdk-client-identity.test.ts
+index eb29823..4b533e1 100644
+--- a/packages/coding-agent/test/sdk-client-identity.test.ts
++++ b/packages/coding-agent/test/sdk-client-identity.test.ts
+@@ -8,8 +8,8 @@ import {
+ 	getAttributionHeaders,
+ 	type Model,
+ 	normalizeContext,
+-	SO_ATTRIBUTION,
+ 	type SimpleStreamOptions,
++	SO_ATTRIBUTION,
+ } from "@so-agent/ai";
+ import { afterEach, beforeEach, describe, expect, it } from "vitest";
+ import { VERSION } from "../src/config.ts";
+diff --git a/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts b/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts
+index 1bf3af8..9235390 100644
+--- a/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts
++++ b/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts
+@@ -1,10 +1,5 @@
+ import type { AgentMessage } from "@so-agent/agent-core";
+-import {
+-	fauxAssistantMessage,
+-	getCurrentSystemPrompt,
+-	getCurrentTools,
+-	type TranscriptContext,
+-} from "@so-agent/ai";
++import { fauxAssistantMessage, getCurrentSystemPrompt, getCurrentTools, type TranscriptContext } from "@so-agent/ai";
+ import { afterEach, describe, expect, it } from "vitest";
+ import type { ExtensionFactory } from "../../../src/index.ts";
+ import { createHarness, type Harness } from "../harness.ts";
+diff --git a/packages/durable/package.json b/packages/durable/package.json
+index 5d70e33..786be75 100644
+--- a/packages/durable/package.json
++++ b/packages/durable/package.json
+@@ -143,7 +143,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/durable"
+ 	},
+ 	"engines": {
+diff --git a/packages/durable/src/codemode/codemode.ts b/packages/durable/src/codemode/codemode.ts
+index 44481a7..09f5aad 100644
+--- a/packages/durable/src/codemode/codemode.ts
++++ b/packages/durable/src/codemode/codemode.ts
+@@ -34,9 +34,10 @@
+  * or when the script diverges: it makes another call, or calls in another order, than the journal says. Each ends the
+  * call with an error result.
+  */
++
++import type { TextContent } from "@so-agent/ai";
+ import { type Context, copyJson, type JsonValue } from "@so-agent/chord";
+ import { ownedSlice } from "@so-agent/chord/delta";
+-import type { TextContent } from "@so-agent/ai";
+ import {
+ 	type CodemodeHostCall,
+ 	type CodemodeOutcome,
+diff --git a/packages/durable/src/codemode/models.ts b/packages/durable/src/codemode/models.ts
+index 02cc1e6..79e9db2 100644
+--- a/packages/durable/src/codemode/models.ts
++++ b/packages/durable/src/codemode/models.ts
+@@ -7,16 +7,9 @@
+  * tool listings): a nested durable call with its own task, live row, abort, usage accounting, and replay policy. The
+  * code mode tool turns a script's call of the global into a call of that tool.
+  */
++
++import type { AnyModel, ClassifierContext, ImagesContext, Models, ModelType, ModelTypeMap, Usage } from "@so-agent/ai";
+ import type { Context, JsonValue } from "@so-agent/chord";
+-import type {
+-	AnyModel,
+-	ClassifierContext,
+-	ImagesContext,
+-	Models,
+-	ModelType,
+-	ModelTypeMap,
+-	Usage,
+-} from "@so-agent/ai";
+ import { Type } from "typebox";
+ import { defineTool } from "../harness/define.ts";
+ import type { ToolRegistration } from "../harness/types.ts";
+diff --git a/packages/durable/src/harness/compaction.ts b/packages/durable/src/harness/compaction.ts
+index 19e36a6..363689f 100644
+--- a/packages/durable/src/harness/compaction.ts
++++ b/packages/durable/src/harness/compaction.ts
+@@ -1,7 +1,7 @@
+-import type { Context, Draft } from "@so-agent/chord";
+ import type { AssistantMessage, Message, ModelThinkingLevel, SimpleStreamOptions } from "@so-agent/ai";
+ import { calculateContextTokens, estimateMessageTokens } from "@so-agent/ai/utils/estimate";
+ import { isRetryableAssistantError, retryDelayMs } from "@so-agent/ai/utils/retry";
++import type { Context, Draft } from "@so-agent/chord";
+ import { CompactionEntry } from "../entries.ts";
+ import { defineTask } from "../tasks.ts";
+ import type {
+diff --git a/packages/durable/src/harness/context.ts b/packages/durable/src/harness/context.ts
+index be2f873..92b6fe1 100644
+--- a/packages/durable/src/harness/context.ts
++++ b/packages/durable/src/harness/context.ts
+@@ -1,5 +1,5 @@
+-import type { Context } from "@so-agent/chord";
+ import type { AssistantMessage, Message, ToolCall, ToolResultMessage } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import { SystemEntry } from "../entries.ts";
+ import { idFromNumber } from "../ids.ts";
+ import type { SessionImpl } from "../session/session.ts";
+diff --git a/packages/durable/src/harness/define.ts b/packages/durable/src/harness/define.ts
+index 2fafd6f..d4f4486 100644
+--- a/packages/durable/src/harness/define.ts
++++ b/packages/durable/src/harness/define.ts
+@@ -1,5 +1,5 @@
+-import type { JsonValue } from "@so-agent/chord";
+ import type { TSchema } from "@so-agent/ai";
++import type { JsonValue } from "@so-agent/chord";
+ import type { AnyTask, Extension, HookRegistration, HooksOf, PromptSection, ToolRegistration, Wrap } from "./types.ts";
+ 
+ /** Identity function that types an extension. */
+diff --git a/packages/durable/src/harness/events.ts b/packages/durable/src/harness/events.ts
+index 36c7351..a436f61 100644
+--- a/packages/durable/src/harness/events.ts
++++ b/packages/durable/src/harness/events.ts
+@@ -1,12 +1,6 @@
+-import {
+-	type Context,
+-	type JsonValue,
+-	NativeWatch,
+-	type NativeWatchChange,
+-	type WatchEnd,
+-} from "@so-agent/chord";
+-import type { Op, Path } from "@so-agent/chord/delta";
+ import type { AssistantMessage, Message, Usage } from "@so-agent/ai";
++import { type Context, type JsonValue, NativeWatch, type NativeWatchChange, type WatchEnd } from "@so-agent/chord";
++import type { Op, Path } from "@so-agent/chord/delta";
+ import type { ObservedCommit } from "../session/session.ts";
+ import type {
+ 	CommitChange,
+diff --git a/packages/durable/src/harness/generation.ts b/packages/durable/src/harness/generation.ts
+index 7d168ce..6171516 100644
+--- a/packages/durable/src/harness/generation.ts
++++ b/packages/durable/src/harness/generation.ts
+@@ -1,4 +1,3 @@
+-import { type Context, copyJson, type Draft } from "@so-agent/chord";
+ import type {
+ 	Api,
+ 	AssistantMessage,
+@@ -12,6 +11,7 @@ import type {
+ import { isContextOverflow } from "@so-agent/ai/utils/overflow";
+ import { isRetryableAssistantError, retryDelayMs } from "@so-agent/ai/utils/retry";
+ import { getCurrentTools } from "@so-agent/ai/utils/transcript";
++import { type Context, copyJson, type Draft } from "@so-agent/chord";
+ import { AssistantEntry, ResetEntry, SystemEntry, UserEntry } from "../entries.ts";
+ import type { ExecutionEnv } from "../env/index.ts";
+ import type { TaskCreationOptions } from "../session/transaction.ts";
+diff --git a/packages/durable/src/harness/harness.ts b/packages/durable/src/harness/harness.ts
+index 2d1d434..5e6dc5c 100644
+--- a/packages/durable/src/harness/harness.ts
++++ b/packages/durable/src/harness/harness.ts
+@@ -1,5 +1,3 @@
+-import type { Context, JsonValue } from "@so-agent/chord";
+-import { withAbortSignal, withoutAbortSignal } from "@so-agent/chord/context";
+ import type { Models } from "@so-agent/ai";
+ import {
+ 	type ClientIdentity,
+@@ -7,6 +5,8 @@ import {
+ 	SO_ATTRIBUTION,
+ 	withClientIdentity,
+ } from "@so-agent/ai/utils/identity";
++import type { Context, JsonValue } from "@so-agent/chord";
++import { withAbortSignal, withoutAbortSignal } from "@so-agent/chord/context";
+ import {
+ 	createTypedMetrics,
+ 	NOOP_TELEMETRY_CONTEXT,
+diff --git a/packages/durable/src/harness/live.ts b/packages/durable/src/harness/live.ts
+index 75e0f6f..be23a60 100644
+--- a/packages/durable/src/harness/live.ts
++++ b/packages/durable/src/harness/live.ts
+@@ -1,5 +1,5 @@
+-import type { Draft, JsonRepresentation, JsonValue } from "@so-agent/chord";
+ import type { AssistantMessage, Usage } from "@so-agent/ai";
++import type { Draft, JsonRepresentation, JsonValue } from "@so-agent/chord";
+ import { defineDoc } from "../documents.ts";
+ import type { Transaction } from "../session/transaction.ts";
+ import type {
+diff --git a/packages/durable/src/harness/partial-changes.ts b/packages/durable/src/harness/partial-changes.ts
+index 2a74808..a10f35f 100644
+--- a/packages/durable/src/harness/partial-changes.ts
++++ b/packages/durable/src/harness/partial-changes.ts
+@@ -1,8 +1,9 @@
+ // What a streamed answer changed in its partial message between two partial commits, so a commit costs the new text.
+-import type { JsonRepresentation, JsonValue } from "@so-agent/chord";
+-import { appendText, type Draft } from "@so-agent/chord/delta";
++
+ import type { AssistantMessage, AssistantMessageEvent, ToolCall } from "@so-agent/ai";
+ import { type JsonChange, StreamingJsonParser } from "@so-agent/ai/utils/streaming-json";
++import type { JsonRepresentation, JsonValue } from "@so-agent/chord";
++import { appendText, type Draft } from "@so-agent/chord/delta";
+ import { type AssignPlan, assignJson } from "./json.ts";
+ import type { LiveState } from "./live.ts";
+ 
+diff --git a/packages/durable/src/harness/prompt.ts b/packages/durable/src/harness/prompt.ts
+index 3c67783..f31c957 100644
+--- a/packages/durable/src/harness/prompt.ts
++++ b/packages/durable/src/harness/prompt.ts
+@@ -1,6 +1,6 @@
+-import type { Context } from "@so-agent/chord";
+ import type { Message, SystemMessage, Tool, ToolReference } from "@so-agent/ai";
+ import { declarationsEqual, getCurrentTools, toToolDeclaration } from "@so-agent/ai/utils/transcript";
++import type { Context } from "@so-agent/chord";
+ import { SystemEntry } from "../entries.ts";
+ import type { ContextEdit, TypedEntryDraft } from "../types.ts";
+ import type { ContextView, PromptInput, PromptSection, ToolRegistration } from "./types.ts";
+diff --git a/packages/durable/src/harness/provider.ts b/packages/durable/src/harness/provider.ts
+index 6050b7e..f63b51d 100644
+--- a/packages/durable/src/harness/provider.ts
++++ b/packages/durable/src/harness/provider.ts
+@@ -1,5 +1,5 @@
+-import type { Context } from "@so-agent/chord";
+ import { uuidv7 } from "@so-agent/ai/utils/uuid";
++import type { Context } from "@so-agent/chord";
+ import { defineDoc } from "../documents.ts";
+ import type { TaskRuntime } from "../types.ts";
+ 
+diff --git a/packages/durable/src/harness/scheduler.ts b/packages/durable/src/harness/scheduler.ts
+index aa683d7..5a3fe83 100644
+--- a/packages/durable/src/harness/scheduler.ts
++++ b/packages/durable/src/harness/scheduler.ts
+@@ -1,7 +1,7 @@
++import type { Models } from "@so-agent/ai";
+ import { type Context, copyJson, type JsonValue } from "@so-agent/chord";
+ import { awaitWithContext, withAbortSignal, withoutAbortSignal, withTelemetry } from "@so-agent/chord/context";
+ import { ownedSlice } from "@so-agent/chord/delta";
+-import type { Models } from "@so-agent/ai";
+ import {
+ 	createTypedMetrics,
+ 	createTypedSpanStarter,
+diff --git a/packages/durable/src/harness/tool.ts b/packages/durable/src/harness/tool.ts
+index 4d46fcd..85a6762 100644
+--- a/packages/durable/src/harness/tool.ts
++++ b/packages/durable/src/harness/tool.ts
+@@ -1,3 +1,5 @@
++import type { ImageContent, TextContent, ToolCall, ToolResultMessage } from "@so-agent/ai";
++import { validateToolArguments } from "@so-agent/ai/utils/validation";
+ import { type Context, copyJson, type Draft, type JsonRepresentation, type JsonValue } from "@so-agent/chord";
+ import { awaitWithContext } from "@so-agent/chord/context";
+ import { overlap, ownedSlice } from "@so-agent/chord/delta";
+@@ -9,8 +11,6 @@ import {
+ 	Progress,
+ 	type ProgressClock,
+ } from "@so-agent/chord/output";
+-import type { ImageContent, TextContent, ToolCall, ToolResultMessage } from "@so-agent/ai";
+-import { validateToolArguments } from "@so-agent/ai/utils/validation";
+ import { Compile } from "typebox/compile";
+ import { defineDocFamily } from "../documents.ts";
+ import { AssistantEntry, ToolResultEntry } from "../entries.ts";
+diff --git a/packages/durable/src/harness/types.ts b/packages/durable/src/harness/types.ts
+index a52ffdb..6503f38 100644
+--- a/packages/durable/src/harness/types.ts
++++ b/packages/durable/src/harness/types.ts
+@@ -1,4 +1,3 @@
+-import type { Context, JsonValue, WatchHandle } from "@so-agent/chord";
+ import type {
+ 	AssistantMessage,
+ 	CacheRetention,
+@@ -15,6 +14,7 @@ import type {
+ 	Usage,
+ 	UserMessage,
+ } from "@so-agent/ai";
++import type { Context, JsonValue, WatchHandle } from "@so-agent/chord";
+ import type { TelemetryContext } from "@so-agent/telemetry";
+ import type { ExecutionEnv, ShellOutputSkip, ShellOutputWindow } from "../env/index.ts";
+ import type {
+diff --git a/packages/durable/src/harness/usage.ts b/packages/durable/src/harness/usage.ts
+index dfe71ac..1c06f44 100644
+--- a/packages/durable/src/harness/usage.ts
++++ b/packages/durable/src/harness/usage.ts
+@@ -1,5 +1,5 @@
+-import { copyJson, type Draft, type JsonRepresentation } from "@so-agent/chord";
+ import type { Usage } from "@so-agent/ai";
++import { copyJson, type Draft, type JsonRepresentation } from "@so-agent/chord";
+ import { defineDoc } from "../documents.ts";
+ import type { ConversationId, Tx } from "../types.ts";
+ 
+diff --git a/packages/durable/src/types.ts b/packages/durable/src/types.ts
+index 053d180..bf782da 100644
+--- a/packages/durable/src/types.ts
++++ b/packages/durable/src/types.ts
+@@ -1,6 +1,6 @@
++import type { Message, Models } from "@so-agent/ai";
+ import type { Context, Draft, JsonValue, WatchChange, WatchHandle } from "@so-agent/chord";
+ import type { Op } from "@so-agent/chord/delta";
+-import type { Message, Models } from "@so-agent/ai";
+ import type { TelemetryCarrier } from "@so-agent/telemetry";
+ import type { ExecutionEnv } from "./env/index.ts";
+ import type {
+diff --git a/packages/durable/test/chat-support.ts b/packages/durable/test/chat-support.ts
+index 064f272..e60ff41 100644
+--- a/packages/durable/test/chat-support.ts
++++ b/packages/durable/test/chat-support.ts
+@@ -1,4 +1,3 @@
+-import type { Context } from "@so-agent/chord";
+ import {
+ 	createModels,
+ 	type FauxProviderHandle,
+@@ -8,6 +7,7 @@ import {
+ 	type Models,
+ 	type RegisterFauxProviderOptions,
+ } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import {
+ 	type Conversation,
+ 	createRegistry,
+diff --git a/packages/durable/test/codemode-bench.ts b/packages/durable/test/codemode-bench.ts
+index 3b7f597..ac192d6 100644
+--- a/packages/durable/test/codemode-bench.ts
++++ b/packages/durable/test/codemode-bench.ts
+@@ -8,9 +8,9 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { CodemodeSandbox } from "@so-agent/codemode";
+ import { Type } from "typebox";
+ import { createCodemodeTool } from "../src/codemode/codemode.ts";
+diff --git a/packages/durable/test/codemode-models.test.ts b/packages/durable/test/codemode-models.test.ts
+index 05dfa7a..c8b8a84 100644
+--- a/packages/durable/test/codemode-models.test.ts
++++ b/packages/durable/test/codemode-models.test.ts
+@@ -1,7 +1,6 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { Context } from "@so-agent/chord";
+ import {
+ 	type AssistantImages,
+ 	type ClassifierResult,
+@@ -11,6 +10,7 @@ import {
+ 	fauxToolCall,
+ 	type MutableModels,
+ } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import { CodemodeSandbox } from "@so-agent/codemode";
+ import { MemoryStorage, ToolResultEntry, UsageDoc } from "@so-agent/durable";
+ import { describe, expect, it } from "vitest";
+diff --git a/packages/durable/test/codemode.test.ts b/packages/durable/test/codemode.test.ts
+index 1644eff..bdb584b 100644
+--- a/packages/durable/test/codemode.test.ts
++++ b/packages/durable/test/codemode.test.ts
+@@ -1,8 +1,8 @@
+ import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { dirname, join } from "node:path";
+-import type { Context } from "@so-agent/chord";
+ import { type AssistantMessage, fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import { type CodemodeRun, CodemodeSandbox } from "@so-agent/codemode";
+ import {
+ 	defineTool,
+diff --git a/packages/durable/test/examples/05-harness.ts b/packages/durable/test/examples/05-harness.ts
+index 22f2af2..42b036d 100644
+--- a/packages/durable/test/examples/05-harness.ts
++++ b/packages/durable/test/examples/05-harness.ts
+@@ -1,9 +1,10 @@
+ // Open a Harness with a registry of extensions.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/05-harness.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	AgentDoc,
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/06-configuration.ts b/packages/durable/test/examples/06-configuration.ts
+index 8e62851..5951173 100644
+--- a/packages/durable/test/examples/06-configuration.ts
++++ b/packages/durable/test/examples/06-configuration.ts
+@@ -1,9 +1,10 @@
+ // Per-conversation agent choices and Harness-wide settings.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/06-configuration.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	AgentDoc,
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/07-harness-conversations.ts b/packages/durable/test/examples/07-harness-conversations.ts
+index 8c0d495..ecfb357 100644
+--- a/packages/durable/test/examples/07-harness-conversations.ts
++++ b/packages/durable/test/examples/07-harness-conversations.ts
+@@ -1,8 +1,9 @@
+ // Conversation handles, typed entries, created conversations, and forks.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/07-harness-conversations.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, defineEntry, Harness, MemoryStorage } from "../../src/index.ts";
+ 
+ const context = BACKGROUND_CONTEXT;
+diff --git a/packages/durable/test/examples/08-context.ts b/packages/durable/test/examples/08-context.ts
+index 402e2ed..47492a5 100644
+--- a/packages/durable/test/examples/08-context.ts
++++ b/packages/durable/test/examples/08-context.ts
+@@ -1,9 +1,10 @@
+ // Transcript history and model context.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/08-context.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import type { AssistantMessage, Message, StopReason, ToolResultMessage } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, Harness, MemoryStorage } from "../../src/index.ts";
+ 
+ const context = BACKGROUND_CONTEXT;
+diff --git a/packages/durable/test/examples/09-registry-reload.ts b/packages/durable/test/examples/09-registry-reload.ts
+index 7da5a0a..fc32b05 100644
+--- a/packages/durable/test/examples/09-registry-reload.ts
++++ b/packages/durable/test/examples/09-registry-reload.ts
+@@ -1,9 +1,10 @@
+ // Reload extension code through the registry.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/09-registry-reload.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, defineExtension, defineTool, Harness, MemoryStorage, wrapTool } from "../../src/index.ts";
+ 
+ const context = BACKGROUND_CONTEXT;
+diff --git a/packages/durable/test/examples/10-extension-state.ts b/packages/durable/test/examples/10-extension-state.ts
+index c21aa9f..cc1854a 100644
+--- a/packages/durable/test/examples/10-extension-state.ts
++++ b/packages/durable/test/examples/10-extension-state.ts
+@@ -1,10 +1,11 @@
+ // An extension that keeps its own per-conversation document.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/10-extension-state.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	createRegistry,
+ 	defineDoc,
+diff --git a/packages/durable/test/examples/11-tasks.ts b/packages/durable/test/examples/11-tasks.ts
+index 732b328..ad622b2 100644
+--- a/packages/durable/test/examples/11-tasks.ts
++++ b/packages/durable/test/examples/11-tasks.ts
+@@ -1,8 +1,9 @@
+ // Run a durable task.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/11-tasks.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, defineExtension, defineTask, Harness, MemoryStorage } from "../../src/index.ts";
+ 
+ const context = BACKGROUND_CONTEXT;
+diff --git a/packages/durable/test/examples/12-recovery.ts b/packages/durable/test/examples/12-recovery.ts
+index dde1100..367287a 100644
+--- a/packages/durable/test/examples/12-recovery.ts
++++ b/packages/durable/test/examples/12-recovery.ts
+@@ -4,8 +4,8 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, defineExtension, defineTask, Harness } from "../../src/index.ts";
+ import { openNodeSqliteStorage } from "../../src/storage/sqlite/node.ts";
+ 
+diff --git a/packages/durable/test/examples/13-chat.ts b/packages/durable/test/examples/13-chat.ts
+index 82e954d..67c5327 100644
+--- a/packages/durable/test/examples/13-chat.ts
++++ b/packages/durable/test/examples/13-chat.ts
+@@ -1,9 +1,10 @@
+ // A chat turn.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/13-chat.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { AssistantEntry, createRegistry, defineExtension, Harness, MemoryStorage, section } from "../../src/index.ts";
+ 
+ const context = BACKGROUND_CONTEXT;
+diff --git a/packages/durable/test/examples/14-system-prompt.ts b/packages/durable/test/examples/14-system-prompt.ts
+index f57eb4b..05f75ff 100644
+--- a/packages/durable/test/examples/14-system-prompt.ts
++++ b/packages/durable/test/examples/14-system-prompt.ts
+@@ -1,9 +1,10 @@
+ // System prompt sections and per-conversation instructions.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/14-system-prompt.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	type Conversation,
+diff --git a/packages/durable/test/examples/15-real-model.ts b/packages/durable/test/examples/15-real-model.ts
+index 63cd550..12131f0 100644
+--- a/packages/durable/test/examples/15-real-model.ts
++++ b/packages/durable/test/examples/15-real-model.ts
+@@ -1,9 +1,10 @@
+ // A real model: stream an answer from OpenAI.
+ // Run from packages/durable (needs OPENAI_API_KEY):
+ //   node --conditions=source --experimental-strip-types test/examples/15-real-model.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { createModels } from "@so-agent/ai/models";
+ import { openaiProvider } from "@so-agent/ai/providers/openai";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	AssistantEntry,
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/16-coding-tools.ts b/packages/durable/test/examples/16-coding-tools.ts
+index f5c82b9..a7c9f18 100644
+--- a/packages/durable/test/examples/16-coding-tools.ts
++++ b/packages/durable/test/examples/16-coding-tools.ts
+@@ -6,10 +6,10 @@
+ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import type { ToolResultMessage } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	AssistantEntry,
+diff --git a/packages/durable/test/examples/17-print.ts b/packages/durable/test/examples/17-print.ts
+index 5c4d013..393db73 100644
+--- a/packages/durable/test/examples/17-print.ts
++++ b/packages/durable/test/examples/17-print.ts
+@@ -2,11 +2,12 @@
+ // idle. Uses OpenAI when OPENAI_API_KEY is set, and a scripted faux model otherwise.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/17-print.ts "What is in this directory?"
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import type { AssistantMessage } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
+ import { openaiProvider } from "@so-agent/ai/providers/openai";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import { AssistantEntry, createRegistry, defineExtension, Harness, MemoryStorage, section } from "../../src/index.ts";
+ import { createBashTool, createReadTool } from "../../src/tools/index.ts";
+diff --git a/packages/durable/test/examples/18-json.ts b/packages/durable/test/examples/18-json.ts
+index 20a6eaf..a998add 100644
+--- a/packages/durable/test/examples/18-json.ts
++++ b/packages/durable/test/examples/18-json.ts
+@@ -9,10 +9,10 @@
+ import { mkdtemp } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
+ import { openaiProvider } from "@so-agent/ai/providers/openai";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/19-inbox.ts b/packages/durable/test/examples/19-inbox.ts
+index 4d592a6..45b2af7 100644
+--- a/packages/durable/test/examples/19-inbox.ts
++++ b/packages/durable/test/examples/19-inbox.ts
+@@ -1,10 +1,11 @@
+ // The inbox: what happens to submissions while a conversation is busy.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/19-inbox.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import type { FauxResponseStep } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, Harness, InboxDoc, MemoryStorage, type Submission } from "../../src/index.ts";
+ 
+ const context = BACKGROUND_CONTEXT;
+diff --git a/packages/durable/test/examples/20-late-join.ts b/packages/durable/test/examples/20-late-join.ts
+index 55a7f51..8d498c1 100644
+--- a/packages/durable/test/examples/20-late-join.ts
++++ b/packages/durable/test/examples/20-late-join.ts
+@@ -2,10 +2,11 @@
+ // view or the snapshot event, and then only what changes after that.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/20-late-join.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	createRegistry,
+ 	defineExtension,
+diff --git a/packages/durable/test/examples/21-subagent-foreground.ts b/packages/durable/test/examples/21-subagent-foreground.ts
+index 612f9cb..e320bfa 100644
+--- a/packages/durable/test/examples/21-subagent-foreground.ts
++++ b/packages/durable/test/examples/21-subagent-foreground.ts
+@@ -4,12 +4,13 @@
+ // Uses OpenAI when OPENAI_API_KEY is set, and a scripted faux model otherwise.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/21-subagent-foreground.ts
+-import type { Context } from "@so-agent/chord";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import { type AssistantMessage, type FauxResponseStep, Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
+ import { openaiProvider } from "@so-agent/ai/providers/openai";
++import type { Context } from "@so-agent/chord";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	type AgentEvent,
+ 	AssistantEntry,
+diff --git a/packages/durable/test/examples/22-subagent-background.ts b/packages/durable/test/examples/22-subagent-background.ts
+index 07812e4..8f89097 100644
+--- a/packages/durable/test/examples/22-subagent-background.ts
++++ b/packages/durable/test/examples/22-subagent-background.ts
+@@ -8,11 +8,11 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { type AssistantMessage, type FauxResponseStep, Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
+ import { openaiProvider } from "@so-agent/ai/providers/openai";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	AssistantEntry,
+ 	type ConversationId,
+diff --git a/packages/durable/test/examples/23-child-tasks.ts b/packages/durable/test/examples/23-child-tasks.ts
+index a96e181..27b869e 100644
+--- a/packages/durable/test/examples/23-child-tasks.ts
++++ b/packages/durable/test/examples/23-child-tasks.ts
+@@ -5,8 +5,8 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	type Conversation,
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/24-compaction.ts b/packages/durable/test/examples/24-compaction.ts
+index 0c132f6..4fa909f 100644
+--- a/packages/durable/test/examples/24-compaction.ts
++++ b/packages/durable/test/examples/24-compaction.ts
+@@ -1,10 +1,11 @@
+ // Compaction: a long trip-planning chat whose older messages are summarized so the model context stays small.
+ // Run from packages/durable:
+ //   node --conditions=source --experimental-strip-types test/examples/24-compaction.ts
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
++
+ import type { AssistantMessage, Message, TranscriptContext } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import {
+ 	CompactionEntry,
+ 	type Conversation,
+diff --git a/packages/durable/test/examples/25-coding-agent.ts b/packages/durable/test/examples/25-coding-agent.ts
+index 1403040..a95bd78 100644
+--- a/packages/durable/test/examples/25-coding-agent.ts
++++ b/packages/durable/test/examples/25-coding-agent.ts
+@@ -5,10 +5,10 @@
+ import { mkdir, mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import type { ToolResultMessage } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/26-plan-mode.ts b/packages/durable/test/examples/26-plan-mode.ts
+index 835295b..7c8adac 100644
+--- a/packages/durable/test/examples/26-plan-mode.ts
++++ b/packages/durable/test/examples/26-plan-mode.ts
+@@ -5,10 +5,10 @@
+ import { mkdtemp, rm, writeFile } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	createRegistry,
+diff --git a/packages/durable/test/examples/27-reviewer.ts b/packages/durable/test/examples/27-reviewer.ts
+index ca7156e..2dc5263 100644
+--- a/packages/durable/test/examples/27-reviewer.ts
++++ b/packages/durable/test/examples/27-reviewer.ts
+@@ -5,10 +5,10 @@
+ import { mkdtemp, rm, writeFile } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import type { AssistantMessage } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	AssistantEntry,
+diff --git a/packages/durable/test/examples/28-sandbox-per-conversation.ts b/packages/durable/test/examples/28-sandbox-per-conversation.ts
+index ac14c5c..6b82579 100644
+--- a/packages/durable/test/examples/28-sandbox-per-conversation.ts
++++ b/packages/durable/test/examples/28-sandbox-per-conversation.ts
+@@ -6,9 +6,9 @@
+ import { mkdtemp, readFile, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import { createRegistry, defineDoc, Harness, MemoryStorage } from "../../src/index.ts";
+ import { CodingTools } from "../../src/tools/index.ts";
+diff --git a/packages/durable/test/examples/29-tool-override.ts b/packages/durable/test/examples/29-tool-override.ts
+index 9617631..18686f3 100644
+--- a/packages/durable/test/examples/29-tool-override.ts
++++ b/packages/durable/test/examples/29-tool-override.ts
+@@ -5,10 +5,10 @@
+ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import type { ToolResultMessage } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { NodeExecutionEnv } from "../../src/env/node.ts";
+ import {
+ 	type Conversation,
+diff --git a/packages/durable/test/examples/30-reload-and-restart.ts b/packages/durable/test/examples/30-reload-and-restart.ts
+index 55bf005..a8661d0 100644
+--- a/packages/durable/test/examples/30-reload-and-restart.ts
++++ b/packages/durable/test/examples/30-reload-and-restart.ts
+@@ -5,10 +5,10 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { type ToolResultMessage, Type } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+ import { createRegistry, defineExtension, defineTool, Harness, ToolResultEntry } from "../../src/index.ts";
+ import { openNodeSqliteStorage } from "../../src/storage/sqlite/node.ts";
+ 
+diff --git a/packages/durable/test/harness-cancellation-barrier.test.ts b/packages/durable/test/harness-cancellation-barrier.test.ts
+index f6a8c59..a53841d 100644
+--- a/packages/durable/test/harness-cancellation-barrier.test.ts
++++ b/packages/durable/test/harness-cancellation-barrier.test.ts
+@@ -1,12 +1,5 @@
+ import type { Context } from "@so-agent/chord";
+-import {
+-	createSession,
+-	defineTask,
+-	MemoryStorage,
+-	type Seq,
+-	type StorageWrite,
+-	type TaskId,
+-} from "@so-agent/durable";
++import { createSession, defineTask, MemoryStorage, type Seq, type StorageWrite, type TaskId } from "@so-agent/durable";
+ import { describe, expect, it } from "vitest";
+ import { context, flush } from "./session-support.ts";
+ import { aborted, deferred, eventually, openTasks } from "./task-support.ts";
+diff --git a/packages/durable/test/harness-context.test.ts b/packages/durable/test/harness-context.test.ts
+index 961feeb..71dd1b2 100644
+--- a/packages/durable/test/harness-context.test.ts
++++ b/packages/durable/test/harness-context.test.ts
+@@ -1,5 +1,5 @@
+-import type { Context } from "@so-agent/chord";
+ import { createModels, type Message } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import {
+ 	type ContextView,
+ 	createRegistry,
+diff --git a/packages/durable/test/harness-deferred-progress.test.ts b/packages/durable/test/harness-deferred-progress.test.ts
+index 0b129d4..c29f902 100644
+--- a/packages/durable/test/harness-deferred-progress.test.ts
++++ b/packages/durable/test/harness-deferred-progress.test.ts
+@@ -2,8 +2,9 @@
+ // the next commit that reads or writes `so.live` or within `settings.progress.persistWithinMs`. Crashes are simulated
+ // by failing the Harness: from that moment nothing more reaches Storage, as when the process dies; the reopened Harness
+ // resumes from what was stored.
+-import { applyImmutable } from "@so-agent/chord/delta";
++
+ import { fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
++import { applyImmutable } from "@so-agent/chord/delta";
+ import {
+ 	AssistantEntry,
+ 	type ConversationId,
+diff --git a/packages/durable/test/harness-events.test.ts b/packages/durable/test/harness-events.test.ts
+index 8a27a80..c9ccdc9 100644
+--- a/packages/durable/test/harness-events.test.ts
++++ b/packages/durable/test/harness-events.test.ts
+@@ -1,6 +1,5 @@
+ import { GCProfiler, getHeapStatistics, setFlagsFromString } from "node:v8";
+ import { runInNewContext } from "node:vm";
+-import type { Draft } from "@so-agent/chord";
+ import {
+ 	type AssistantMessage,
+ 	type FauxResponseStep,
+@@ -10,6 +9,7 @@ import {
+ 	fauxToolCall,
+ 	Type,
+ } from "@so-agent/ai";
++import type { Draft } from "@so-agent/chord";
+ import {
+ 	AgentDoc,
+ 	type AgentEvent,
+diff --git a/packages/durable/test/harness-generation.test.ts b/packages/durable/test/harness-generation.test.ts
+index f0ad0bf..5993b76 100644
+--- a/packages/durable/test/harness-generation.test.ts
++++ b/packages/durable/test/harness-generation.test.ts
+@@ -3,8 +3,8 @@ import {
+ 	fauxAssistantMessage,
+ 	type Message,
+ 	type Models,
+-	SO_ATTRIBUTION,
+ 	type SimpleStreamOptions,
++	SO_ATTRIBUTION,
+ 	type SystemMessage,
+ } from "@so-agent/ai";
+ import {
+diff --git a/packages/durable/test/harness-inbox.test.ts b/packages/durable/test/harness-inbox.test.ts
+index 75a5315..47a39ba 100644
+--- a/packages/durable/test/harness-inbox.test.ts
++++ b/packages/durable/test/harness-inbox.test.ts
+@@ -1,7 +1,6 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { Op } from "@so-agent/chord/delta";
+ import {
+ 	type AssistantMessage,
+ 	type FauxResponseStep,
+@@ -12,6 +11,7 @@ import {
+ 	Type,
+ 	type Usage,
+ } from "@so-agent/ai";
++import type { Op } from "@so-agent/chord/delta";
+ import {
+ 	type Conversation,
+ 	defineDoc,
+diff --git a/packages/durable/test/harness-lifecycle.test.ts b/packages/durable/test/harness-lifecycle.test.ts
+index 92e4506..347233a 100644
+--- a/packages/durable/test/harness-lifecycle.test.ts
++++ b/packages/durable/test/harness-lifecycle.test.ts
+@@ -1,9 +1,9 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
++import { createModels, fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
+ import type { Context, JsonValue } from "@so-agent/chord";
+ import { withAbortSignal } from "@so-agent/chord/context";
+-import { createModels, fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
+ import {
+ 	type Conversation,
+ 	type ConversationId,
+diff --git a/packages/durable/test/harness-live-deltas.test.ts b/packages/durable/test/harness-live-deltas.test.ts
+index 35fcbcc..d1afe7a 100644
+--- a/packages/durable/test/harness-live-deltas.test.ts
++++ b/packages/durable/test/harness-live-deltas.test.ts
+@@ -1,5 +1,5 @@
+-import type { Op } from "@so-agent/chord/delta";
+ import { fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
++import type { Op } from "@so-agent/chord/delta";
+ import {
+ 	type CommitPublication,
+ 	defineTool,
+diff --git a/packages/durable/test/harness-nested-tools-restart.test.ts b/packages/durable/test/harness-nested-tools-restart.test.ts
+index 7aeefb8..58e0d8b 100644
+--- a/packages/durable/test/harness-nested-tools-restart.test.ts
++++ b/packages/durable/test/harness-nested-tools-restart.test.ts
+@@ -1,7 +1,6 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { Context } from "@so-agent/chord";
+ import {
+ 	type AssistantMessage,
+ 	fauxAssistantMessage,
+@@ -10,6 +9,7 @@ import {
+ 	type ToolResultMessage,
+ 	Type,
+ } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import {
+ 	type AgentEvent,
+ 	defineExtension,
+diff --git a/packages/durable/test/harness-nested-tools.test.ts b/packages/durable/test/harness-nested-tools.test.ts
+index f29fa7b..0ef320f 100644
+--- a/packages/durable/test/harness-nested-tools.test.ts
++++ b/packages/durable/test/harness-nested-tools.test.ts
+@@ -1,8 +1,6 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { JsonValue } from "@so-agent/chord";
+-import { withAbortSignal } from "@so-agent/chord/context";
+ import {
+ 	type AssistantMessage,
+ 	fauxAssistantMessage,
+@@ -12,6 +10,8 @@ import {
+ 	Type,
+ 	type Usage,
+ } from "@so-agent/ai";
++import type { JsonValue } from "@so-agent/chord";
++import { withAbortSignal } from "@so-agent/chord/context";
+ import {
+ 	type AgentEvent,
+ 	AssistantEntry,
+diff --git a/packages/durable/test/harness-partial-changes.test.ts b/packages/durable/test/harness-partial-changes.test.ts
+index 5b2f4ff..40ae030 100644
+--- a/packages/durable/test/harness-partial-changes.test.ts
++++ b/packages/durable/test/harness-partial-changes.test.ts
+@@ -1,11 +1,11 @@
+-import { copyJson } from "@so-agent/chord";
+-import { type Op, track } from "@so-agent/chord/delta";
+ import {
+ 	type AssistantMessage,
+ 	type AssistantMessageEvent,
+ 	type ToolCall,
+ 	ToolCallArgumentsStream,
+ } from "@so-agent/ai";
++import { copyJson } from "@so-agent/chord";
++import { type Op, track } from "@so-agent/chord/delta";
+ import { describe, expect, it } from "vitest";
+ import type { LiveState } from "../src/harness/live.ts";
+ import { PartialChanges, type PartialMessage } from "../src/harness/partial-changes.ts";
+diff --git a/packages/durable/test/harness-scheduler-retention.test.ts b/packages/durable/test/harness-scheduler-retention.test.ts
+index 7cbccfd..89b4e54 100644
+--- a/packages/durable/test/harness-scheduler-retention.test.ts
++++ b/packages/durable/test/harness-scheduler-retention.test.ts
+@@ -3,14 +3,7 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import {
+-	type Conversation,
+-	defineTask,
+-	type Harness,
+-	LiveDoc,
+-	type Storage,
+-	type TaskId,
+-} from "@so-agent/durable";
++import { type Conversation, defineTask, type Harness, LiveDoc, type Storage, type TaskId } from "@so-agent/durable";
+ import { afterEach, describe, expect, it } from "vitest";
+ import { SCHEDULER_INDEX_SIZES } from "../src/harness/harness.ts";
+ import { openNodeSqliteStorage } from "../src/storage/sqlite/node.ts";
+diff --git a/packages/durable/test/harness-storage-failure.test.ts b/packages/durable/test/harness-storage-failure.test.ts
+index 606909c..66eaf91 100644
+--- a/packages/durable/test/harness-storage-failure.test.ts
++++ b/packages/durable/test/harness-storage-failure.test.ts
+@@ -1,6 +1,6 @@
+ import { runInNewContext } from "node:vm";
+-import type { Context } from "@so-agent/chord";
+ import { createModels } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import {
+ 	createRegistry,
+ 	defineExtension,
+diff --git a/packages/durable/test/harness-structured-output.test.ts b/packages/durable/test/harness-structured-output.test.ts
+index 3f56680..02ab132 100644
+--- a/packages/durable/test/harness-structured-output.test.ts
++++ b/packages/durable/test/harness-structured-output.test.ts
+@@ -1,7 +1,6 @@
+ import { mkdtempSync, rmSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { JsonValue } from "@so-agent/chord";
+ import {
+ 	type AssistantMessage,
+ 	fauxAssistantMessage,
+@@ -10,6 +9,7 @@ import {
+ 	type ToolResultMessage,
+ 	Type,
+ } from "@so-agent/ai";
++import type { JsonValue } from "@so-agent/chord";
+ import {
+ 	defineTool,
+ 	MemoryStorage,
+diff --git a/packages/durable/test/harness-structured.test.ts b/packages/durable/test/harness-structured.test.ts
+index f4481b3..2548557 100644
+--- a/packages/durable/test/harness-structured.test.ts
++++ b/packages/durable/test/harness-structured.test.ts
+@@ -1,15 +1,8 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
++import { fauxAssistantMessage, fauxText, fauxToolCall, type Models, type ToolResultMessage, Type } from "@so-agent/ai";
+ import type { Context, JsonValue } from "@so-agent/chord";
+-import {
+-	fauxAssistantMessage,
+-	fauxText,
+-	fauxToolCall,
+-	type Models,
+-	type ToolResultMessage,
+-	Type,
+-} from "@so-agent/ai";
+ import {
+ 	type AgentEvent,
+ 	type Conversation,
+diff --git a/packages/durable/test/harness-tasks-recovery.test.ts b/packages/durable/test/harness-tasks-recovery.test.ts
+index 5dcf288..3bfc3f4 100644
+--- a/packages/durable/test/harness-tasks-recovery.test.ts
++++ b/packages/durable/test/harness-tasks-recovery.test.ts
+@@ -1,8 +1,8 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { Context, JsonValue } from "@so-agent/chord";
+ import { createModels, Type } from "@so-agent/ai";
++import type { Context, JsonValue } from "@so-agent/chord";
+ import {
+ 	createRegistry,
+ 	defineDoc,
+diff --git a/packages/durable/test/harness-tasks.test.ts b/packages/durable/test/harness-tasks.test.ts
+index ad2f248..5424046 100644
+--- a/packages/durable/test/harness-tasks.test.ts
++++ b/packages/durable/test/harness-tasks.test.ts
+@@ -1,6 +1,6 @@
++import { createModels, Type } from "@so-agent/ai";
+ import type { Context } from "@so-agent/chord";
+ import { withAbortSignal, withCancel } from "@so-agent/chord/context";
+-import { createModels, Type } from "@so-agent/ai";
+ import {
+ 	type CommitPublication,
+ 	type Conversation,
+diff --git a/packages/durable/test/harness-telemetry.test.ts b/packages/durable/test/harness-telemetry.test.ts
+index be3de8c..a4e0f5a 100644
+--- a/packages/durable/test/harness-telemetry.test.ts
++++ b/packages/durable/test/harness-telemetry.test.ts
+@@ -1,5 +1,5 @@
+-import { withTelemetry } from "@so-agent/chord/context";
+ import { fauxAssistantMessage, fauxToolCall, Type } from "@so-agent/ai";
++import { withTelemetry } from "@so-agent/chord/context";
+ import { CodemodeSandbox } from "@so-agent/codemode";
+ import {
+ 	CompactionTask,
+diff --git a/packages/durable/test/harness-tools-recovery.test.ts b/packages/durable/test/harness-tools-recovery.test.ts
+index 2e944f4..ff61de9 100644
+--- a/packages/durable/test/harness-tools-recovery.test.ts
++++ b/packages/durable/test/harness-tools-recovery.test.ts
+@@ -1,7 +1,6 @@
+ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { dirname, join } from "node:path";
+-import type { JsonValue } from "@so-agent/chord";
+ import {
+ 	type AssistantMessage,
+ 	fauxAssistantMessage,
+@@ -10,6 +9,7 @@ import {
+ 	type ToolResultMessage,
+ 	Type,
+ } from "@so-agent/ai";
++import type { JsonValue } from "@so-agent/chord";
+ import {
+ 	defineTool,
+ 	type EntryRecord,
+diff --git a/packages/durable/test/harness-tools.test.ts b/packages/durable/test/harness-tools.test.ts
+index d469a06..278ff1a 100644
+--- a/packages/durable/test/harness-tools.test.ts
++++ b/packages/durable/test/harness-tools.test.ts
+@@ -1,7 +1,6 @@
+ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import type { JsonValue } from "@so-agent/chord";
+ import {
+ 	type AssistantMessage,
+ 	type FauxResponseStep,
+@@ -13,6 +12,7 @@ import {
+ 	type ToolResultMessage,
+ 	Type,
+ } from "@so-agent/ai";
++import type { JsonValue } from "@so-agent/chord";
+ import {
+ 	AgentDoc,
+ 	type Conversation,
+diff --git a/packages/durable/test/harness-view.test.ts b/packages/durable/test/harness-view.test.ts
+index 95a487c..cf0b82f 100644
+--- a/packages/durable/test/harness-view.test.ts
++++ b/packages/durable/test/harness-view.test.ts
+@@ -1,5 +1,5 @@
+-import { applyImmutable, type Op } from "@so-agent/chord/delta";
+ import { type AssistantMessage, type FauxResponseStep, fauxAssistantMessage, fauxText } from "@so-agent/ai";
++import { applyImmutable, type Op } from "@so-agent/chord/delta";
+ import {
+ 	AgentDoc,
+ 	type Conversation,
+diff --git a/packages/durable/test/nested-images-bench.ts b/packages/durable/test/nested-images-bench.ts
+index 8572fbe..1e8c4b9 100644
+--- a/packages/durable/test/nested-images-bench.ts
++++ b/packages/durable/test/nested-images-bench.ts
+@@ -14,10 +14,10 @@ import { randomBytes } from "node:crypto";
+ import { mkdtemp, readdir, rm, stat } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import type { ImageContent } from "@so-agent/ai";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { Type } from "typebox";
+ import {
+ 	createRegistry,
+diff --git a/packages/durable/test/nested-tools-bench.ts b/packages/durable/test/nested-tools-bench.ts
+index 4925de3..9c736e1 100644
+--- a/packages/durable/test/nested-tools-bench.ts
++++ b/packages/durable/test/nested-tools-bench.ts
+@@ -12,9 +12,9 @@
+ import { mkdtemp, readdir, rm, stat } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { Type } from "typebox";
+ import {
+ 	type Conversation,
+diff --git a/packages/durable/test/scheduler-fanout-bench.ts b/packages/durable/test/scheduler-fanout-bench.ts
+index 5abe176..b8c88da 100644
+--- a/packages/durable/test/scheduler-fanout-bench.ts
++++ b/packages/durable/test/scheduler-fanout-bench.ts
+@@ -5,9 +5,10 @@
+  *
+  *   node --conditions=source --experimental-strip-types test/scheduler-fanout-bench.ts [calls...]
+  */
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
++
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { Type } from "typebox";
+ import { createRegistry, defineExtension, defineTool, Harness, ToolResultEntry } from "../src/index.ts";
+ import { MemoryStorage } from "../src/storage/memory.ts";
+diff --git a/packages/durable/test/scheduler-memory-bench.ts b/packages/durable/test/scheduler-memory-bench.ts
+index 2922015..0291aed 100644
+--- a/packages/durable/test/scheduler-memory-bench.ts
++++ b/packages/durable/test/scheduler-memory-bench.ts
+@@ -9,8 +9,8 @@
+ import { mkdtempSync, rmSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { SCHEDULER_INDEX_SIZES } from "../src/harness/harness.ts";
+ import {
+ 	type ConversationId,
+diff --git a/packages/durable/test/session-adoption.test.ts b/packages/durable/test/session-adoption.test.ts
+index 749f50f..22f131d 100644
+--- a/packages/durable/test/session-adoption.test.ts
++++ b/packages/durable/test/session-adoption.test.ts
+@@ -2,13 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
+ import { tmpdir } from "node:os";
+ import { basename, join } from "node:path";
+ import type { Context } from "@so-agent/chord";
+-import {
+-	type CommitPublication,
+-	defineDoc,
+-	MemoryStorage,
+-	type Seq,
+-	type StorageWrite,
+-} from "@so-agent/durable";
++import { type CommitPublication, defineDoc, MemoryStorage, type Seq, type StorageWrite } from "@so-agent/durable";
+ import { afterEach, describe, expect, it, vi } from "vitest";
+ import type { FileError, Result } from "../src/env/index.ts";
+ import { NodeExecutionEnv } from "../src/env/node.ts";
+diff --git a/packages/durable/test/session-checkpoints-migrations.test.ts b/packages/durable/test/session-checkpoints-migrations.test.ts
+index 94ecb62..fea93fb 100644
+--- a/packages/durable/test/session-checkpoints-migrations.test.ts
++++ b/packages/durable/test/session-checkpoints-migrations.test.ts
+@@ -1,11 +1,5 @@
+ import type { Op } from "@so-agent/chord/delta";
+-import {
+-	defineDoc,
+-	defineDocFamily,
+-	type EntryId,
+-	type JsonObject,
+-	type StorageWrite,
+-} from "@so-agent/durable";
++import { defineDoc, defineDocFamily, type EntryId, type JsonObject, type StorageWrite } from "@so-agent/durable";
+ import { describe, expect, it } from "vitest";
+ import { context, createConversation, documentChanges, flush, openTestSession } from "./session-support.ts";
+ 
+diff --git a/packages/durable/test/session-document-cache-bench.ts b/packages/durable/test/session-document-cache-bench.ts
+index dc20f7f..26c148e 100644
+--- a/packages/durable/test/session-document-cache-bench.ts
++++ b/packages/durable/test/session-document-cache-bench.ts
+@@ -8,8 +8,8 @@
+ import { mkdtempSync, rmSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import {
+ 	type ConversationId,
+ 	createRegistry,
+diff --git a/packages/durable/test/session-document-retention.test.ts b/packages/durable/test/session-document-retention.test.ts
+index 9b21071..306203f 100644
+--- a/packages/durable/test/session-document-retention.test.ts
++++ b/packages/durable/test/session-document-retention.test.ts
+@@ -1,7 +1,8 @@
+ // The Session's document cache is bounded by use: unattached documents leave it after the retention period and load
+ // from Storage again; documents with a watch or a document state never leave it.
+-import type { Context } from "@so-agent/chord";
++
+ import { fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
++import type { Context } from "@so-agent/chord";
+ import {
+ 	type AgentEvent,
+ 	type ConversationId,
+diff --git a/packages/durable/test/session-documents.test.ts b/packages/durable/test/session-documents.test.ts
+index e88d7b6..5420382 100644
+--- a/packages/durable/test/session-documents.test.ts
++++ b/packages/durable/test/session-documents.test.ts
+@@ -1,11 +1,5 @@
+ import type { Draft, JsonValue } from "@so-agent/chord";
+-import {
+-	type ConversationId,
+-	defineDoc,
+-	defineDocFamily,
+-	type JsonObject,
+-	type TaskId,
+-} from "@so-agent/durable";
++import { type ConversationId, defineDoc, defineDocFamily, type JsonObject, type TaskId } from "@so-agent/durable";
+ import { describe, expect, it } from "vitest";
+ import { idFromNumber } from "../src/ids.ts";
+ import { context, createConversation, documentChanges, flush, openTestSession } from "./session-support.ts";
+diff --git a/packages/durable/test/spec-usage.test.ts b/packages/durable/test/spec-usage.test.ts
+index ca77285..b77a98a 100644
+--- a/packages/durable/test/spec-usage.test.ts
++++ b/packages/durable/test/spec-usage.test.ts
+@@ -3,8 +3,9 @@
+  * the names the spec leaves to the application declared below. Keep the two in sync; `test/examples/` runs the same
+  * patterns end to end.
+  */
+-import type { Context, Draft } from "@so-agent/chord";
++
+ import { type AssistantMessage, type Models, type ToolCall, Type } from "@so-agent/ai";
++import type { Context, Draft } from "@so-agent/chord";
+ import {
+ 	type ConversationId,
+ 	configure,
+diff --git a/packages/durable/test/tool-output-bench.ts b/packages/durable/test/tool-output-bench.ts
+index 075a8b2..de22911 100644
+--- a/packages/durable/test/tool-output-bench.ts
++++ b/packages/durable/test/tool-output-bench.ts
+@@ -13,9 +13,9 @@ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import { fileURLToPath } from "node:url";
+ import { promisify } from "node:util";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { createModels } from "@so-agent/ai/models";
+ import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import { Type } from "typebox";
+ import { NodeExecutionEnv } from "../src/env/node.ts";
+ import { createRegistry, defineTool, Harness, LiveDoc, MemoryStorage, type Storage } from "../src/index.ts";
+diff --git a/packages/durable/test/tools-images.test.ts b/packages/durable/test/tools-images.test.ts
+index 9d5a54b..b15cfae 100644
+--- a/packages/durable/test/tools-images.test.ts
++++ b/packages/durable/test/tools-images.test.ts
+@@ -3,12 +3,12 @@ import { appendFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from
+ import { createRequire } from "node:module";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
++import { initSync, PhotonImage } from "@silvia-odwyer/photon/photon_rs.js";
+ import type { Model } from "@so-agent/ai";
++import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+ import type { ToolDiagnostic, ToolExecutionApi, ToolExecutionResult } from "@so-agent/durable";
+ import { createNodePhotonImages } from "@so-agent/durable/images/node";
+ import { createCodingTools } from "@so-agent/durable/tools";
+-import { initSync, PhotonImage } from "@silvia-odwyer/photon/photon_rs.js";
+ import { afterAll, beforeAll, describe, expect, it } from "vitest";
+ import { getOrThrow } from "../src/env/index.ts";
+ import { NodeExecutionEnv } from "../src/env/node.ts";
+diff --git a/packages/durable/test/tools.test.ts b/packages/durable/test/tools.test.ts
+index 8bad966..6676bdd 100644
+--- a/packages/durable/test/tools.test.ts
++++ b/packages/durable/test/tools.test.ts
+@@ -6,12 +6,7 @@ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import type { Context, JsonValue } from "@so-agent/chord";
+ import { BACKGROUND_CONTEXT, withAbortSignal } from "@so-agent/chord/context";
+-import type {
+-	ToolDiagnostic,
+-	ToolExecutionApi,
+-	ToolExecutionResult,
+-	ToolRegistration,
+-} from "@so-agent/durable";
++import type { ToolDiagnostic, ToolExecutionApi, ToolExecutionResult, ToolRegistration } from "@so-agent/durable";
+ import { applyPatch } from "diff";
+ import { afterAll, describe, expect, it } from "vitest";
+ import {
+diff --git a/packages/env/package.json b/packages/env/package.json
+index 9bb6caf..5d0e3fb 100644
+--- a/packages/env/package.json
++++ b/packages/env/package.json
+@@ -38,7 +38,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/env"
+ 	},
+ 	"engines": {
+diff --git a/packages/evals/test/report.test.ts b/packages/evals/test/report.test.ts
+index 060b1b1..67a5e44 100644
+--- a/packages/evals/test/report.test.ts
++++ b/packages/evals/test/report.test.ts
+@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import { afterEach, describe, expect, it } from "vitest";
+ import type { EvalTask } from "../src/plan.ts";
+-import { classifyCaseStatus, SO_SESSION_SNAPSHOT_ARTIFACT, readTaskObservation } from "../src/report.ts";
++import { classifyCaseStatus, readTaskObservation, SO_SESSION_SNAPSHOT_ARTIFACT } from "../src/report.ts";
+ 
+ const temporaryDirectories: string[] = [];
+ afterEach(async () => {
+diff --git a/packages/mcp/package.json b/packages/mcp/package.json
+index 4d122e6..dc9700e 100644
+--- a/packages/mcp/package.json
++++ b/packages/mcp/package.json
+@@ -44,7 +44,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/mcp"
+ 	},
+ 	"engines": {
+diff --git a/packages/telemetry/package.json b/packages/telemetry/package.json
+index 8e02837..5843f70 100644
+--- a/packages/telemetry/package.json
++++ b/packages/telemetry/package.json
+@@ -41,7 +41,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/telemetry"
+ 	},
+ 	"engines": {
+diff --git a/packages/tui/package.json b/packages/tui/package.json
+index 99c3b90..ce2e0c6 100644
+--- a/packages/tui/package.json
++++ b/packages/tui/package.json
+@@ -44,7 +44,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/tui"
+ 	},
+ 	"engines": {
+-- 
+2.47.3
+

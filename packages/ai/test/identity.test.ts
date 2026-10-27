@@ -101,7 +101,7 @@ describe("client identity", () => {
 	it("attributes OpenRouter requests", () => {
 		const openRouter = target("openrouter", "https://openrouter.ai/api/v1");
 		expect(getAttributionHeaders(openRouter, { attribution: SO_ATTRIBUTION })).toEqual({
-			"HTTP-Referer": "https://pi.dev",
+			"HTTP-Referer": "https://github.com/kevin9327/so-agent",
 			"X-OpenRouter-Title": "so",
 			"X-OpenRouter-Categories": "cli-agent",
 		});

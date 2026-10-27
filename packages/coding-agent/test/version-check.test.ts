@@ -129,3 +129,24 @@ describe("version checks", () => {
 		expect(fetchMock).toHaveBeenCalledOnce();
 	});
 });
+
+describe("version checks without a configured feed", () => {
+	it("makes no request unless SO_UPDATE_URL is set", async () => {
+		vi.stubEnv("SO_UPDATE_URL", "");
+		const fetchMock = vi.fn(async () => Response.json({ version: "9.9.9" }));
+		vi.stubGlobal("fetch", fetchMock);
+
+		await expect(getLatestSoRelease("1.0.0")).resolves.toBeUndefined();
+		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it("uses SO_UPDATE_URL when set", async () => {
+		vi.stubEnv("SO_UPDATE_URL", "https://updates.example.test/latest");
+		const fetchMock = vi.fn(async () => Response.json({ version: "1.0.1" }));
+		vi.stubGlobal("fetch", fetchMock);
+
+		await expect(getLatestSoVersion("1.0.0")).resolves.toBe("1.0.1");
+		expect(fetchMock).toHaveBeenCalledWith("https://updates.example.test/latest", expect.anything());
+	});
+});

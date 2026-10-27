@@ -149,7 +149,7 @@ describe("createAgentSession client identity", () => {
 			attribution: SO_ATTRIBUTION,
 		});
 		expect(getAttributionHeaders(model, options?.identity)).toEqual({
-			"HTTP-Referer": "https://pi.dev",
+			"HTTP-Referer": "https://github.com/kevin9327/so-agent",
 			"X-OpenRouter-Title": "so",
 			"X-OpenRouter-Categories": "cli-agent",
 		});

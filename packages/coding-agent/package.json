@@ -1,6 +1,6 @@
 {
 	"name": "@so-agent/coding-agent",
-	"version": "1.4.0",
+	"version": "0.0.1",
 	"description": "Coding agent CLI with read, bash, edit, write tools and session management",
 	"type": "module",
 	"soConfig": {
@@ -41,11 +41,11 @@
 		"prepublishOnly": "npm run clean && npm run build"
 	},
 	"dependencies": {
-		"@so-agent/agent-core": "1.4.0",
-		"@so-agent/ai": "1.4.0",
-		"@so-agent/codemode": "1.4.0",
-		"@so-agent/mcp": "1.4.0",
-		"@so-agent/tui": "1.4.0",
+		"@so-agent/agent-core": "0.0.1",
+		"@so-agent/ai": "0.0.1",
+		"@so-agent/codemode": "0.0.1",
+		"@so-agent/mcp": "0.0.1",
+		"@so-agent/tui": "0.0.1",
 		"@silvia-odwyer/photon-node": "0.3.4",
 		"brace-expansion": "5.0.12",
 		"chalk": "6.0.0",

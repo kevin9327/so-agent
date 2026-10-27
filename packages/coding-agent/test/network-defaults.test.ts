@@ -1,6 +1,7 @@
 import type { Provider } from "@so-agent/ai/compat";
 import { describe, expect, it } from "vitest";
-import { getCatalogBaseUrl, withRemoteCatalog } from "../src/core/remote-catalog-provider.ts";
+import { VERSION } from "../src/config.ts";
+import { CATALOG_PROTOCOL_VERSION, getCatalogBaseUrl, withRemoteCatalog } from "../src/core/remote-catalog-provider.ts";
 import { getInstallReportUrl } from "../src/core/telemetry.ts";
 import { getManagedInstallerCommand } from "../src/package-manager-cli.ts";
 
@@ -14,6 +15,13 @@ describe("remote model catalog", () => {
 		);
 		for (const off of ["off", "OFF", "0", "false", "none"])
 			expect(getCatalogBaseUrl({ SO_CATALOG_URL: off })).toBe("");
+	});
+
+	it("speaks upstream's catalog protocol version, independent of so's own version", () => {
+		// The server picks a catalog revision from `pi-version`; so's package version (0.0.x) would select a catalog
+		// from before the schema this client reads. The pin only moves when a newer upstream protocol is implemented.
+		expect(CATALOG_PROTOCOL_VERSION).toBe("1.4.0");
+		expect(VERSION).not.toBe(CATALOG_PROTOCOL_VERSION);
 	});
 
 	it("wraps the provider unless the catalog is switched off", () => {

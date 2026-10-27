@@ -176,20 +176,27 @@ export function compareVersions(v1: ChangelogEntry, v2: ChangelogEntry): number 
 	return v1.patch - v2.patch;
 }
 
-/**
- * Get entries newer than lastVersion
- */
-export function getNewEntries(entries: ChangelogEntry[], lastVersion: string): ChangelogEntry[] {
-	// Parse lastVersion
-	const parts = lastVersion.split(".").map(Number);
-	const last: ChangelogEntry = {
-		major: parts[0] || 0,
-		minor: parts[1] || 0,
-		patch: parts[2] || 0,
-		content: "",
-	};
+function parseVersion(version: string): ChangelogEntry {
+	const parts = version.split(".").map(Number);
+	return { major: parts[0] || 0, minor: parts[1] || 0, patch: parts[2] || 0, content: "" };
+}
 
-	return entries.filter((entry) => compareVersions(entry, last) > 0);
+/**
+ * Get entries newer than lastVersion. When currentVersion is given, entries newer than the running version are left
+ * out: so agent keeps the upstream Pi changelog below its own entries, and a so 0.0.x release must not announce Pi's
+ * 1.x history as "what's new".
+ */
+export function getNewEntries(
+	entries: ChangelogEntry[],
+	lastVersion: string,
+	currentVersion?: string,
+): ChangelogEntry[] {
+	const last = parseVersion(lastVersion);
+	const current = currentVersion === undefined ? undefined : parseVersion(currentVersion);
+
+	return entries.filter(
+		(entry) => compareVersions(entry, last) > 0 && (current === undefined || compareVersions(entry, current) <= 0),
+	);
 }
 
 // Re-export getChangelogPath from paths.ts for convenience

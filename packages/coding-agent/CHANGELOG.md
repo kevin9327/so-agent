@@ -1,6 +1,6 @@
 # Changelog
 
-> so agent fork notice: entries below are the upstream Pi project's history, kept verbatim (names, commands and links refer to Pi). so agent changes are listed in `docs/EFFICIENCY.md` and the git log.
+> so agent fork notice: entries from `[1.4.0]` down are the upstream Pi project's history, kept verbatim (names, commands and links refer to Pi), and `[Unreleased]` is Pi's unreleased text at the fork point. so agent releases start at `[0.0.1]`; more detail is in `docs/EFFICIENCY.md` and the git log.
 
 ## [Unreleased]
 
@@ -25,6 +25,12 @@
 - Fixed aborting a bash command on macOS sometimes running the next command of a list such as `long_step; next_step`. pi now stops the process group before killing it ([#11252](https://github.com/earendil-works/pi/issues/11252), [#11289](https://github.com/earendil-works/pi/pull/11289))
 - Fixed streamed tool calls re-running their call renderer on every argument delta; the interactive mode now renders the latest arguments once per frame, so a large streamed `write` no longer re-highlights its whole content per delta ([#9265](https://github.com/earendil-works/pi/issues/9265))
 - Fixed the login dialog opening sign-in URLs that are not web URLs, and printing control characters from sign-in, device-code, and info URLs, which could end a terminal hyperlink and send escape sequences to the terminal
+
+## [0.0.1] - 2026-10-27
+
+### Added
+
+- First so agent release: a rename fork of Pi 1.4.0 (`6c384aa`) with the CLI `so` and the `@so-agent/*` packages. Behavior is unchanged apart from the rename, with these additions: update check, remote model catalog and install report are configurable through `SO_UPDATE_URL`, `SO_CATALOG_URL`, `SO_INSTALL_REPORT_URL`, `SO_INSTALLER_URL` and `SO_INSTALLER_PS1_URL`; `so --version` answers without loading the runtime; run modes load on demand. See `docs/EFFICIENCY.md`.
 
 ## [1.4.0] - 2026-10-21
 

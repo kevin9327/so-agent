@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { type ChangelogEntry, normalizeChangelogLinks } from "../src/utils/changelog.ts";
+import { type ChangelogEntry, getNewEntries, normalizeChangelogLinks } from "../src/utils/changelog.ts";
 
 const entry: ChangelogEntry = {
 	major: 0,
@@ -45,5 +45,24 @@ describe("normalizeChangelogLinks", () => {
 				"[Local anchor](#settings)",
 			].join("\n"),
 		);
+	});
+});
+
+describe("getNewEntries", () => {
+	const at = (major: number, minor: number, patch: number): ChangelogEntry => ({
+		major,
+		minor,
+		patch,
+		content: `${major}.${minor}.${patch}`,
+	});
+	const entries = [at(1, 4, 0), at(0, 0, 3), at(0, 0, 2), at(0, 0, 1)];
+
+	test("returns entries newer than the last seen version", () => {
+		expect(getNewEntries(entries, "0.0.1").map((e) => e.content)).toEqual(["1.4.0", "0.0.3", "0.0.2"]);
+	});
+
+	test("leaves out entries newer than the running version, so upstream history is not announced", () => {
+		expect(getNewEntries(entries, "0.0.1", "0.0.2").map((e) => e.content)).toEqual(["0.0.2"]);
+		expect(getNewEntries(entries, "0.0.2", "0.0.2")).toEqual([]);
 	});
 });

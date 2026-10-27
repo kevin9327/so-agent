@@ -8,11 +8,11 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
 import { type AssistantMessage, type FauxResponseStep, Type } from "@so-agent/ai";
 import { createModels } from "@so-agent/ai/models";
 import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
 import { openaiProvider } from "@so-agent/ai/providers/openai";
+import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
 import {
 	AssistantEntry,
 	type ConversationId,

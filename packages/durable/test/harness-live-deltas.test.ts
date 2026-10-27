@@ -1,5 +1,5 @@
-import type { Op } from "@so-agent/chord/delta";
 import { fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
+import type { Op } from "@so-agent/chord/delta";
 import {
 	type CommitPublication,
 	defineTool,

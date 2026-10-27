@@ -1,4 +1,3 @@
-import type { Context, JsonValue, WatchHandle } from "@so-agent/chord";
 import type {
 	AssistantMessage,
 	CacheRetention,
@@ -15,6 +14,7 @@ import type {
 	Usage,
 	UserMessage,
 } from "@so-agent/ai";
+import type { Context, JsonValue, WatchHandle } from "@so-agent/chord";
 import type { TelemetryContext } from "@so-agent/telemetry";
 import type { ExecutionEnv, ShellOutputSkip, ShellOutputWindow } from "../env/index.ts";
 import type {

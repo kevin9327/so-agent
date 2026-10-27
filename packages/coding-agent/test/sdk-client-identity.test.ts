@@ -8,8 +8,8 @@ import {
 	getAttributionHeaders,
 	type Model,
 	normalizeContext,
-	SO_ATTRIBUTION,
 	type SimpleStreamOptions,
+	SO_ATTRIBUTION,
 } from "@so-agent/ai";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { VERSION } from "../src/config.ts";

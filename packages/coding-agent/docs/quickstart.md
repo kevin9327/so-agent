@@ -6,27 +6,13 @@ For native Windows setup, read [Windows Setup](windows.md). For Android, read [T
 
 ## 1. Install So
 
-On macOS or Linux, you can use the installer:
+so agent is built from source. This requires Node.js 22.19 or newer:
 
 ```bash
-curl -fsSL https://pi.dev/install.sh | sh
+git clone <your so-agent repository> so-agent && cd so-agent
+npm ci --ignore-scripts && npm run build
+npm link --ignore-scripts ./packages/coding-agent
 ```
-
-The installer pins all dependencies and updates So with `so update`. Alternatively, install So from npm, which does not pin transitive dependencies. This requires Node.js 22.19 or newer:
-
-```bash
-npm install -g --ignore-scripts @so-agent/coding-agent
-```
-
-So does not require dependency lifecycle scripts for a normal npm installation.
-
-With Nix on macOS or Linux, install the latest release from So's flake. Nix builds So from source:
-
-```bash
-nix profile add github:earendil-works/pi/stable
-```
-
-Older Nix versions use `nix profile install` instead. Update with `nix profile upgrade so`; `so update` cannot update a Nix installation. To pin a release, use a tag such as `github:earendil-works/pi/v1.0.0`.
 
 Verify the installation:
 
@@ -119,12 +105,6 @@ If you installed So with npm, run:
 
 ```bash
 npm uninstall -g @so-agent/coding-agent
-```
-
-If you used the installer, run it again and choose **Uninstall So**:
-
-```bash
-curl -fsSL https://pi.dev/install.sh | sh
 ```
 
 If you installed So with Nix, run:

@@ -1,5 +1,5 @@
-import { withTelemetry } from "@so-agent/chord/context";
 import { fauxAssistantMessage, fauxToolCall, Type } from "@so-agent/ai";
+import { withTelemetry } from "@so-agent/chord/context";
 import { CodemodeSandbox } from "@so-agent/codemode";
 import {
 	CompactionTask,

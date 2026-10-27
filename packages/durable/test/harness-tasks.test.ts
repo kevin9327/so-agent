@@ -1,6 +1,6 @@
+import { createModels, Type } from "@so-agent/ai";
 import type { Context } from "@so-agent/chord";
 import { withAbortSignal, withCancel } from "@so-agent/chord/context";
-import { createModels, Type } from "@so-agent/ai";
 import {
 	type CommitPublication,
 	type Conversation,

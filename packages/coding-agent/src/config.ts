@@ -577,7 +577,7 @@ try {
 const soConfigName: string | undefined = pkg.soConfig?.name;
 export const PACKAGE_NAME: string = pkg.name || "@so-agent/coding-agent";
 export const APP_NAME: string = soConfigName || "so";
-export const APP_TITLE: string = soConfigName ? APP_NAME : "π";
+export const APP_TITLE: string = soConfigName ? APP_NAME : "so";
 export const CONFIG_DIR_NAME: string = pkg.soConfig?.configDir || ".so";
 export const VERSION: string = pkg.version || "0.0.0";
 

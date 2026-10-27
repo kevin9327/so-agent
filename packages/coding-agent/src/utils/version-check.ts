@@ -2,7 +2,8 @@ import { compare, valid } from "semver";
 import { fetchWithRetry } from "./management-http.ts";
 import { getSoUserAgent } from "./so-user-agent.ts";
 
-const LATEST_VERSION_URL = "https://pi.dev/api/latest-version";
+/** so has no hosted release feed. Set `SO_UPDATE_URL` to a JSON endpoint returning `{ version, packageName?, note? }`. */
+const getLatestVersionUrl = (): string | undefined => process.env.SO_UPDATE_URL?.trim() || undefined;
 const DEFAULT_VERSION_CHECK_TIMEOUT_MS = 10000;
 
 export interface LatestSoRelease {
@@ -52,10 +53,11 @@ export async function getLatestSoRelease(
 	currentVersion: string,
 	options: { timeoutMs?: number; retry?: boolean } = {},
 ): Promise<LatestSoRelease | undefined> {
-	if (process.env.SO_OFFLINE) return undefined;
+	const latestVersionUrl = getLatestVersionUrl();
+	if (process.env.SO_OFFLINE || !latestVersionUrl) return undefined;
 
 	const response = await fetchWithRetry(
-		LATEST_VERSION_URL,
+		latestVersionUrl,
 		{
 			headers: {
 				"User-Agent": getSoUserAgent(currentVersion),

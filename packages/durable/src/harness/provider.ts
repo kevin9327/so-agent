@@ -1,5 +1,5 @@
-import type { Context } from "@so-agent/chord";
 import { uuidv7 } from "@so-agent/ai/utils/uuid";
+import type { Context } from "@so-agent/chord";
 import { defineDoc } from "../documents.ts";
 import type { TaskRuntime } from "../types.ts";
 

@@ -1,9 +1,10 @@
 // Per-conversation agent choices and Harness-wide settings.
 // Run from packages/durable:
 //   node --conditions=source --experimental-strip-types test/examples/06-configuration.ts
-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+
 import { Type } from "@so-agent/ai";
 import { createModels } from "@so-agent/ai/models";
+import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
 import {
 	AgentDoc,
 	createRegistry,

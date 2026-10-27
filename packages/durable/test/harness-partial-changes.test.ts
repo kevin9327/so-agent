@@ -1,11 +1,11 @@
-import { copyJson } from "@so-agent/chord";
-import { type Op, track } from "@so-agent/chord/delta";
 import {
 	type AssistantMessage,
 	type AssistantMessageEvent,
 	type ToolCall,
 	ToolCallArgumentsStream,
 } from "@so-agent/ai";
+import { copyJson } from "@so-agent/chord";
+import { type Op, track } from "@so-agent/chord/delta";
 import { describe, expect, it } from "vitest";
 import type { LiveState } from "../src/harness/live.ts";
 import { PartialChanges, type PartialMessage } from "../src/harness/partial-changes.ts";

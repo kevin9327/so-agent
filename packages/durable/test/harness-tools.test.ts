@@ -1,7 +1,6 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { JsonValue } from "@so-agent/chord";
 import {
 	type AssistantMessage,
 	type FauxResponseStep,
@@ -13,6 +12,7 @@ import {
 	type ToolResultMessage,
 	Type,
 } from "@so-agent/ai";
+import type { JsonValue } from "@so-agent/chord";
 import {
 	AgentDoc,
 	type Conversation,

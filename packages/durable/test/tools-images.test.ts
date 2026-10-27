@@ -3,12 +3,12 @@ import { appendFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+import { initSync, PhotonImage } from "@silvia-odwyer/photon/photon_rs.js";
 import type { Model } from "@so-agent/ai";
+import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
 import type { ToolDiagnostic, ToolExecutionApi, ToolExecutionResult } from "@so-agent/durable";
 import { createNodePhotonImages } from "@so-agent/durable/images/node";
 import { createCodingTools } from "@so-agent/durable/tools";
-import { initSync, PhotonImage } from "@silvia-odwyer/photon/photon_rs.js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { getOrThrow } from "../src/env/index.ts";
 import { NodeExecutionEnv } from "../src/env/node.ts";

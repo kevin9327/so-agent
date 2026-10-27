@@ -1,8 +1,8 @@
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import type { Context } from "@so-agent/chord";
 import { type AssistantMessage, fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
+import type { Context } from "@so-agent/chord";
 import { type CodemodeRun, CodemodeSandbox } from "@so-agent/codemode";
 import {
 	defineTool,

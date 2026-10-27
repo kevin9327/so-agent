@@ -1,5 +1,5 @@
-import type { Context } from "@so-agent/chord";
 import { createModels, type Message } from "@so-agent/ai";
+import type { Context } from "@so-agent/chord";
 import {
 	type ContextView,
 	createRegistry,

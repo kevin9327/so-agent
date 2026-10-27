@@ -34,9 +34,10 @@
  * or when the script diverges: it makes another call, or calls in another order, than the journal says. Each ends the
  * call with an error result.
  */
+
+import type { TextContent } from "@so-agent/ai";
 import { type Context, copyJson, type JsonValue } from "@so-agent/chord";
 import { ownedSlice } from "@so-agent/chord/delta";
-import type { TextContent } from "@so-agent/ai";
 import {
 	type CodemodeHostCall,
 	type CodemodeOutcome,

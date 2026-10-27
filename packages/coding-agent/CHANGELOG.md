@@ -1,5 +1,7 @@
 # Changelog
 
+> so agent fork notice: entries below are the upstream Pi project's history, kept verbatim (names, commands and links refer to Pi). so agent changes are listed in `docs/EFFICIENCY.md` and the git log.
+
 ## [Unreleased]
 
 ### Added

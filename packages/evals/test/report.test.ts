@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { EvalTask } from "../src/plan.ts";
-import { classifyCaseStatus, SO_SESSION_SNAPSHOT_ARTIFACT, readTaskObservation } from "../src/report.ts";
+import { classifyCaseStatus, readTaskObservation, SO_SESSION_SNAPSHOT_ARTIFACT } from "../src/report.ts";
 
 const temporaryDirectories: string[] = [];
 afterEach(async () => {

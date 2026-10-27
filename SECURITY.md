@@ -26,8 +26,8 @@ coding agent trivially and this cannot be protected against.
 If you believe you found a security vulnerability in so or another package in
 this repository, please report it privately by either:
 
-- Emailing `security@earendil.com`, or
-- Opening a private report through GitHub Security Advisories for this repository
+- Opening a private report through GitHub Security Advisories for this repository, or
+- Contacting the maintainer of this fork directly
 
 Please include:
 
@@ -42,8 +42,8 @@ reports and coordinate disclosure as appropriate.
 ## Scope
 
 Security issues in the distributed packages, command-line tools, APIs, and
-repository code are in scope as well as earendil operated infrastructure
-on `pi.dev`.
+repository code are in scope. Infrastructure operated by the upstream Pi project
+(for example `pi.dev`) is out of scope for this fork; report it upstream.
 
 ## Out Of Scope
 

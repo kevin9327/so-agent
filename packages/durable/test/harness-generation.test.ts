@@ -3,8 +3,8 @@ import {
 	fauxAssistantMessage,
 	type Message,
 	type Models,
-	SO_ATTRIBUTION,
 	type SimpleStreamOptions,
+	SO_ATTRIBUTION,
 	type SystemMessage,
 } from "@so-agent/ai";
 import {

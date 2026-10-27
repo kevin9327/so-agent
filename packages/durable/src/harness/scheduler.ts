@@ -1,7 +1,7 @@
+import type { Models } from "@so-agent/ai";
 import { type Context, copyJson, type JsonValue } from "@so-agent/chord";
 import { awaitWithContext, withAbortSignal, withoutAbortSignal, withTelemetry } from "@so-agent/chord/context";
 import { ownedSlice } from "@so-agent/chord/delta";
-import type { Models } from "@so-agent/ai";
 import {
 	createTypedMetrics,
 	createTypedSpanStarter,

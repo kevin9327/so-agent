@@ -131,13 +131,12 @@ function createModel(
 
 const CORAL: Rgb = [228, 138, 122];
 const BLUE: Rgb = [79, 142, 179];
-const YELLOW: Rgb = [234, 182, 93];
-const SO_LOGO_PIXELS = ["ccc.", "b.c.", "bb.y", "b..y"];
-const SO_LOGO_COLORS: Record<string, Rgb> = { c: CORAL, b: BLUE, y: YELLOW };
+const SO_LOGO_PIXELS = ["ccc.bbb", "c...b.b", "ccc.b.b", "..c.b.b", "ccc.bbb"];
+const SO_LOGO_COLORS: Record<string, Rgb> = { c: CORAL, b: BLUE };
 
 function soLogoModel(origin: { column: number; row: number }): Model {
-	return createModel(4, 4, (column, row) => SO_LOGO_COLORS[SO_LOGO_PIXELS[row]![column]!], {
-		cameraDistance: 10,
+	return createModel(7, 5, (column, row) => SO_LOGO_COLORS[SO_LOGO_PIXELS[row]![column]!], {
+		cameraDistance: 14,
 		widthShare: 0.35,
 		puzzleMoves: (random) => (random < 0.4 ? 2 : 1),
 		origin,

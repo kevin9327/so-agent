@@ -94,10 +94,7 @@ function getAliases(): Record<string, string> {
 	const soAiCompatEntry = resolveWorkspaceOrImport("ai/dist/compat.js", "@so-agent/ai/compat");
 	const soAiModelsEntry = resolveWorkspaceOrImport("ai/dist/models.js", "@so-agent/ai/models");
 	const soAiOauthEntry = resolveWorkspaceOrImport("ai/dist/oauth.js", "@so-agent/ai/oauth");
-	const soAiProvidersEntry = resolveWorkspaceOrImport(
-		"ai/dist/providers/all.js",
-		"@so-agent/ai/providers/all",
-	);
+	const soAiProvidersEntry = resolveWorkspaceOrImport("ai/dist/providers/all.js", "@so-agent/ai/providers/all");
 
 	_aliases = {
 		"@so-agent/coding-agent": soCodingAgentEntry,

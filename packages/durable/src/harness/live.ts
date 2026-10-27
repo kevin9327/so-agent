@@ -1,5 +1,5 @@
-import type { Draft, JsonRepresentation, JsonValue } from "@so-agent/chord";
 import type { AssistantMessage, Usage } from "@so-agent/ai";
+import type { Draft, JsonRepresentation, JsonValue } from "@so-agent/chord";
 import { defineDoc } from "../documents.ts";
 import type { Transaction } from "../session/transaction.ts";
 import type {

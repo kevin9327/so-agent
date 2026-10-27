@@ -1,11 +1,5 @@
 import type { Draft, JsonValue } from "@so-agent/chord";
-import {
-	type ConversationId,
-	defineDoc,
-	defineDocFamily,
-	type JsonObject,
-	type TaskId,
-} from "@so-agent/durable";
+import { type ConversationId, defineDoc, defineDocFamily, type JsonObject, type TaskId } from "@so-agent/durable";
 import { describe, expect, it } from "vitest";
 import { idFromNumber } from "../src/ids.ts";
 import { context, createConversation, documentChanges, flush, openTestSession } from "./session-support.ts";

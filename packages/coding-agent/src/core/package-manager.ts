@@ -50,8 +50,8 @@ import {
 } from "../utils/paths.ts";
 import { stripBom } from "../utils/text.ts";
 import { isStdoutTakenOver } from "./output-guard.ts";
-import { type SoManifest, readSoManifest } from "./so-manifest.ts";
 import type { PackageSource, SettingsManager } from "./settings-manager.ts";
+import { readSoManifest, type SoManifest } from "./so-manifest.ts";
 import { BUILTIN_PATH_PREFIX } from "./source-info.ts";
 
 const NETWORK_TIMEOUT_MS = 10000;

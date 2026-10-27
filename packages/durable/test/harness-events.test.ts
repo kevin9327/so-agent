@@ -1,6 +1,5 @@
 import { GCProfiler, getHeapStatistics, setFlagsFromString } from "node:v8";
 import { runInNewContext } from "node:vm";
-import type { Draft } from "@so-agent/chord";
 import {
 	type AssistantMessage,
 	type FauxResponseStep,
@@ -10,6 +9,7 @@ import {
 	fauxToolCall,
 	Type,
 } from "@so-agent/ai";
+import type { Draft } from "@so-agent/chord";
 import {
 	AgentDoc,
 	type AgentEvent,

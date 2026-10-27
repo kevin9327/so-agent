@@ -1,5 +1,5 @@
-import { applyImmutable, type Op } from "@so-agent/chord/delta";
 import { type AssistantMessage, type FauxResponseStep, fauxAssistantMessage, fauxText } from "@so-agent/ai";
+import { applyImmutable, type Op } from "@so-agent/chord/delta";
 import {
 	AgentDoc,
 	type Conversation,

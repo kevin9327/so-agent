@@ -1,6 +1,6 @@
+import type { Message, Models } from "@so-agent/ai";
 import type { Context, Draft, JsonValue, WatchChange, WatchHandle } from "@so-agent/chord";
 import type { Op } from "@so-agent/chord/delta";
-import type { Message, Models } from "@so-agent/ai";
 import type { TelemetryCarrier } from "@so-agent/telemetry";
 import type { ExecutionEnv } from "./env/index.ts";
 import type {

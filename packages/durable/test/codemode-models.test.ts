@@ -1,7 +1,6 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Context } from "@so-agent/chord";
 import {
 	type AssistantImages,
 	type ClassifierResult,
@@ -11,6 +10,7 @@ import {
 	fauxToolCall,
 	type MutableModels,
 } from "@so-agent/ai";
+import type { Context } from "@so-agent/chord";
 import { CodemodeSandbox } from "@so-agent/codemode";
 import { MemoryStorage, ToolResultEntry, UsageDoc } from "@so-agent/durable";
 import { describe, expect, it } from "vitest";

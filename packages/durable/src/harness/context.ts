@@ -1,5 +1,5 @@
-import type { Context } from "@so-agent/chord";
 import type { AssistantMessage, Message, ToolCall, ToolResultMessage } from "@so-agent/ai";
+import type { Context } from "@so-agent/chord";
 import { SystemEntry } from "../entries.ts";
 import { idFromNumber } from "../ids.ts";
 import type { SessionImpl } from "../session/session.ts";

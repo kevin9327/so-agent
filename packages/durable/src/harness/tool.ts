@@ -1,3 +1,5 @@
+import type { ImageContent, TextContent, ToolCall, ToolResultMessage } from "@so-agent/ai";
+import { validateToolArguments } from "@so-agent/ai/utils/validation";
 import { type Context, copyJson, type Draft, type JsonRepresentation, type JsonValue } from "@so-agent/chord";
 import { awaitWithContext } from "@so-agent/chord/context";
 import { overlap, ownedSlice } from "@so-agent/chord/delta";
@@ -9,8 +11,6 @@ import {
 	Progress,
 	type ProgressClock,
 } from "@so-agent/chord/output";
-import type { ImageContent, TextContent, ToolCall, ToolResultMessage } from "@so-agent/ai";
-import { validateToolArguments } from "@so-agent/ai/utils/validation";
 import { Compile } from "typebox/compile";
 import { defineDocFamily } from "../documents.ts";
 import { AssistantEntry, ToolResultEntry } from "../entries.ts";

@@ -1,12 +1,6 @@
-import {
-	type Context,
-	type JsonValue,
-	NativeWatch,
-	type NativeWatchChange,
-	type WatchEnd,
-} from "@so-agent/chord";
-import type { Op, Path } from "@so-agent/chord/delta";
 import type { AssistantMessage, Message, Usage } from "@so-agent/ai";
+import { type Context, type JsonValue, NativeWatch, type NativeWatchChange, type WatchEnd } from "@so-agent/chord";
+import type { Op, Path } from "@so-agent/chord/delta";
 import type { ObservedCommit } from "../session/session.ts";
 import type {
 	CommitChange,

@@ -1,5 +1,5 @@
-import { copyJson, type Draft, type JsonRepresentation } from "@so-agent/chord";
 import type { Usage } from "@so-agent/ai";
+import { copyJson, type Draft, type JsonRepresentation } from "@so-agent/chord";
 import { defineDoc } from "../documents.ts";
 import type { ConversationId, Tx } from "../types.ts";
 

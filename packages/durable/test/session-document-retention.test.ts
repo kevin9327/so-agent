@@ -1,7 +1,8 @@
 // The Session's document cache is bounded by use: unattached documents leave it after the retention period and load
 // from Storage again; documents with a watch or a document state never leave it.
-import type { Context } from "@so-agent/chord";
+
 import { fauxAssistantMessage, fauxText, fauxToolCall, Type } from "@so-agent/ai";
+import type { Context } from "@so-agent/chord";
 import {
 	type AgentEvent,
 	type ConversationId,

@@ -1,9 +1,10 @@
 // Open a Harness with a registry of extensions.
 // Run from packages/durable:
 //   node --conditions=source --experimental-strip-types test/examples/05-harness.ts
-import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+
 import { Type } from "@so-agent/ai";
 import { createModels } from "@so-agent/ai/models";
+import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
 import {
 	AgentDoc,
 	createRegistry,

@@ -11,12 +11,7 @@ import {
 	runToolCall,
 } from "@so-agent/agent-core";
 import type { ImageContent, JsonObject, JsonValue, TextContent } from "@so-agent/ai";
-import {
-	type CodemodeJsonSchema,
-	CodemodeSandbox,
-	type CodemodeTool,
-	renderDeclarations,
-} from "@so-agent/codemode";
+import { type CodemodeJsonSchema, CodemodeSandbox, type CodemodeTool, renderDeclarations } from "@so-agent/codemode";
 import { type McpClient, toLlmContent } from "@so-agent/mcp";
 import { Type } from "typebox";
 

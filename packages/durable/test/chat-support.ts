@@ -1,4 +1,3 @@
-import type { Context } from "@so-agent/chord";
 import {
 	createModels,
 	type FauxProviderHandle,
@@ -8,6 +7,7 @@ import {
 	type Models,
 	type RegisterFauxProviderOptions,
 } from "@so-agent/ai";
+import type { Context } from "@so-agent/chord";
 import {
 	type Conversation,
 	createRegistry,

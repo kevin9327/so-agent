@@ -6,15 +6,7 @@
  */
 
 import type { ExtensionAPI } from "@so-agent/coding-agent";
-import {
-	Editor,
-	type EditorTheme,
-	Key,
-	matchesKey,
-	Text,
-	visibleWidth,
-	wrapTextWithAnsi,
-} from "@so-agent/tui";
+import { Editor, type EditorTheme, Key, matchesKey, Text, visibleWidth, wrapTextWithAnsi } from "@so-agent/tui";
 import { Type } from "typebox";
 
 // Types

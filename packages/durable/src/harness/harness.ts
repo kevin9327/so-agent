@@ -1,5 +1,3 @@
-import type { Context, JsonValue } from "@so-agent/chord";
-import { withAbortSignal, withoutAbortSignal } from "@so-agent/chord/context";
 import type { Models } from "@so-agent/ai";
 import {
 	type ClientIdentity,
@@ -7,6 +5,8 @@ import {
 	SO_ATTRIBUTION,
 	withClientIdentity,
 } from "@so-agent/ai/utils/identity";
+import type { Context, JsonValue } from "@so-agent/chord";
+import { withAbortSignal, withoutAbortSignal } from "@so-agent/chord/context";
 import {
 	createTypedMetrics,
 	NOOP_TELEMETRY_CONTEXT,

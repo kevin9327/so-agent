@@ -1,8 +1,6 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { JsonValue } from "@so-agent/chord";
-import { withAbortSignal } from "@so-agent/chord/context";
 import {
 	type AssistantMessage,
 	fauxAssistantMessage,
@@ -12,6 +10,8 @@ import {
 	Type,
 	type Usage,
 } from "@so-agent/ai";
+import type { JsonValue } from "@so-agent/chord";
+import { withAbortSignal } from "@so-agent/chord/context";
 import {
 	type AgentEvent,
 	AssistantEntry,

@@ -80,7 +80,8 @@ function createPnpmGlobalInstall(): { root: string; packageDir: string } {
 			".pnpm",
 			"@so-agent+coding-agent@0.0.0",
 			"node_modules",
-			"@so-agent", "coding-agent",
+			"@so-agent",
+			"coding-agent",
 			"dist",
 			"cli.js",
 		),
@@ -358,11 +359,13 @@ describe("detectInstallMethod", () => {
 			"store",
 			"v11",
 			"links",
-			"@so-agent", "coding-agent",
+			"@so-agent",
+			"coding-agent",
 			"0.75.0",
 			"hash",
 			"node_modules",
-			"@so-agent", "coding-agent",
+			"@so-agent",
+			"coding-agent",
 		);
 		mkdirSync(globalPackageDir, { recursive: true });
 		mkdirSync(storePackageDir, { recursive: true });

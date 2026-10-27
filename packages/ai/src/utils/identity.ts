@@ -21,7 +21,11 @@ export interface ClientAttribution {
 }
 
 /** so's attribution, used by so-agent-core, so-durable, and the coding agent. */
-export const SO_ATTRIBUTION: ClientAttribution = { name: "so", url: "https://pi.dev", categories: ["cli-agent"] };
+export const SO_ATTRIBUTION: ClientAttribution = {
+	name: "so",
+	url: "https://github.com/kevin9327/so-agent",
+	categories: ["cli-agent"],
+};
 
 /**
  * How so-ai identifies the calling app to providers. Every field is optional; absent fields use so-ai's defaults:

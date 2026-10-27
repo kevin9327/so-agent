@@ -1,6 +1,6 @@
-import type { Context } from "@so-agent/chord";
 import type { Message, SystemMessage, Tool, ToolReference } from "@so-agent/ai";
 import { declarationsEqual, getCurrentTools, toToolDeclaration } from "@so-agent/ai/utils/transcript";
+import type { Context } from "@so-agent/chord";
 import { SystemEntry } from "../entries.ts";
 import type { ContextEdit, TypedEntryDraft } from "../types.ts";
 import type { ContextView, PromptInput, PromptSection, ToolRegistration } from "./types.ts";

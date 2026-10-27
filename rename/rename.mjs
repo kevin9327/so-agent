@@ -45,9 +45,11 @@ const REMOVE = [];
 // infrastructure. Renaming a file back to `*.yml` re-enables it once it has been adapted.
 const DISABLED_WORKFLOWS = [
 	".github/workflows/approve-contributor.yml",
+	".github/workflows/build-binaries.yml",
 	".github/workflows/issue-analysis.yml",
 	".github/workflows/issue-gate.yml",
 	".github/workflows/issue-triage-labels.yml",
+	".github/workflows/nix.yml",
 	".github/workflows/pr-gate.yml",
 	".github/workflows/preview-packages.yml",
 	".github/workflows/publish-model-catalog.yml",

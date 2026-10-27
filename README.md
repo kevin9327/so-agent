@@ -1,75 +1,74 @@
 <p align="center">
-  <a href="https://pi.dev">
-    <img alt="so logo" src="https://pi.dev/logo-auto.svg" width="128">
-  </a>
+  <img alt="so agent: a small, extensible coding agent for your terminal" src="assets/banner.svg" width="720">
 </p>
+
 <p align="center">
-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
-  <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square" /></a>
+  <a href="https://github.com/kevin9327/so-agent/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kevin9327/so-agent/actions/workflows/ci.yml/badge.svg" /></a>
+  <a href="https://github.com/kevin9327/so-agent/releases"><img alt="release" src="https://img.shields.io/github/v/release/kevin9327/so-agent?style=flat-square&include_prereleases" /></a>
+  <a href="LICENSE"><img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
+  <img alt="node >= 22.19" src="https://img.shields.io/badge/node-%3E%3D22.19-339933?style=flat-square&logo=node.js&logoColor=white" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
 </p>
 
-> **so agent is a fork of [Pi](https://github.com/earendil-works/pi)** (MIT, by Mario Zechner and contributors); see [ATTRIBUTION.md](ATTRIBUTION.md) and [docs/EFFICIENCY.md](docs/EFFICIENCY.md). The installer URLs, badges, logo and screenshots below are still upstream's: the installers (`pi.dev/install.sh`) install **Pi, not so**, and the `@so-agent/*` packages are not published to npm yet. Until they are, build from source (see [Development](#development) and `./so-test.sh`). Everything else in this README is upstream's text with the names changed.
+**so agent** is a terminal coding agent: a minimal harness with `read`, `write`, `edit` and `bash` tools that you extend with TypeScript extensions, skills, prompt templates, themes and packages instead of waiting for features. It is a **fork of [Pi](https://github.com/earendil-works/pi)** (MIT, by Mario Zechner and contributors; [ATTRIBUTION.md](ATTRIBUTION.md)), renamed, kept compatible with Pi's extension API, and tuned conservatively. Early (0.0.x), built from source for now.
 
-> New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
+A real run (so 0.0.2, local Qwen3-4B model, [full transcript and how it was recorded](docs/demo.md)):
 
-# So
+```text
+You: Change the default server port from 3000 to 8080 in config.js and update the README so it states the new default. Change nothing else.
 
-So is a minimal, extensible agent harness that you can make your own.
+  read   config.js
+  read   README.md
+  edit   config.js     Successfully replaced 1 block(s) in config.js.
+  edit   README.md     Successfully replaced 1 block(s) in README.md.
 
-Adapt So to your workflows, not the other way around. Customize So with [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), and [themes](packages/coding-agent/docs/themes.md). Bundle them as [So packages](packages/coding-agent/docs/packages.md) and share via npm or git.
+so: I've updated both files as requested: the default port in config.js is now 8080 and the README states it.
+```
 
-So ships with powerful defaults but skips features like sub-agents and plan mode. Ask So to build what you want, or install a package that does it your way.
+## Why so agent
 
-Use So [interactively](packages/coding-agent/docs/usage.md), automate it in [print or JSON mode](packages/coding-agent/docs/cli.md), control it over [RPC](packages/coding-agent/docs/rpc.md), or build apps with the [So TypeScript SDK](packages/coding-agent/docs/sdk.md). See [OpenClaw](https://github.com/OpenClaw/OpenClaw) for a real-world integration.
+so is the same agent as Pi 1.4.0 with its behavior kept (nothing removed), plus a short list of changes that are measured or tested. The numbers are in [docs/EFFICIENCY.md](docs/EFFICIENCY.md); they are small on purpose, because most of an agent's time is the model, not the harness.
 
-## Getting started
+| | Pi 1.4.0 | so 0.0.3 | How measured |
+|---|---|---|---|
+| `so --version` | 171.5 ms | **23.5 ms** | median of 31 runs (`bench/run.mjs`); `node -e 0` alone is 20.7 ms |
+| Peak memory, one print-mode run | 122 MiB | **117 MiB** | same harness |
+| Time to first provider request | 234 ms | 235 ms (same) | same harness, mock provider |
+| System prompt, tool descriptions | upstream | upstream wording | unchanged apart from the name |
+| Prompt cache prefix across turns | stable | stable | `promptPrefixBreak: null` |
 
-Install the command-line interface:
+What else is different:
+
+- **Pi extensions keep working.** `@earendil-works/pi-*` and `@mariozechner/pi-*` imports still resolve, next to the new `@so-agent/*` names.
+- **Fork-safe network defaults.** Update check points at this package's npm entry, install reporting and the installer hint have no upstream endpoint, and the remote model catalog can be pointed elsewhere or off (`SO_CATALOG_URL`). Every variable is in [docs/UPSTREAM-ENDPOINTS.md](docs/UPSTREAM-ENDPOINTS.md).
+- **Small fixes found by running it** (see [CHANGELOG](packages/coding-agent/CHANGELOG.md)): streams that send a tool call's arguments under a new index no longer create a nameless call; a failed `edit` shows the closest lines of the file; the output-limit error tells the model how to retry.
+- **A reproducible rename** from upstream: `rename/rename.sh` regenerates this tree from a Pi checkout, so upstream updates can be merged.
+- **A real-model eval harness** for comparing builds on the same tasks with any OpenAI-compatible endpoint ([bench/eval](bench/eval/README.md)). The first small eval, on a local 4B model, found no difference between so and Pi beyond noise; the sample is tiny and it is documented as such.
+
+What so is **not**: it is not faster in the work that matters (model latency), it has no new features over Pi yet, and it is not affiliated with the Pi authors. If you only want the original, use [Pi](https://github.com/earendil-works/pi).
+
+## Quick start (from source)
+
+so is not on npm yet. Requires Node.js 22.19 or newer.
 
 ```bash
-curl -fsSL https://pi.dev/install.sh | sh
+git clone https://github.com/kevin9327/so-agent && cd so-agent
+npm ci --ignore-scripts
+npm run build                     # builds all packages (refreshes model data from the network)
+
+# run it from any project directory
+cd /path/to/your/project
+node /path/to/so-agent/packages/coding-agent/dist/bundle/cli.js
+# optional: alias so="node /path/to/so-agent/packages/coding-agent/dist/bundle/cli.js"
 ```
 
-On Windows:
+Inside so, run `/login` to connect a subscription or API key, or export a provider key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`, then give it a task. A local model works too: add an OpenAI-compatible server to `~/.so/agent/models.json` (see [docs/models.md](packages/coding-agent/docs/models.md)). To run from TypeScript sources without building, use `./so-test.sh`.
 
-```shell
-powershell -c "irm https://pi.dev/install.ps1 | iex"
-```
+`npm install -g @so-agent/coding-agent` will work once the packages are published; until then that command fails.
 
-The installer pins all dependencies and updates So with `so update`. Alternatively, install directly with npm, which does not pin transitive dependencies:
+## What you can do with it
 
-```bash
-npm install -g --ignore-scripts @so-agent/coding-agent
-```
-
-So requires Node.js 22.19 or newer. The macOS, Linux, and Windows installers can install it if needed. So does not require dependency lifecycle scripts for a normal npm installation.
-
-Start So in the directory where you want it to work:
-
-```bash
-cd /path/to/project
-so
-```
-
-For a built-in AI provider, run `/login` inside So to connect a subscription or API key. Then give So a task.
-
-See the [documentation](https://pi.dev/docs/latest) for full setup and usage instructions, or [visit pi.dev](https://pi.dev) for demos.
-
-## Run with Nix
-
-```bash
-nix run github:earendil-works/pi/stable
-```
-
-`stable` points at the latest release. Install it with `nix profile add github:earendil-works/pi/stable` and update with `nix profile upgrade so`. Use a release tag such as `github:earendil-works/pi/v1.0.0` to pin a version, or `github:earendil-works/pi` for unreleased changes on `main`. Nix builds So from source.
-
-Supports ARM64 and x86-64 on Linux and macOS. Use `nix build .` or `nix run .` to build or run your checkout.
-
-Nix builds are offline, so the bundled model data comes from a pi.dev model catalog revision pinned in `nix/model-catalog.json`. At runtime, So still overlays newer catalog data from pi.dev as usual. The Nix workflow replaces the pin on `main` when it no longer matches the checkout, for example after a provider is added or gains a new model type. To refresh it by hand:
-
-```bash
-npm run update:model-catalog-pin
-```
+Customize so with [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), and [themes](packages/coding-agent/docs/themes.md). Bundle them as [packages](packages/coding-agent/docs/packages.md) and share via npm or git. Use so [interactively](packages/coding-agent/docs/usage.md), automate it in [print or JSON mode](packages/coding-agent/docs/cli.md), control it over [RPC](packages/coding-agent/docs/rpc.md), or build apps with the [TypeScript SDK](packages/coding-agent/docs/sdk.md). It skips sub-agents and plan mode on purpose: ask so to build what you want, or install a package.
 
 ## Packages
 
@@ -85,7 +84,7 @@ This monorepo contains the So CLI and its supporting libraries.
 | **[@so-agent/coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
 | **[@so-agent/tui](packages/tui)** | Terminal UI library with differential rendering |
 
-For Slack/chat automation and workflows see [earendil-works/so-chat](https://github.com/earendil-works/pi-chat).
+For Slack/chat automation and workflows see upstream's [pi-chat](https://github.com/earendil-works/pi-chat) (a Pi project, not tested with so).
 
 ## Permissions & Containerization
 
@@ -99,7 +98,7 @@ If you need stronger boundaries, containerize or sandbox So. See [packages/codin
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Longer term plans for So can also be found in [RFCs](https://rfc.earendil.com/keyword/pi/).
+Issues and PRs are welcome (no contribution gate on this fork). See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Upstream's longer-term plans for Pi are in its [RFCs](https://rfc.earendil.com/keyword/pi/).
 
 ## Development
 
@@ -175,34 +174,19 @@ We treat npm dependency changes as reviewed code changes.
 - `.npmrc` sets `save-exact=true` and `min-release-age=2` to avoid same-day dependency releases during npm resolution.
 - `package-lock.json` is the dependency ground truth. Pre-commit blocks accidental lockfile commits unless `SO_ALLOW_LOCKFILE_CHANGE=1` is set.
 - `npm run check` verifies pinned direct deps, native TypeScript import compatibility, and the generated coding-agent install lock.
-- The pi.dev installer installs from `packages/coding-agent/install-lock/`, generated from the root lockfile, to pin transitive deps. The npm package does not pin transitive deps.
+- The upstream (Pi) installer installs from `packages/coding-agent/install-lock/`, generated from the root lockfile, to pin transitive deps. The npm package does not pin transitive deps.
 - Local release smoke tests and npm publication use the same tarball packer; npm publishes the validated tarballs rather than repacking workspace directories.
 - Local release installs, documented npm installs, and `so update --self` use `--ignore-scripts` where supported.
 - CI installs with `npm ci --ignore-scripts`, and a scheduled GitHub workflow runs `npm audit --omit=dev` plus `npm audit signatures --omit=dev`.
 - Install lock generation has an explicit allowlist for dependency lifecycle scripts; new lifecycle-script deps fail checks until reviewed.
 
-## Share your OSS coding agent sessions
+## Launch notes, comparison, history
 
-If you use So or other coding agents for open source work, please share your sessions.
-
-Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks.
-
-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
-
-To publish sessions, use [`badlogic/so-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `so-share-hf`.
-
-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `so-agent` sessions.
-
-I regularly publish my own `so-agent` work sessions here:
-
-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
+- [docs/EFFICIENCY.md](docs/EFFICIENCY.md): every change from the first pass, what was kept, restored or replaced, and measured numbers
+- [docs/VERSIONING.md](docs/VERSIONING.md), [CHANGELOG](packages/coding-agent/CHANGELOG.md), [releases](https://github.com/kevin9327/so-agent/releases)
+- [docs/UPSTREAM-ENDPOINTS.md](docs/UPSTREAM-ENDPOINTS.md), [docs/INSTALL-REPORT.md](docs/INSTALL-REPORT.md)
+- [docs/UPSTREAM-README-SECTIONS.md](docs/UPSTREAM-README-SECTIONS.md): sections of upstream's README that do not apply here
 
 ## License
 
-MIT
-
-<p align="center">
-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by
-  <br /><br />
-  <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
-</p>
+MIT. The original license and copyright notice (Mario Zechner) are kept; see [LICENSE](LICENSE) and [ATTRIBUTION.md](ATTRIBUTION.md).

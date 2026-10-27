@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Questions
-    url: https://discord.com/invite/3cU7Bz4UPx
-    about: Ask questions on Discord instead of opening an issue
+  - name: Questions and ideas
+    url: https://github.com/kevin9327/so-agent/discussions
+    about: Ask questions or share what you built with so in Discussions instead of opening an issue

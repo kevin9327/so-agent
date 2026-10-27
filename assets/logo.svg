@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="so agent logo">
+  <title>so agent</title>
+  <rect width="128" height="128" rx="28" fill="#0b1020"/>
+  <polyline points="22,46 42,64 22,82" fill="none" stroke="#5eead4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M82 52 C78 45 56 45 56 56 C56 67 82 62 82 73 C82 84 60 84 53 76" fill="none" stroke="#f8fafc" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="104" cy="64" r="12" fill="none" stroke="#f8fafc" stroke-width="9"/>
+</svg>

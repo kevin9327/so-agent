@@ -38,6 +38,28 @@ headroom that remains at startup is single-digit milliseconds per item. I measur
   start (357/350 vs 358/363 ms), so it was not kept.
 - Lazy interactive-mode import in the interactive path: neutral.
 
+## Real-model eval (so 0.0.2 vs the upstream baseline)
+
+Local Qwen3-4B-Instruct-2507 (Q4_K_M) through llama.cpp, same prompts and tasks for both builds, 3 runs per task, `--max-tokens 1024`. Raw results are in `bench/eval/results/`, merged with `bench/eval/summarize.mjs`.
+
+| Task | Upstream | so |
+|---|---|---|
+| fix-off-by-one | 2/3 | 1/3 |
+| add-function | 0/3 | 0/3 |
+| count-todos | 0/3 | 0/3 |
+| create-config | 3/3 | 3/3 |
+| create-fizzbuzz | 3/3 | 3/3 |
+| change-default-port | 3/3 | 3/3 |
+| edit-package-json | 0/3 | 2/3 |
+| count-errors-large-log | 0 valid | 0 valid |
+| **Total** | 11/21 | 12/21 |
+
+Turns: so 88, upstream 61. Wall time: so 1596 s, upstream 935 s. Both are most likely sampling noise (the two builds send the same prompt apart from the name) but this was not verified with more runs.
+
+Caveats: n is tiny; a 4B model is weak and sampling is stochastic; some runs were invalid (a llama.cpp OOM kill) and are excluded; the large-log task exceeds the 20k context used, so it has no valid run; `--max-tokens 1024` truncates the model's many parallel tool calls identically for both builds. Treat this as a regression check (so is not worse by a margin visible at this n), not as an improvement claim. A hosted-model run with more tasks and runs is the next useful measurement.
+
+An earlier attempt through a free anonymous gateway produced the inconclusive file `bench/eval/results/pollinations-gpt-oss-20b-inconclusive.json`; that gateway sent tool-call arguments under a wrong index, which led to the 0.0.2 client fix, and returned frequent 5xx errors.
+
 ## Kept changes (all lossless)
 
 | Change | Where | Evidence |

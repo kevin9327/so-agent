@@ -38,3 +38,9 @@ With a rate-limited endpoint, start `throttle-proxy.mjs --upstream <url> --port 
   the same amount to both builds.
 - Results of a run are kept next to the results JSON; `docs/EFFICIENCY.md` records the one that was done for this repo and
   its caveats.
+
+## Summaries, transcripts, results
+
+- `node bench/eval/summarize.mjs bench/eval/results/*.json` merges result files into a per-task pass table.
+- `--transcripts <dir>` on `run-eval.mjs` saves each run's JSON event stream; `node bench/eval/transcript-to-md.mjs <file.jsonl> "<prompt>"` renders one as Markdown (see `docs/demo.md`).
+- Committed results live in `bench/eval/results/`.

@@ -29,6 +29,9 @@ this repository, please report it privately by either:
 - Opening a private report through GitHub Security Advisories for this repository, or
 - Contacting the maintainer of this fork directly
 
+If the issue is in code that so inherited unchanged from Pi (see [ATTRIBUTION.md](ATTRIBUTION.md)), it may also be
+worth reporting upstream; upstream's contact is `security@earendil.com`. That address does not handle so-specific issues.
+
 Please include:
 
 - A description of the issue and its impact

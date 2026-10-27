@@ -26,6 +26,12 @@
 - Fixed streamed tool calls re-running their call renderer on every argument delta; the interactive mode now renders the latest arguments once per frame, so a large streamed `write` no longer re-highlights its whole content per delta ([#9265](https://github.com/earendil-works/pi/issues/9265))
 - Fixed the login dialog opening sign-in URLs that are not web URLs, and printing control characters from sign-in, device-code, and info URLs, which could end a terminal hyperlink and send escape sequences to the terminal
 
+## [0.0.3] - 2026-10-27
+
+### Changed
+
+- When a response hits the output token limit and its tool calls are not executed, the error now ends with retry guidance: make one tool call per response and keep each call small (several smaller edits instead of one large one, or a large file written in parts). The original sentence is unchanged. Seen in the local-model eval, where a model re-issued the same oversized edit three times in a row. Covered by `agent-loop.test.ts`. Effect on success rates is not measured.
+
 ## [0.0.2] - 2026-10-27
 
 ### Fixed

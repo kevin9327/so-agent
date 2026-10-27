@@ -1,6 +1,6 @@
 {
 	"name": "@so-agent/env",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Remote execution environments for So Durable: a small daemon deployed over SSH and its ExecutionEnv client",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -45,8 +45,8 @@
 		"node": ">=22.19.0"
 	},
 	"dependencies": {
-		"@so-agent/chord": "0.0.2",
-		"@so-agent/durable": "0.0.2"
+		"@so-agent/chord": "0.0.3",
+		"@so-agent/durable": "0.0.3"
 	},
 	"devDependencies": {
 		"shx": "0.3.4",

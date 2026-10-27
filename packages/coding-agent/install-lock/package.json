@@ -1,10 +1,10 @@
 {
 	"name": "@so-agent/coding-agent-install",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": true,
 	"description": "Lockfile root used by the So installer and updater.",
 	"dependencies": {
-		"@so-agent/coding-agent": "0.0.2"
+		"@so-agent/coding-agent": "0.0.3"
 	},
 	"overrides": {
 		"protobufjs": "7.6.6"

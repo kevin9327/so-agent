@@ -518,7 +518,9 @@ describe("agentLoop with AgentMessage", () => {
 			const text = toolEnd.result.content.find((c: { type: string }) => c.type === "text");
 			expect(text && "text" in text ? text.text : "").toContain("output token limit");
 			// Original sentence kept; the retry guidance is appended after it.
-			expect(text && "text" in text ? text.text : "").toContain("Re-issue the tool call with complete arguments. If responses keep hitting the limit, make one tool call per response");
+			expect(text && "text" in text ? text.text : "").toContain(
+				"Re-issue the tool call with complete arguments. If responses keep hitting the limit, make one tool call per response",
+			);
 		}
 
 		// The loop continues so the model can re-issue the tool call.

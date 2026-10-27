@@ -2,6 +2,32 @@
   "baseUrl": "http://127.0.0.1:8787/v1",
   "model": "openai-fast",
   "runs": 2,
+  "summary": {
+    "upstream": {
+      "runs": 3,
+      "invalid": 9,
+      "providerErrorsRetried": 28,
+      "passed": 2,
+      "avgTurns": 7.333333333333333,
+      "avgToolCalls": 6.333333333333333,
+      "avgInputTokens": 12216,
+      "avgOutputTokens": 1491,
+      "avgWallS": 259.1,
+      "firstTurnInputTokens": 1434
+    },
+    "so": {
+      "runs": 4,
+      "invalid": 8,
+      "providerErrorsRetried": 24,
+      "passed": 3,
+      "avgTurns": 8.75,
+      "avgToolCalls": 8,
+      "avgInputTokens": 16101,
+      "avgOutputTokens": 1527,
+      "avgWallS": 304.4,
+      "firstTurnInputTokens": 1429
+    }
+  },
   "results": [
     {
       "build": "upstream",
@@ -159,6 +185,390 @@
       "run": 0,
       "attempts": 3,
       "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 114713,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "stderrTail": "",
+      "run": 0,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 108437,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "stderrTail": "",
+      "run": 0,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 124841,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "stderrTail": "",
+      "run": 0,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 124222,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "stderrTail": "",
+      "run": 0,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "fix-off-by-one",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14388,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "fix-off-by-one",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14343,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "add-function",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14313,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "add-function",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14295,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "rename-across-files",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14292,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "rename-across-files",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14359,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "count-todos",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14378,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "count-todos",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14277,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14287,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14303,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14330,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "success": false,
+      "exitCode": 0,
+      "turns": 4,
+      "toolCalls": 0,
+      "toolErrors": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "wallMs": 14322,
+      "firstTurnInputTokens": 0,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "stderrTail": "",
+      "run": 1,
+      "attempts": 3,
+      "invalid": true
     }
   ],
   "retried": [
@@ -211,6 +621,678 @@
         "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
         "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
         "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "run": 0,
+      "attempt": 1,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "run": 0,
+      "attempt": 2,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "run": 0,
+      "attempt": 3,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "run": 0,
+      "attempt": 1,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "run": 0,
+      "attempt": 2,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "run": 0,
+      "attempt": 3,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "run": 0,
+      "attempt": 1,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "run": 0,
+      "attempt": 2,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "run": 0,
+      "attempt": 3,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "run": 0,
+      "attempt": 1,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "run": 0,
+      "attempt": 2,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "run": 0,
+      "attempt": 3,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27"
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-off-by-one",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "500: {\"code\":\"INTERNAL_ERROR\",\"message\":\"Something went wrong on our side. Please try again, or use every model with a pollen key at https://enter.pollinations.ai/?ref=classic\",\"timestamp\":\"2026-10-27",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-off-by-one",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-off-by-one",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-off-by-one",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-off-by-one",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-off-by-one",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "add-function",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "add-function",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "add-function",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "add-function",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "add-function",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "add-function",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "rename-across-files",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "rename-across-files",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "rename-across-files",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "rename-across-files",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "rename-across-files",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "rename-across-files",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "count-todos",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "count-todos",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "count-todos",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "count-todos",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "count-todos",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "count-todos",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "create-config",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "create-config",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "so",
+      "task": "fix-empty-mean",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "run": 1,
+      "attempt": 1,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "run": 1,
+      "attempt": 2,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
+      ],
+      "turns": 4,
+      "success": false
+    },
+    {
+      "build": "upstream",
+      "task": "fix-empty-mean",
+      "run": 1,
+      "attempt": 3,
+      "errors": [
+        "Connection error.",
+        "Connection error.",
+        "Connection error.",
+        "Connection error."
       ],
       "turns": 4,
       "success": false

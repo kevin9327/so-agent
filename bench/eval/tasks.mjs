@@ -88,4 +88,55 @@ export const tasks = [
 		},
 		check: (cwd) => node(cwd, "test.js").status === 0 && read(cwd, "test.js").includes("mean([]), 0"),
 	},
+	{
+		id: "create-fizzbuzz",
+		// Reference solution, used by scripts/eval-tasks.test.mjs to prove the check passes only on a correct end state.
+		solution: { "fizzbuzz.js": 'export function fizzbuzz(n) {\n  if (n % 15 === 0) return "FizzBuzz";\n  if (n % 3 === 0) return "Fizz";\n  if (n % 5 === 0) return "Buzz";\n  return String(n);\n}\n' },
+		prompt: "Create fizzbuzz.js (ES module) exporting `fizzbuzz(n)`: returns 'FizzBuzz' for multiples of 15, 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, otherwise the number as a string.",
+		files: { "package.json": '{"type":"module"}\n' },
+		check: (cwd) =>
+			node(cwd, "--input-type=module", "-e", 'import {fizzbuzz as f} from "./fizzbuzz.js"; const ok = f(15)==="FizzBuzz"&&f(9)==="Fizz"&&f(10)==="Buzz"&&f(7)==="7"&&f(30)==="FizzBuzz"; if(!ok) process.exit(1)').status === 0,
+	},
+	{
+		id: "change-default-port",
+		solution: { "config.js": "export const config = {\n  host: \"localhost\",\n  port: 8080,\n};\n", "README.md": "# App\n\nThe server listens on port 8080 by default.\n" },
+		prompt: "Change the default server port from 3000 to 8080 in config.js and update the README so it states the new default. Change nothing else.",
+		files: { "config.js": 'export const config = {\n  host: "localhost",\n  port: 3000,\n};\n', "README.md": "# App\n\nThe server listens on port 3000 by default.\n", "package.json": '{"type":"module"}\n' },
+		check: (cwd) => read(cwd, "config.js").includes("port: 8080") && !read(cwd, "config.js").includes("3000") && read(cwd, "config.js").includes('host: "localhost"') && read(cwd, "README.md").includes("8080") && !read(cwd, "README.md").includes("3000"),
+	},
+	{
+		id: "find-definition",
+		solution: { "answer.txt": "src/time/parse.js\n" },
+		prompt: "Which file defines the function `parseDate`? Write its path relative to the project root (for example `src/foo.js`) to answer.txt and nothing else.",
+		files: {
+			"src/index.js": 'import { parseDate } from "./time/parse.js";\nconsole.log(parseDate("2026-01-02"));\n',
+			"src/time/parse.js": "export function parseDate(s) {\n  return new Date(s);\n}\n",
+			"src/time/format.js": "export function formatDate(d) {\n  return d.toISOString();\n}\n",
+			"src/util/strings.js": "export const pad = (s) => s.padStart(2, '0');\n",
+		},
+		check: (cwd) => read(cwd, "answer.txt").trim() === "src/time/parse.js",
+	},
+	{
+		id: "edit-package-json",
+		solution: { "package.json": JSON.stringify({ name: "demo", version: "1.3.0", scripts: { test: "node test.js", lint: "echo lint" }, license: "MIT" }, null, 2) + "\n" },
+		prompt: 'In package.json change the version from 1.2.3 to 1.3.0 and add a script "lint" with the value "echo lint". Keep every other field.',
+		files: { "package.json": JSON.stringify({ name: "demo", version: "1.2.3", scripts: { test: "node test.js" }, license: "MIT" }, null, 2) + "\n" },
+		check: (cwd) => {
+			try {
+				const p = JSON.parse(read(cwd, "package.json"));
+				return p.name === "demo" && p.version === "1.3.0" && p.license === "MIT" && p.scripts?.test === "node test.js" && p.scripts?.lint === "echo lint";
+			} catch {
+				return false;
+			}
+		},
+	},
+	{
+		id: "count-errors-large-log",
+		solution: { "answer.txt": "18\n" },
+		prompt: "app.log is a large log file. Count the lines that contain the level ERROR (as a whole word, uppercase) and write only the number to answer.txt.",
+		files: {
+			"app.log": Array.from({ length: 3000 }, (_, i) => `2026-10-27T10:${String(Math.floor(i / 60) % 60).padStart(2, "0")}:${String(i % 60).padStart(2, "0")} ${i % 176 === 5 ? "ERROR" : i % 97 === 0 ? "WARN" : "INFO"} request ${i} handled${i % 500 === 7 ? " (no ERRORS here, just a word)" : ""}`).join("\n") + "\n",
+		},
+		check: (cwd) => read(cwd, "answer.txt").trim() === String(Array.from({ length: 3000 }, (_, i) => i).filter((i) => i % 176 === 5).length),
+	},
 ];

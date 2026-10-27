@@ -6,7 +6,7 @@
 //     --build upstream=/path/to/baseline/packages/coding-agent/dist/bundle/cli.js:PI \
 //     --build so=/path/to/so/packages/coding-agent/dist/bundle/cli.js:SO \
 //     --base-url https://api.example.com/v1 --model some-model [--api-key-env EXAMPLE_API_KEY] \
-//     [--runs 3] [--retry-invalid 2] [--tasks fix-off-by-one,add-function] [--reasoning] [--timeout-ms 600000] [--out results.json]
+//     [--runs 3] [--retry-invalid 2] [--transcripts dir] [--tasks fix-off-by-one,add-function] [--reasoning] [--timeout-ms 600000] [--out results.json]
 //
 // The API key is read from the named environment variable and written only to a temp models.json that is deleted at the
 // end. Each build gets the same temp project (re-created per run); build order alternates per task to spread drift.
@@ -40,9 +40,11 @@ const out = one("out", "eval-results.json");
 const thinking = one("thinking");
 // A run whose provider answered with an error is not evidence about the build (gateway glitches, rate limits). It is
 // repeated up to --retry-invalid times and, if it still errors, reported as invalid and left out of pass counts.
+const transcripts = one("transcripts"); // directory: raw --mode json event stream of every attempt, for debugging
+if (transcripts) mkdirSync(transcripts, { recursive: true });
 const retryInvalid = Number(one("retry-invalid", "2"));
 
-function runOnce(build, task) {
+function runOnce(build, task, tag = "") {
 	const home = mkdtempSync(join(tmpdir(), "eval-home-"));
 	const agentDir = join(home, "agent");
 	const project = join(home, "project");
@@ -76,6 +78,7 @@ function runOnce(build, task) {
 		const timer = setTimeout(() => child.kill("SIGKILL"), timeoutMs);
 		child.on("close", (code) => {
 			clearTimeout(timer);
+			if (transcripts) writeFileSync(join(transcripts, `${build.label}-${task.id}${tag}.jsonl`), stdout);
 			const events = stdout.split("\n").flatMap((l) => {
 				try {
 					return [JSON.parse(l)];
@@ -126,7 +129,7 @@ for (let r = 0; r < runs; r++) {
 			let res;
 			let attempts = 0;
 			do {
-				res = await runOnce(build, task);
+				res = await runOnce(build, task, `-r${r}-a${attempts + 1}`);
 				attempts++;
 				console.error(`[${build.label}] ${task.id} run ${r} attempt ${attempts}: ${res.success ? "PASS" : "FAIL"} turns=${res.turns} tools=${res.toolCalls} in=${res.inputTokens} out=${res.outputTokens} ${(res.wallMs / 1000).toFixed(0)}s${res.errors.length ? ` PROVIDER-ERROR ${res.errors[0].slice(0, 80)}` : ""}`);
 				if (res.errors.length) retried.push({ build: build.label, task: task.id, run: r, attempt: attempts, errors: res.errors, turns: res.turns, success: res.success });

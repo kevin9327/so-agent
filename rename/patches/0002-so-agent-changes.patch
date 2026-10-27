@@ -1,0 +1,1494 @@
+diff --git a/.github/workflows/DISABLED.md b/.github/workflows/DISABLED.md
+new file mode 100644
+index 0000000..5055110
+--- /dev/null
++++ b/.github/workflows/DISABLED.md
+@@ -0,0 +1,12 @@
++# Disabled upstream workflows
++
++The `*.yml.disabled` files here are upstream Pi's maintainer-governance and publishing workflows, kept (with so's names) so nothing
++is lost, but renamed so GitHub does not run them. They use `github.repository`, so in this repository they would:
++
++- auto-close issues and pull requests from "new contributors" against upstream's `.github/APPROVED_CONTRIBUTORS` list
++  (`issue-gate`, `pr-gate`, `approve-contributor`, `remove-inprogress-on-close`, `issue-triage-labels`),
++- run an issue-analysis agent that checks membership of upstream's `earendil-works/staff` team (`issue-analysis`),
++- publish preview packages and the model catalog to upstream's infrastructure (`preview-packages`, `publish-model-catalog`).
++
++Adapt one to this repository (contributor list, team, secrets, destinations), then rename it back to `*.yml` to enable it.
++`rename/rename.mjs` produces this layout (`DISABLED_WORKFLOWS`).
+diff --git a/ATTRIBUTION.md b/ATTRIBUTION.md
+new file mode 100644
+index 0000000..58f58fa
+--- /dev/null
++++ b/ATTRIBUTION.md
+@@ -0,0 +1,24 @@
++# Attribution
++
++**so agent** is based on **Pi** by Mario Zechner and contributors
++(<https://github.com/earendil-works/pi>, formerly `badlogic/pi-mono`),
++which is distributed under the MIT License. The original `LICENSE` file,
++including the copyright notice `Copyright (c) 2025 Mario Zechner`, is kept
++unchanged in this repository, as the license requires.
++
++Forked from upstream commit `6c384aa30f619d7b28963f2bab24d8dacbe73cb6`
++(Pi 1.4.0, 2026-10-26).
++
++Changes made in this fork:
++
++- Everything user-visible and internal was renamed from Pi to so agent
++  (see `rename/rename.sh`, which reproduces the rename from an upstream checkout).
++- Efficiency work (see `docs/EFFICIENCY.md`).
++
++Kept verbatim on purpose: `LICENSE`, `packages/mcp/LICENSES/`, the upstream
++`CHANGELOG.md` files (release history of the upstream project), recorded test
++fixtures, links to upstream issues and pull requests, and the URLs of
++upstream-hosted services (see `docs/UPSTREAM-ENDPOINTS.md`).
++
++so agent is an independent derivative. It is not affiliated with or endorsed by
++the Pi authors, and upstream maintainers do not support it.
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 9aa2389..858c82f 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -1,5 +1,7 @@
+ # Contributing to so
+ 
++> so agent is a fork of Pi ([ATTRIBUTION.md](ATTRIBUTION.md)). This guide is upstream's, with names changed. The contribution gate and Discord link are inherited and belong to the upstream project until the fork's owner adapts them; the gate workflows are disabled (see [.github/workflows/DISABLED.md](.github/workflows/DISABLED.md)).
++
+ This guide exists to save both sides time.
+ 
+ ## Philosophy
+diff --git a/README.md b/README.md
+index e8b60f1..dd9ad48 100644
+--- a/README.md
++++ b/README.md
+@@ -8,6 +8,8 @@
+   <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square" /></a>
+ </p>
+ 
++> **so agent is a fork of [Pi](https://github.com/earendil-works/pi)** (MIT, by Mario Zechner and contributors); see [ATTRIBUTION.md](ATTRIBUTION.md) and [docs/EFFICIENCY.md](docs/EFFICIENCY.md). The installer URLs, badges, logo and screenshots below are still upstream's: the installers (`pi.dev/install.sh`) install **Pi, not so**, and the `@so-agent/*` packages are not published to npm yet. Until they are, build from source (see [Development](#development) and `./so-test.sh`). Everything else in this README is upstream's text with the names changed.
++
+ > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
+ 
+ # So
+diff --git a/SECURITY.md b/SECURITY.md
+index d393c7f..64bfa0d 100644
+--- a/SECURITY.md
++++ b/SECURITY.md
+@@ -26,8 +26,11 @@ coding agent trivially and this cannot be protected against.
+ If you believe you found a security vulnerability in so or another package in
+ this repository, please report it privately by either:
+ 
+-- Emailing `security@earendil.com`, or
+-- Opening a private report through GitHub Security Advisories for this repository
++- Opening a private report through GitHub Security Advisories for this repository, or
++- Contacting the maintainer of this fork directly
++
++If the issue is in code that so inherited unchanged from Pi (see [ATTRIBUTION.md](ATTRIBUTION.md)), it may also be
++worth reporting upstream; upstream's contact is `security@earendil.com`. That address does not handle so-specific issues.
+ 
+ Please include:
+ 
+@@ -42,8 +45,8 @@ reports and coordinate disclosure as appropriate.
+ ## Scope
+ 
+ Security issues in the distributed packages, command-line tools, APIs, and
+-repository code are in scope as well as earendil operated infrastructure
+-on `pi.dev`.
++repository code are in scope. Infrastructure operated by the upstream Pi project
++(for example `pi.dev`) is out of scope for this fork; report it upstream.
+ 
+ ## Out Of Scope
+ 
+diff --git a/bench/README.md b/bench/README.md
+new file mode 100644
+index 0000000..a5be37a
+--- /dev/null
++++ b/bench/README.md
+@@ -0,0 +1,36 @@
++# Benchmarks
++
++Everything here runs against a local mock provider, so no API key or network is needed.
++
++```bash
++npm ci --ignore-scripts && npm run build
++# before/after: build the upstream or an earlier commit in another checkout, then compare
++node bench/run.mjs --cli "$PWD/packages/coding-agent/dist/bundle/cli.js" --prefix SO --runs 21 --label so
++node bench/run.mjs --cli /path/to/other/checkout/packages/coding-agent/dist/bundle/cli.js --prefix PI --runs 21 --label upstream
++```
++
++`--prefix` is the env var prefix of the build under test (`SO` for so agent, `PI` for upstream Pi).
++
++`run.mjs` reports, as medians over `--runs` cold processes (plus one discarded warm-up):
++
++- `firstRequestMs`: process spawn to the first byte of the first provider request. This is startup cost as a user
++  would feel it before the model is even asked.
++- `totalMs`: whole print-mode run with three model turns (a `bash` call, a `read` call, then a text answer).
++- `cpuMs`: user + system CPU time of the CLI process (less noisy than wall time).
++- `peakRssMiB`: peak resident set size of the CLI process (`VmHWM`).
++- `promptPrefixBreak`: `null` when every request starts with the previous request's tools, system prompt and messages
++  byte for byte (what provider prompt caches need), otherwise the first turn that breaks it.
++- `turns[]`: for every model request, the request body size, system prompt characters, tool schema characters,
++  tool count, and message characters.
++
++`--json out.json` also writes `out.request1.json` and `out.request3.json`, the exact request bodies, which can be
++tokenized with any tokenizer to turn characters into tokens.
++
++Other knobs: `BENCH_EXTRA_ENV='{"SO_TIMING":"1"}'`, `BENCH_NODE_ARGS="--cpu-prof --cpu-prof-dir=/tmp/prof"`,
++`BENCH_SHOW_OUTPUT=1`.
++
++`interactive.mjs` times the TUI start in a pseudo terminal (first output byte, and the moment the screen stops changing):
++
++```bash
++node bench/interactive.mjs --cli "$PWD/packages/coding-agent/dist/bundle/cli.js" --prefix SO --runs 15
++```
+diff --git a/bench/cpu-preload.mjs b/bench/cpu-preload.mjs
+new file mode 100644
+index 0000000..6824405
+--- /dev/null
++++ b/bench/cpu-preload.mjs
+@@ -0,0 +1,6 @@
++// Preloaded into the benchmarked process: appends the process's own CPU time (user + system, ms) at exit.
++import { appendFileSync } from "node:fs";
++process.on("exit", () => {
++	const { user, system } = process.cpuUsage();
++	if (process.env.BENCH_CPU_FILE) appendFileSync(process.env.BENCH_CPU_FILE, `${(user + system) / 1000}\n`);
++});
+diff --git a/bench/interactive.mjs b/bench/interactive.mjs
+new file mode 100644
+index 0000000..4afd66f
+--- /dev/null
++++ b/bench/interactive.mjs
+@@ -0,0 +1,68 @@
++#!/usr/bin/env node
++// Time the interactive TUI start: first output byte, and the moment the screen settles (no output for 300 ms).
++//   node bench/interactive.mjs --cli <cli.js> --prefix SO|PI [--runs 9]
++// A pseudo terminal is provided by util-linux `script`; the child is killed once the screen has settled.
++import { spawn } from "node:child_process";
++import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++
++const arg = (n, d) => {
++	const i = process.argv.indexOf(`--${n}`);
++	return i >= 0 ? process.argv[i + 1] : d;
++};
++const cli = arg("cli");
++const prefix = arg("prefix", "SO");
++const runs = Number(arg("runs", "9"));
++const home = mkdtempSync(join(tmpdir(), "ibench-home-"));
++const agentDir = join(home, "agent");
++const project = mkdtempSync(join(tmpdir(), "ibench-proj-"));
++mkdirSync(agentDir, { recursive: true });
++writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ quietStartup: false }));
++
++const median = (a) => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
++
++async function once() {
++	const env = {
++		PATH: process.env.PATH,
++		HOME: home,
++		TERM: "xterm-256color",
++		COLUMNS: "100",
++		LINES: "30",
++		[`${prefix}_CODING_AGENT_DIR`]: agentDir,
++		[`${prefix}_OFFLINE`]: "1",
++		[`${prefix}_SKIP_VERSION_CHECK`]: "1",
++		[`${prefix}_TELEMETRY`]: "0",
++	};
++	const t0 = performance.now();
++	const child = spawn("script", ["-qefc", `${process.execPath} ${process.env.BENCH_NODE_ARGS ?? ""} ${cli} --no-extensions --no-session`, "/dev/null"], { cwd: project, env, stdio: ["pipe", "pipe", "pipe"] });
++	let first;
++	let last = 0;
++	let bytes = 0;
++	child.stdout.on("data", (c) => {
++		const now = performance.now() - t0;
++		first ??= now;
++		last = now;
++		bytes += c.length;
++	});
++	await new Promise((resolve) => {
++		const tick = setInterval(() => {
++			if (last > 0 && performance.now() - t0 - last > 300) {
++				clearInterval(tick);
++				resolve();
++			}
++			if (performance.now() - t0 > 8000) {
++				clearInterval(tick);
++				resolve();
++			}
++		}, 20);
++	});
++	child.kill("SIGKILL");
++	await new Promise((r) => child.on("exit", r));
++	return { first, settled: last, bytes };
++}
++
++await once();
++const rs = [];
++for (let i = 0; i < runs; i++) rs.push(await once());
++console.log(JSON.stringify({ label: arg("label", prefix), runs, firstByteMs: Math.round(median(rs.map((r) => r.first))), settledMs: Math.round(median(rs.map((r) => r.settled))), bytes: rs[0].bytes }, null, 2));
+diff --git a/bench/mock-server.mjs b/bench/mock-server.mjs
+new file mode 100644
+index 0000000..0d0c6b1
+--- /dev/null
++++ b/bench/mock-server.mjs
+@@ -0,0 +1,39 @@
++// Minimal OpenAI-compatible chat-completions server that records every request body.
++// Turn 1 answers with a `bash` tool call, turn 2 with `read`, turn 3 with plain text.
++import { appendFileSync, writeFileSync } from "node:fs";
++import { createServer } from "node:http";
++
++export function startMockServer({ logFile, port = 0, toolOutputTurns = 2 }) {
++	writeFileSync(logFile, "");
++	let turn = 0;
++	const server = createServer((req, res) => {
++		let body = "";
++		req.on("data", (c) => (body += c));
++		req.on("end", () => {
++			if (req.method !== "POST" || !req.url.includes("/chat/completions")) {
++				res.writeHead(404).end();
++				return;
++			}
++			appendFileSync(logFile, `${JSON.stringify({ t: Date.now(), url: req.url, bytes: Buffer.byteLength(body), body: JSON.parse(body) })}\n`);
++			turn++;
++			res.writeHead(200, { "content-type": "text/event-stream" });
++			const send = (delta, finish) =>
++				res.write(`data: ${JSON.stringify({ id: "x", object: "chat.completion.chunk", created: 1, model: "m", choices: [{ index: 0, delta, finish_reason: finish ?? null }] })}\n\n`);
++			if (turn <= toolOutputTurns) {
++				const call =
++					turn === 1
++						? { name: "bash", arguments: JSON.stringify({ command: "seq 1 4000" }) }
++						: { name: "read", arguments: JSON.stringify({ path: "package.json" }) };
++				send({ role: "assistant", tool_calls: [{ index: 0, id: `call_${turn}`, type: "function", function: call }] });
++				send({}, "tool_calls");
++			} else {
++				send({ role: "assistant", content: "done" });
++				send({}, "stop");
++			}
++			res.write(`data: ${JSON.stringify({ id: "x", object: "chat.completion.chunk", created: 1, model: "m", choices: [], usage: { prompt_tokens: 100, completion_tokens: 5, total_tokens: 105 } })}\n\n`);
++			res.write("data: [DONE]\n\n");
++			res.end();
++		});
++	});
++	return new Promise((resolve) => server.listen(port, "127.0.0.1", () => resolve({ server, port: server.address().port })));
++}
+diff --git a/bench/run.mjs b/bench/run.mjs
+new file mode 100644
+index 0000000..f234b25
+--- /dev/null
++++ b/bench/run.mjs
+@@ -0,0 +1,151 @@
++#!/usr/bin/env node
++// Benchmark one build of the CLI against the local mock provider.
++//   node bench/run.mjs --cli <path/to/cli.js> --prefix SO|PI [--runs 15] [--json out.json] [--label name]
++// Measures: wall time to the first provider request (cold start to first byte on the wire), total print-mode run,
++// peak RSS of the process tree, request payload size per turn (system prompt, tool schema, messages).
++import { spawn } from "node:child_process";
++import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { fileURLToPath } from "node:url";
++import { startMockServer } from "./mock-server.mjs";
++
++const cpuPreload = fileURLToPath(new URL("./cpu-preload.mjs", import.meta.url));
++
++const arg = (n, d) => {
++	const i = process.argv.indexOf(`--${n}`);
++	return i >= 0 ? process.argv[i + 1] : d;
++};
++const cli = arg("cli");
++const prefix = arg("prefix", "SO");
++const runs = Number(arg("runs", "15"));
++const label = arg("label", prefix);
++
++const home = mkdtempSync(join(tmpdir(), "bench-home-"));
++const agentDir = join(home, "agent");
++const project = mkdtempSync(join(tmpdir(), "bench-proj-"));
++mkdirSync(agentDir, { recursive: true });
++writeFileSync(join(project, "package.json"), JSON.stringify({ name: "bench", version: "1.0.0", description: "x".repeat(200) }, null, 2));
++
++const logFile = join(home, "requests.jsonl");
++const { server, port } = await startMockServer({ logFile });
++writeFileSync(
++	join(agentDir, "models.json"),
++	JSON.stringify({
++		providers: { mock: { baseUrl: `http://127.0.0.1:${port}/v1`, api: "openai-completions", apiKey: "k", models: [{ id: "m", contextWindow: 200000, maxTokens: 4096 }] } },
++	}),
++);
++
++function median(a) {
++	const s = [...a].sort((x, y) => x - y);
++	return s[Math.floor(s.length / 2)];
++}
++function readRss(pid) {
++	try {
++		const m = /VmHWM:\s+(\d+) kB/.exec(readFileSync(`/proc/${pid}/status`, "utf8"));
++		return m ? Number(m[1]) / 1024 : 0;
++	} catch {
++		return 0;
++	}
++}
++
++async function once() {
++	writeFileSync(logFile, "");
++	// reset turn counter by restarting the server state: a fresh server per run is simplest
++	const srv = await startMockServer({ logFile });
++	writeFileSync(
++		join(agentDir, "models.json"),
++		JSON.stringify({ providers: { mock: { baseUrl: `http://127.0.0.1:${srv.port}/v1`, api: "openai-completions", apiKey: "k", models: [{ id: "m", contextWindow: 200000, maxTokens: 4096 }] } } }),
++	);
++	const env = {
++		PATH: process.env.PATH,
++		HOME: home,
++		TMPDIR: tmpdir(),
++		[`${prefix}_CODING_AGENT_DIR`]: agentDir,
++		[`${prefix}_OFFLINE`]: "1",
++		[`${prefix}_SKIP_VERSION_CHECK`]: "1",
++		[`${prefix}_TELEMETRY`]: "0",
++		BENCH_CPU_FILE: join(home, "cpu.txt"),
++		...JSON.parse(process.env.BENCH_EXTRA_ENV ?? "{}"),
++	};
++	writeFileSync(env.BENCH_CPU_FILE, "");
++	const t0 = performance.now();
++	const child = spawn(process.execPath, ["--import", cpuPreload, ...(process.env.BENCH_NODE_ARGS ?? "").split(" ").filter(Boolean), cli, "-p", "--provider", "mock", "--model", "m", "--no-session", "--no-extensions", "run the commands", "--mode", "text"], { cwd: project, env, stdio: ["ignore", "pipe", "pipe"] });
++	let peak = 0;
++	const poll = setInterval(() => (peak = Math.max(peak, readRss(child.pid))), 20);
++	let firstReq;
++	const watch = setInterval(() => {
++		if (firstReq === undefined) {
++			try {
++				const l = readFileSync(logFile, "utf8").split("\n").filter(Boolean);
++				if (l.length) firstReq = performance.now() - t0;
++			} catch {}
++		}
++	}, 2);
++	let out = "";
++	child.stdout.on("data", (c) => (out += c));
++	child.stderr.on("data", (c) => (out += c));
++	const code = await new Promise((r) => child.on("exit", r));
++	clearInterval(poll);
++	clearInterval(watch);
++	const total = performance.now() - t0;
++	srv.server.close();
++	const reqs = readFileSync(logFile, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
++	const cpu = readFileSync(env.BENCH_CPU_FILE, "utf8").split("\n").filter(Boolean).map(Number).reduce((a, b) => a + b, 0);
++	return { code, out, firstReq, total, peak, reqs, cpu };
++}
++
++server.close();
++const results = [];
++await once(); // warmup (page cache)
++for (let i = 0; i < runs; i++) results.push(await once());
++const ok = results.filter((r) => r.code === 0 && r.reqs.length >= 3);
++if (ok.length === 0) {
++	console.error("no successful runs", results[0]?.code, results[0]?.out.slice(0, 2000));
++	process.exit(1);
++}
++const first = ok[0].reqs;
++const turn = (r) => {
++	const b = r.body;
++	const sys = (b.messages.find((m) => m.role === "system" || m.role === "developer")?.content) ?? "";
++	const sysText = typeof sys === "string" ? sys : JSON.stringify(sys);
++	return {
++		requestBytes: r.bytes,
++		systemPromptChars: sysText.length,
++		toolSchemaChars: JSON.stringify(b.tools ?? []).length,
++		toolCount: (b.tools ?? []).length,
++		messageChars: JSON.stringify(b.messages.filter((m) => m.role !== "system" && m.role !== "developer")).length,
++	};
++};
++// Prompt-cache friendliness: every request must start with the previous request's tools, system prompt and messages,
++// byte for byte, so providers can reuse the cached prefix. Reports the first turn that breaks the prefix, or null.
++function firstPrefixBreak(reqs) {
++	for (let i = 1; i < reqs.length; i++) {
++		const prev = reqs[i - 1].body;
++		const cur = reqs[i].body;
++		const strip = (b) => JSON.stringify({ ...b, messages: undefined, stream_options: undefined });
++		if (strip(prev) !== strip(cur)) return { turn: i + 1, why: "request parameters or tools changed" };
++		for (let m = 0; m < prev.messages.length; m++) {
++			if (JSON.stringify(prev.messages[m]) !== JSON.stringify(cur.messages[m])) return { turn: i + 1, why: `message ${m} changed` };
++		}
++	}
++	return null;
++}
++if (process.env.BENCH_SHOW_OUTPUT) console.error(ok[0].out);
++const summary = {
++	label,
++	runs: ok.length,
++	firstRequestMs: { median: Math.round(median(ok.map((r) => r.firstReq))), min: Math.round(Math.min(...ok.map((r) => r.firstReq))) },
++	totalMs: { median: Math.round(median(ok.map((r) => r.total))) },
++	cpuMs: { median: Math.round(median(ok.map((r) => r.cpu))) },
++	peakRssMiB: Math.round(median(ok.map((r) => r.peak))),
++	turns: first.map(turn),
++	promptPrefixBreak: firstPrefixBreak(first),
++};
++console.log(JSON.stringify(summary, null, 2));
++const jf = arg("json");
++if (jf) {
++	writeFileSync(jf, JSON.stringify(summary, null, 2));
++	writeFileSync(jf.replace(/\.json$/, ".request1.json"), JSON.stringify(first[0].body, null, 2));
++	writeFileSync(jf.replace(/\.json$/, ".request3.json"), JSON.stringify(first[2].body, null, 2));
++}
+diff --git a/docs/EFFICIENCY.md b/docs/EFFICIENCY.md
+new file mode 100644
+index 0000000..6a88de4
+--- /dev/null
++++ b/docs/EFFICIENCY.md
+@@ -0,0 +1,99 @@
++# Efficiency work and fork changes
++
++This is the honest account of what the fork changed beyond renaming, what was tried and reverted, and what was measured.
++The first pass of this work traded capability for speed (a shorter system prompt, shorter tool descriptions, network
++features switched off, files deleted). That was the wrong trade and most of it was reverted. The rule now: nothing that
++removes functionality, model guidance, docs or user-facing behavior stays unless it is purely the rename or fixes a
++fork-specific problem (the fix is then described below).
++
++Reproduce every number with `bench/` (see `bench/README.md`). Upstream baseline: Pi 1.4.0 at `6c384aa`, built unchanged.
++Machine: 8 vCPU Linux box, Node 22.23.4, mock OpenAI-compatible provider on localhost, medians of 31 cold runs after one
++warm-up, two interleaved rounds.
++
++## Results
++
++| Metric | Upstream Pi 1.4.0 | so agent | Reading |
++|---|---|---|---|
++| `--version` | 171.5 ms | 23.5 ms | Floor: `node -e 0` is 20.7 ms. The launcher answers without loading the application. |
++| Print mode, process start to first provider request | 234 / 238 ms | 235 / 238 ms | No change. Startup is about 150 ms of module evaluation and compile, 34 ms of `main()`, and 20 ms of Node itself. |
++| Print mode, whole 3-turn run | 315 / 319 ms | 315 / 318 ms | No change. |
++| Print mode, CPU time (user + system) | 396 / 401 ms | 393 / 400 ms | No change. |
++| Print mode, peak RSS | 122 MiB | 117 MiB | -5 MiB (-4%): the interactive UI module graph is no longer evaluated in print and RPC runs. |
++| Interactive TUI, first byte / screen settled | 219 / 357 ms and 212 / 350 ms | 219 / 358 ms and 224 / 363 ms | No change. |
++| System prompt, tool schemas, tool descriptions | 2682 chars, 2841 chars | same text, with the names changed (2655 chars) | Not touched. |
++| Request prefix stability across turns | n/a | stable | Every request starts with the previous request's tools, system prompt and messages byte for byte (`promptPrefixBreak: null`), so provider prompt caches work. Upstream's request has the same property. |
++| npm tarball | 7.70 MB packed, 23.7 MB unpacked | 7.71 MB, 23.7 MB | Unchanged (the first pass shrank it by dropping sourcemaps and images; reverted). |
++
++What limits these numbers. Wall time and CPU are dominated by evaluating and compiling the bundled module graph at start
++(the compile cache already saves about 58 ms; the cpu profile shows the time spread flat over the model catalog, the
++schema library, undici, the TUI and markdown libraries, with no single module above about 25 ms). Lazy mode loading
++therefore moves work around without removing it: print mode skips the interactive graph, which shows up as memory, not
++time. The only large win is the one that skips the application entirely (`--version`).
++
++The honest conclusion: upstream was already tuned (lazy chunks, compile cache, graph budgets enforced by
++`npm run check`, section-patch system prompts, truncated tool output with notes, provider cache markers). The lossless
++headroom that remains at startup is single-digit milliseconds per item. I measured and dropped these:
++
++- Deferring highlight.js language registration (12 ms of CPU in the profile): no measurable change in interactive
++  start (357/350 vs 358/363 ms), so it was not kept.
++- Lazy interactive-mode import in the interactive path: neutral.
++
++## Kept changes (all lossless)
++
++| Change | Where | Evidence |
++|---|---|---|
++| `so --version` / `-v` answers from the launcher | `scripts/build-coding-agent-bundle.mjs` | 171.5 -> 23.5 ms. Only when it is the sole argument and `SO_PACKAGE_DIR` is not set; everything else takes the normal path. `scripts/cli-launcher.test.mjs` checks the output equals the full path's output and that other invocations load the runtime. |
++| Run modes imported on demand | `packages/coding-agent/src/main.ts` | RSS 122 -> 117 MiB. `scripts/cli-launcher.test.mjs` runs a real print-mode turn against the mock provider with a module resolution hook and asserts the `interactive-mode` chunk is never loaded. |
++| Benchmarks | `bench/` | `run.mjs` (start, CPU, RSS, per-turn payload, prompt-prefix stability), `interactive.mjs` (TUI start in a pty), `mock-server.mjs`. |
++| Catalog protocol pin | `remote-catalog-provider.ts` | so sends `pi-version=1.4.0` itself (`CATALOG_PROTOCOL_VERSION`). The server picks the revision a client can read from that parameter and only redirects clients that announce `pi/<version>`; so announces `so/<version>`, so without the pin it would get whatever revision is newest. Test: `model-catalog-protocol.test.ts`. |
++
++## Audit of the first pass: keep, restore, or replace
++
++| Earlier change | Verdict | What it is now, and why |
++|---|---|---|
++| Codemod renames (content, paths, env, scopes) | **Keep** | Pure rename. |
++| Codemod deleted 12 items: issue templates, `APPROVED_CONTRIBUTORS`, 8 workflows, `scripts/issues/` | **Restore** (workflows: **replace**) | Everything is back. The 8 governance/publishing workflows are renamed to `*.yml.disabled` (`.github/workflows/DISABLED.md`): they use `github.repository`, so in a fork they would auto-close issues against upstream's contributor list, check upstream's staff team, and publish to upstream's infrastructure. Re-enable one by renaming it back after adapting it. `scripts/rename-codemod.test.mjs` pins this. |
++| Codemod deduplicated the `@earendil-works/pi-*` and `@mariozechner/pi-*` import aliases | **Restore** | Pi extensions import those names. The loader, virtual modules, resource loader, coding-agent vitest config and the theme's old global key keep them as keys next to `@so-agent/*`, so existing Pi extensions load unchanged. Test: `scripts/rename-codemod.test.mjs`; upstream's own `11156-*-virtual-module` test still passes. |
++| Removed the announcement component and `/dementedelves` | **Restore** | Back, with its text made accurate ("Pi, the project so agent is based on, has joined Earendil"); the blog link is unchanged. |
++| Condensed system prompt (2682 -> 1890 chars) | **Restore** | Prompt quality was never evaluated on real models. Back to upstream's wording. |
++| Condensed tool descriptions (edit tool) | **Restore** | Same. |
++| Prompt size-budget test, boundaries-test fixture bump | **Drop** | They only existed for the shorter prompt. |
++| Update feed off unless `SO_UPDATE_URL` | **Replace** | On by default again, as upstream. The upstream feed would offer, and `so update --self` would install, Pi (its answer carries Pi's package name). The default feed is now the npm registry entry of the installed package, which stays silent (404) until the package is published. `SO_UPDATE_URL` restores the upstream-style feed; `SO_SKIP_VERSION_CHECK` / `SO_OFFLINE` turn it off. Tests: `version-check.test.ts`. |
++| Remote model catalog off unless `SO_CATALOG_URL` | **Restore** | On by default (`https://pi.dev`), as upstream, plus `SO_CATALOG_URL` to change the host and `SO_CATALOG_URL=off` to disable. Tests: `network-defaults.test.ts`, `model-catalog-protocol.test.ts`. |
++| Install ping removed | **Replace** | Code, setting (`enableInstallTelemetry`, `SO_TELEMETRY`) and docs are back. The endpoint is `SO_INSTALL_REPORT_URL` with no default: the upstream counter would count so installs as Pi installs. Open question for you. Test: `network-defaults.test.ts`. |
++| Post-update installer hint removed | **Replace** | Hint is back, printed only when `SO_INSTALLER_URL` / `SO_INSTALLER_PS1_URL` name an so installer (upstream's installer installs Pi). |
++| "Could not determine latest version" message | **Keep (improved)** | Names the URL it looked at and `SO_UPDATE_URL`. |
++| `--version` launcher fast path | **Keep** | See above; added the `SO_PACKAGE_DIR` guard and equivalence tests. |
++| Lazy mode imports in `main.ts` | **Keep** | See above; added the real print-mode test. |
++| Sourcemaps and `docs/images` left out of the npm tarball | **Restore** | The bundle is minified; without maps `--enable-source-maps` stack traces are useless. Tarball back to upstream's contents. |
++| README, CONTRIBUTING, coding-agent README, quickstart rewritten | **Restore** | Upstream text with the names changed, plus a short fork notice at the top of README, CONTRIBUTING and the coding-agent README (the installer URLs in them install Pi, not so, and the npm packages are not published). Pictures still show Pi's logo: replace later. |
++| SECURITY.md contact | **Keep** | Upstream's security mailbox would receive reports about the fork. It is kept as a pointer for issues in inherited code. |
++| CHANGELOG fork notice | **Keep** | Additive. |
++| `APP_TITLE` and the easter-egg logo changed from the pi symbol to "so" | **Keep** | Branding. |
++| `SO_ATTRIBUTION.url` (OpenRouter `HTTP-Referer`) | **Keep** | Credits the so repository (placeholder `kevin9327/so-agent`) instead of Pi's site. |
++| `repository.url` in 11 `package.json` files | **Keep** | Points at the placeholder so-agent repository instead of upstream. |
++| Biome import/line-wrap fixes, `install-lock` duplicate-key cleanup, `legacy-ai` test key | **Keep** | Mechanical consequences of the rename (`rename/patches/0001`). |
++| Test edits made for the removed behavior | **Replace** | Reverted to upstream's tests where the behavior is restored; new tests added for every kept or replaced change. |
++| `docs/UPSTREAM-ENDPOINTS.md` | **Rewrite** | Lists each upstream URL and what so does with it. |
++
++## Tests
++
++Full `./test.sh` with `fd` on PATH and Node 22.23.4, compared with the unmodified upstream checkout:
++
++| | Upstream Pi 1.4.0 | so agent |
++|---|---|---|
++| coding-agent (vitest) | 2766 passed, 1 failed, 50 skipped | 2774 passed, 1 failed, 50 skipped |
++| root scripts (`node:test`) | 49 passed | 56 passed (new: codemod, launcher, print-mode laziness) |
++| everything else (agent, ai, tui, codemode, mcp, chord, durable, evals, telemetry) | passes | passes |
++| failures | `auth-storage.test.ts` "keeps a coalesced reload alive...", and six `packages/env` suites that need the Rust daemon (`npm run build:daemon`) | the same seven, and only those |
++
++The `auth-storage` failure is environmental: the cache key for `auth.json` is `dev:ino:size:mtimeNs:ctimeNs`, and on
++ext4 the timestamps move in 4 ms ticks, so two writes of the same size in one tick look identical. It does not fail on
++filesystems with nanosecond timestamps. Left as is: a fix would change upstream's caching semantics, which other tests
++depend on.
++
++## Unverified
++
++- Performance on a real provider and network (all numbers use a localhost mock). Startup numbers are from one machine.
++- Whether `https://pi.dev` keeps serving so's `so/<version>` user agent; the pin was checked against the live server once.
++- The npm registry default for updates has not run against a published `@so-agent/coding-agent` (the package does not exist yet).
+diff --git a/docs/UPSTREAM-ENDPOINTS.md b/docs/UPSTREAM-ENDPOINTS.md
+new file mode 100644
+index 0000000..fbe5292
+--- /dev/null
++++ b/docs/UPSTREAM-ENDPOINTS.md
+@@ -0,0 +1,21 @@
++# Upstream endpoints
++
++so agent inherits URLs that point at services run by the upstream Pi project. Every feature that uses one is kept. Where
++using the upstream default would be wrong for a fork (it would offer or install Pi, or count so as Pi), the default
++is replaced and the old behavior is available through an environment variable.
++
++| Endpoint | Used for | so agent behavior |
++|---|---|---|
++| `https://pi.dev/api/latest-version` | update check at startup, `so update --self` | **Replaced.** The upstream feed would offer, and `so update --self` would install, Pi. The default is the npm registry entry of the installed package (`https://registry.npmjs.org/@so-agent%2fcoding-agent/latest`). It answers 404 until the package is published, and then the check is silent. `SO_UPDATE_URL` points at any feed that returns `{ "version", "packageName"?, "note"? }` or a registry `{ "name", "version" }`. `SO_SKIP_VERSION_CHECK` and `SO_OFFLINE` turn it off. |
++| `https://pi.dev/api/models/providers/<id>` | remote model catalog overlay | **On by default, as upstream.** so sends `pi-version=1.4.0` itself (`CATALOG_PROTOCOL_VERSION`) so the server returns a revision this code understands. `SO_CATALOG_URL` selects another host, `SO_CATALOG_URL=off` disables the overlay. `SO_OFFLINE` disables all network requests. |
++| `https://pi.dev/api/report-install` | anonymous install counter (setting `enableInstallTelemetry`, `SO_TELEMETRY`) | **Replaced.** The upstream counter would count so as Pi. The code and setting are intact; the endpoint comes from `SO_INSTALL_REPORT_URL` and there is no default, so nothing is sent until you set one. |
++| `pi.dev/install.sh`, `install.ps1`, `https://pi.dev/api/installer/releases` | managed installer, hint printed after `so update --self` | **Replaced for the hint.** The upstream installer installs Pi. The post-update hint prints only when `SO_INSTALLER_URL` / `SO_INSTALLER_PS1_URL` name an so installer. The installer-managed update path itself is unchanged (`SO_INSTALLER_API_BASE`). |
++| `https://pi.dev/session/` | `/share` viewer | Unchanged. Override with `SO_SHARE_VIEWER_URL`. |
++| `https://pi.dev/oauth/*/client.json` | MCP OAuth client metadata (`clientRegistration: "cimd"`, opt-in) | Unchanged. The default is dynamic client registration. |
++| `https://radius.pi.dev` | Radius provider gateway | Unchanged. Only used with Radius credentials. |
++| `https://pi.dev/schemas/*.schema.json` | `$schema` hints in JSON files | Unchanged. Cosmetic. |
++| `ai/src/utils/identity.ts` `SO_ATTRIBUTION.url` | `HTTP-Referer` to OpenRouter | Points at the so repository (placeholder `https://github.com/kevin9327/so-agent`). The upstream value would credit Pi's site for so's traffic. |
++| Upstream issue and PR links, `github.com/earendil-works/pi` | comments, changelogs | Kept as history and attribution. |
++
++`scripts/model-catalog-protocol.ts` is the wire protocol shared with the upstream server and keeps the upstream names
++(`pi-version`, `pi/<version>`).
+diff --git a/packages/agent/package.json b/packages/agent/package.json
+index 28d295b..a40fa95 100644
+--- a/packages/agent/package.json
++++ b/packages/agent/package.json
+@@ -37,7 +37,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/agent"
+ 	},
+ 	"engines": {
+diff --git a/packages/ai/package.json b/packages/ai/package.json
+index d6af526..df76431 100644
+--- a/packages/ai/package.json
++++ b/packages/ai/package.json
+@@ -92,7 +92,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/ai"
+ 	},
+ 	"engines": {
+diff --git a/packages/ai/src/utils/identity.ts b/packages/ai/src/utils/identity.ts
+index 7deecfc..21c6c3f 100644
+--- a/packages/ai/src/utils/identity.ts
++++ b/packages/ai/src/utils/identity.ts
+@@ -21,7 +21,11 @@ export interface ClientAttribution {
+ }
+ 
+ /** so's attribution, used by so-agent-core, so-durable, and the coding agent. */
+-export const SO_ATTRIBUTION: ClientAttribution = { name: "so", url: "https://pi.dev", categories: ["cli-agent"] };
++export const SO_ATTRIBUTION: ClientAttribution = {
++	name: "so",
++	url: "https://github.com/kevin9327/so-agent",
++	categories: ["cli-agent"],
++};
+ 
+ /**
+  * How so-ai identifies the calling app to providers. Every field is optional; absent fields use so-ai's defaults:
+diff --git a/packages/ai/test/identity.test.ts b/packages/ai/test/identity.test.ts
+index d7ca6a0..c44a854 100644
+--- a/packages/ai/test/identity.test.ts
++++ b/packages/ai/test/identity.test.ts
+@@ -101,7 +101,7 @@ describe("client identity", () => {
+ 	it("attributes OpenRouter requests", () => {
+ 		const openRouter = target("openrouter", "https://openrouter.ai/api/v1");
+ 		expect(getAttributionHeaders(openRouter, { attribution: SO_ATTRIBUTION })).toEqual({
+-			"HTTP-Referer": "https://pi.dev",
++			"HTTP-Referer": "https://github.com/kevin9327/so-agent",
+ 			"X-OpenRouter-Title": "so",
+ 			"X-OpenRouter-Categories": "cli-agent",
+ 		});
+diff --git a/packages/chord/package.json b/packages/chord/package.json
+index a2f8856..c0ec06d 100644
+--- a/packages/chord/package.json
++++ b/packages/chord/package.json
+@@ -78,7 +78,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/chord"
+ 	},
+ 	"engines": {
+diff --git a/packages/codemode/package.json b/packages/codemode/package.json
+index 0cc6ce0..1fe33bc 100644
+--- a/packages/codemode/package.json
++++ b/packages/codemode/package.json
+@@ -60,7 +60,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/codemode"
+ 	},
+ 	"engines": {
+diff --git a/packages/coding-agent/CHANGELOG.md b/packages/coding-agent/CHANGELOG.md
+index 59827b2..0a4aa22 100644
+--- a/packages/coding-agent/CHANGELOG.md
++++ b/packages/coding-agent/CHANGELOG.md
+@@ -1,5 +1,7 @@
+ # Changelog
+ 
++> so agent fork notice: entries below are the upstream Pi project's history, kept verbatim (names, commands and links refer to Pi). so agent changes are listed in `docs/EFFICIENCY.md` and the git log.
++
+ ## [Unreleased]
+ 
+ ### Added
+diff --git a/packages/coding-agent/README.md b/packages/coding-agent/README.md
+index 14846e9..0ec17a9 100644
+--- a/packages/coding-agent/README.md
++++ b/packages/coding-agent/README.md
+@@ -8,6 +8,8 @@
+   <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square&logo=npm&logoColor=white" /></a>
+ </p>
+ 
++> **so agent is a fork of [Pi](https://github.com/earendil-works/pi)** (MIT); see [ATTRIBUTION.md](../../ATTRIBUTION.md). Installer URLs, logo and screenshots in this file are still upstream's: `pi.dev/install.sh` installs Pi, not so, and the `@so-agent/*` npm packages are not published yet.
++
+ > New issues and PRs from new contributors are closed automatically. Maintainers review closed submissions daily. See [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md).
+ 
+ # So
+diff --git a/packages/coding-agent/docs/environment-variables.md b/packages/coding-agent/docs/environment-variables.md
+index fc55c85..5324957 100644
+--- a/packages/coding-agent/docs/environment-variables.md
++++ b/packages/coding-agent/docs/environment-variables.md
+@@ -82,7 +82,11 @@ These variables are read by So itself:
+ | `SO_CODING_AGENT_SESSION_DIR` | Override session storage; overridden by `--session-dir` |
+ | `SO_PACKAGE_DIR` | Override the package directory, useful for Nix/Guix store paths |
+ | `SO_OFFLINE` | Disable automatic network activity, including model catalog refreshes |
+-| `SO_SKIP_VERSION_CHECK` | Disable the `pi.dev` latest-version request |
++| `SO_SKIP_VERSION_CHECK` | Disable the latest-version request made at startup |
++| `SO_UPDATE_URL` | Release feed for the update check and `so update --self`. Default: the npm registry entry of the installed package. Accepts `{ "version", "packageName"?, "note"? }` or a registry `{ "name", "version" }` |
++| `SO_CATALOG_URL` | Model catalog host. Default: `https://pi.dev` (the upstream project's public model list). `off` disables the remote catalog overlay |
++| `SO_INSTALL_REPORT_URL` | Endpoint for the anonymous install counter (`enableInstallTelemetry`). No default, so nothing is sent unless set |
++| `SO_INSTALLER_URL`, `SO_INSTALLER_PS1_URL` | Installer script URLs printed as a hint after `so update --self` on npm installs. No default |
+ | `SO_TELEMETRY` | Override install/update telemetry and provider attribution headers: `1`/`true`/`yes` or `0`/`false`/`no` |
+ | `SO_CODEMODE_MAX_WORKERS` | Maximum codemode workers alive at once across all sessions in the process; default `2`. Each worker's script may use up to 256 MB. Raise it when one process runs several sessions, such as in-process subagents. Further scripts wait for a free worker. See [Codemode](codemode.md) |
+ | `SO_CACHE_RETENTION` | Set to `long` for extended provider prompt caching where supported |
+diff --git a/packages/coding-agent/package.json b/packages/coding-agent/package.json
+index 2e4c0d9..2f18890 100644
+--- a/packages/coding-agent/package.json
++++ b/packages/coding-agent/package.json
+@@ -89,7 +89,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/coding-agent"
+ 	},
+ 	"engines": {
+diff --git a/packages/coding-agent/src/config.ts b/packages/coding-agent/src/config.ts
+index 87b2a97..1ec1d03 100644
+--- a/packages/coding-agent/src/config.ts
++++ b/packages/coding-agent/src/config.ts
+@@ -577,7 +577,7 @@ try {
+ const soConfigName: string | undefined = pkg.soConfig?.name;
+ export const PACKAGE_NAME: string = pkg.name || "@so-agent/coding-agent";
+ export const APP_NAME: string = soConfigName || "so";
+-export const APP_TITLE: string = soConfigName ? APP_NAME : "π";
++export const APP_TITLE: string = soConfigName ? APP_NAME : "so";
+ export const CONFIG_DIR_NAME: string = pkg.soConfig?.configDir || ".so";
+ export const VERSION: string = pkg.version || "0.0.0";
+ 
+diff --git a/packages/coding-agent/src/core/remote-catalog-provider.ts b/packages/coding-agent/src/core/remote-catalog-provider.ts
+index ff92610..947feef 100644
+--- a/packages/coding-agent/src/core/remote-catalog-provider.ts
++++ b/packages/coding-agent/src/core/remote-catalog-provider.ts
+@@ -12,6 +12,24 @@ import { fetchWithRetry } from "../utils/management-http.ts";
+ import { getSoUserAgent } from "../utils/so-user-agent.ts";
+ 
+ const DEFAULT_CATALOG_BASE_URL = "https://pi.dev";
++/**
++ * The catalog service is the upstream project's public, read-only model list. It stays on by default so model data
++ * stays current. `SO_CATALOG_URL` points so at another catalog host with the same protocol; `off` (also `0`,
++ * `false`, `none`) disables the overlay. `SO_OFFLINE` already disables every network request.
++ */
++export function getCatalogBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
++	const configured = env.SO_CATALOG_URL?.trim();
++	if (!configured) return DEFAULT_CATALOG_BASE_URL;
++	return /^(off|0|false|none)$/i.test(configured) ? "" : configured;
++}
++/**
++ * The upstream Pi release whose catalog protocol this client implements (so is based on upstream Pi 1.4.0). The catalog
++ * server picks the catalog revision a client can read from the `pi-version` query parameter; it redirects clients with
++ * the user agent `pi/<version>` (upstream Pi) to it. so announces itself as `so/<version>`, so it sends the parameter itself:
++ * that pins the revision to one this code understands and saves the redirect round trip. Bump this when merging a
++ * newer upstream Pi release.
++ */
++export const CATALOG_PROTOCOL_VERSION = "1.4.0";
+ const REMOTE_CATALOG_ATTEMPT_TIMEOUT_MS = 4_000;
+ export const REMOTE_CATALOG_REFRESH_INTERVAL_MS = 4 * 60 * 60 * 1000;
+ /**
+@@ -80,6 +98,7 @@ function requestCatalog(
+ ): Promise<Response> {
+ 	const url = new URL(`/api/models/providers/${encodeURIComponent(providerId)}`, catalogBaseUrl);
+ 	url.searchParams.set("types", REMOTE_CATALOG_MODEL_TYPES.join(","));
++	url.searchParams.set("pi-version", CATALOG_PROTOCOL_VERSION);
+ 	return fetchWithRetry(
+ 		url,
+ 		{
+@@ -103,9 +122,10 @@ export type PersonalizeCatalog = (
+ /** Add a persisted pi.dev catalog overlay to a static built-in provider. */
+ export function withRemoteCatalog(
+ 	provider: Provider,
+-	catalogBaseUrl: string = DEFAULT_CATALOG_BASE_URL,
++	catalogBaseUrl: string = getCatalogBaseUrl(),
+ 	localGeneratedAt?: number,
+ ): Provider {
++	if (!catalogBaseUrl) return provider;
+ 	let dynamicModels: readonly AnyModel[] = [];
+ 
+ 	return {
+@@ -195,7 +215,7 @@ export function withRemoteCatalog(
+ export function withPersonalizedCatalog(
+ 	provider: Provider,
+ 	personalize: PersonalizeCatalog,
+-	catalogBaseUrl: string = DEFAULT_CATALOG_BASE_URL,
++	catalogBaseUrl: string = getCatalogBaseUrl(),
+ 	localGeneratedAt?: number,
+ ): Provider {
+ 	let personalModels: readonly AnyModel[] = [];
+@@ -219,10 +239,12 @@ export function withPersonalizedCatalog(
+ 			}
+ 			if (!context.allowNetwork || context.signal.aborted) return;
+ 
+-			const response = await requestCatalog(provider.id, catalogBaseUrl, context.signal);
++			const response = catalogBaseUrl
++				? await requestCatalog(provider.id, catalogBaseUrl, context.signal)
++				: undefined;
+ 			if (context.signal.aborted) return;
+ 			let remote: readonly AnyModel[] = [];
+-			if (response.status !== 404 && response.status !== 501) {
++			if (response && response.status !== 404 && response.status !== 501) {
+ 				if (!response.ok) throw new Error(`Model catalog request failed for ${provider.id}: ${response.status}`);
+ 				const catalog = await readCatalog(provider.id, response);
+ 				if (isNewer(catalog.lastModified, localGeneratedAt)) remote = catalog.models;
+diff --git a/packages/coding-agent/src/core/telemetry.ts b/packages/coding-agent/src/core/telemetry.ts
+index 04159f0..d45e8c1 100644
+--- a/packages/coding-agent/src/core/telemetry.ts
++++ b/packages/coding-agent/src/core/telemetry.ts
+@@ -11,3 +11,14 @@ export function isInstallTelemetryEnabled(
+ ): boolean {
+ 	return telemetryEnv !== undefined ? isTruthyEnvFlag(telemetryEnv) : settingsManager.getEnableInstallTelemetry();
+ }
++
++/**
++ * URL of the anonymous install counter for `version`, or undefined when none is configured. There is no default
++ * endpoint: the upstream project's counter would count so installs as Pi installs. Set `SO_INSTALL_REPORT_URL` to
++ * your own counter to enable the report (it still obeys `enableInstallTelemetry` and `SO_TELEMETRY`).
++ */
++export function getInstallReportUrl(version: string, env: NodeJS.ProcessEnv = process.env): string | undefined {
++	const base = env.SO_INSTALL_REPORT_URL?.trim();
++	if (!base) return undefined;
++	return `${base}${base.includes("?") ? "&" : "?"}version=${encodeURIComponent(version)}`;
++}
+diff --git a/packages/coding-agent/src/main.ts b/packages/coding-agent/src/main.ts
+index a9df0ec..8f167ec 100644
+--- a/packages/coding-agent/src/main.ts
++++ b/packages/coding-agent/src/main.ts
+@@ -64,7 +64,6 @@ import { hasTrustRequiringProjectResources, ProjectTrustStore } from "./core/tru
+ import { builtInExtensions } from "./extensions/index.ts";
+ import { loadMcpCommand } from "./extensions/mcp/cli.lazy.ts";
+ import { runMigrations, showDeprecationWarnings } from "./migrations.ts";
+-import { InteractiveMode, runPrintMode, runRpcMode } from "./modes/index.ts";
+ import { initTheme, setThemeJsonValidator, stopThemeWatcher } from "./modes/interactive/theme/theme.ts";
+ import { validateThemeJson } from "./modes/interactive/theme/theme-schema.ts";
+ import { cleanupManagedInstall, handleConfigCommand, handlePackageCommand } from "./package-manager-cli.ts";
+@@ -947,10 +946,13 @@ export async function main(args: string[], options?: MainOptions) {
+ 			.finally(() => clearTimeout(timeout));
+ 	}
+ 
++	// Each mode is imported on demand: print and RPC runs never evaluate the interactive UI module graph.
+ 	if (appMode === "rpc") {
+ 		printTimings();
++		const { runRpcMode } = await import("./modes/rpc/rpc-mode.ts");
+ 		await runRpcMode(runtime);
+ 	} else if (appMode === "interactive") {
++		const { InteractiveMode } = await import("./modes/interactive/interactive-mode.ts");
+ 		const interactiveMode = new InteractiveMode(runtime, {
+ 			migratedProviders,
+ 			startupDiagnostics,
+@@ -985,6 +987,7 @@ export async function main(args: string[], options?: MainOptions) {
+ 		await interactiveMode.run();
+ 	} else {
+ 		printTimings();
++		const { runPrintMode } = await import("./modes/print-mode.ts");
+ 		const exitCode = await runPrintMode(runtime, {
+ 			mode: toPrintOutputMode(appMode),
+ 			messages: parsed.messages,
+diff --git a/packages/coding-agent/src/modes/interactive/components/earendil-announcement.ts b/packages/coding-agent/src/modes/interactive/components/earendil-announcement.ts
+index af1b93d..55d7889 100644
+--- a/packages/coding-agent/src/modes/interactive/components/earendil-announcement.ts
++++ b/packages/coding-agent/src/modes/interactive/components/earendil-announcement.ts
+@@ -29,7 +29,9 @@ export class EarendilAnnouncementComponent extends Container {
+ 		super();
+ 
+ 		this.addChild(new DynamicBorder((text) => theme.fg("accent", text)));
+-		this.addChild(new Text(theme.bold(theme.fg("accent", "so has joined Earendil")), 1, 0));
++		this.addChild(
++			new Text(theme.bold(theme.fg("accent", "Pi, the project so agent is based on, has joined Earendil")), 1, 0),
++		);
+ 		this.addChild(new Spacer(1));
+ 		this.addChild(new Text(theme.fg("muted", "Read the blog post:"), 1, 0));
+ 		this.addChild(new Text(theme.fg("mdLink", BLOG_URL), 1, 0));
+diff --git a/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts b/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
+index 271e16b..bdb571b 100644
+--- a/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
++++ b/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
+@@ -131,13 +131,12 @@ function createModel(
+ 
+ const CORAL: Rgb = [228, 138, 122];
+ const BLUE: Rgb = [79, 142, 179];
+-const YELLOW: Rgb = [234, 182, 93];
+-const SO_LOGO_PIXELS = ["ccc.", "b.c.", "bb.y", "b..y"];
+-const SO_LOGO_COLORS: Record<string, Rgb> = { c: CORAL, b: BLUE, y: YELLOW };
++const SO_LOGO_PIXELS = ["ccc.bbb", "c...b.b", "ccc.b.b", "..c.b.b", "ccc.bbb"];
++const SO_LOGO_COLORS: Record<string, Rgb> = { c: CORAL, b: BLUE };
+ 
+ function soLogoModel(origin: { column: number; row: number }): Model {
+-	return createModel(4, 4, (column, row) => SO_LOGO_COLORS[SO_LOGO_PIXELS[row]![column]!], {
+-		cameraDistance: 10,
++	return createModel(7, 5, (column, row) => SO_LOGO_COLORS[SO_LOGO_PIXELS[row]![column]!], {
++		cameraDistance: 14,
+ 		widthShare: 0.35,
+ 		puzzleMoves: (random) => (random < 0.4 ? 2 : 1),
+ 		origin,
+diff --git a/packages/coding-agent/src/modes/interactive/interactive-mode.ts b/packages/coding-agent/src/modes/interactive/interactive-mode.ts
+index b098972..4e4e03f 100644
+--- a/packages/coding-agent/src/modes/interactive/interactive-mode.ts
++++ b/packages/coding-agent/src/modes/interactive/interactive-mode.ts
+@@ -116,7 +116,7 @@ import {
+ import type { FullscreenExitOutput, TuiMode } from "../../core/settings-manager.ts";
+ import { BUILTIN_SLASH_COMMANDS } from "../../core/slash-commands.ts";
+ import type { SourceInfo } from "../../core/source-info.ts";
+-import { isInstallTelemetryEnabled } from "../../core/telemetry.ts";
++import { getInstallReportUrl, isInstallTelemetryEnabled } from "../../core/telemetry.ts";
+ import { withBuiltInRenderers } from "../../core/tools/renderers/index.ts";
+ import type { TruncationResult } from "../../core/tools/truncate.ts";
+ import { hasTrustRequiringProjectResources, ProjectTrustStore } from "../../core/trust-manager.ts";
+@@ -1367,7 +1367,12 @@ export class InteractiveMode {
+ 			return;
+ 		}
+ 
+-		void fetch(`https://pi.dev/api/report-install?version=${encodeURIComponent(version)}`, {
++		const reportUrl = getInstallReportUrl(version);
++		if (!reportUrl) {
++			return;
++		}
++
++		void fetch(reportUrl, {
+ 			headers: {
+ 				"User-Agent": getSoUserAgent(version),
+ 			},
+diff --git a/packages/coding-agent/src/package-manager-cli.ts b/packages/coding-agent/src/package-manager-cli.ts
+index 8132772..973d3e3 100644
+--- a/packages/coding-agent/src/package-manager-cli.ts
++++ b/packages/coding-agent/src/package-manager-cli.ts
+@@ -38,7 +38,12 @@ import { spawnProcess, spawnProcessSync, waitForChildProcess } from "./utils/chi
+ import { canonicalizePath, getCwdRelativePath } from "./utils/paths.ts";
+ import { getSoUserAgent } from "./utils/so-user-agent.ts";
+ import { stripBom } from "./utils/text.ts";
+-import { formatVersionCheckError, getLatestSoRelease, isNewerPackageVersion } from "./utils/version-check.ts";
++import {
++	formatVersionCheckError,
++	getLatestSoRelease,
++	getLatestVersionUrl,
++	isNewerPackageVersion,
++} from "./utils/version-check.ts";
+ import {
+ 	cleanupWindowsSelfUpdateQuarantine,
+ 	quarantineWindowsNativeDependencies,
+@@ -683,6 +688,23 @@ interface SelfUpdatePlan {
+ 	note?: string;
+ }
+ 
++/**
++ * The shell command that migrates an npm install to a managed one, or undefined when no so installer is configured.
++ * The upstream project's installer would install Pi, so there is no default: set `SO_INSTALLER_URL` (shell script) or
++ * `SO_INSTALLER_PS1_URL` (PowerShell script on Windows).
++ */
++export function getManagedInstallerCommand(
++	platform: NodeJS.Platform = process.platform,
++	env: NodeJS.ProcessEnv = process.env,
++): string | undefined {
++	if (platform === "win32") {
++		const url = env.SO_INSTALLER_PS1_URL?.trim();
++		return url ? `powershell -c "irm ${url} | iex"` : undefined;
++	}
++	const url = env.SO_INSTALLER_URL?.trim();
++	return url ? `curl -fsSL ${url} | sh` : undefined;
++}
++
+ async function getSelfUpdatePlan(force: boolean): Promise<SelfUpdatePlan> {
+ 	let latestRelease: Awaited<ReturnType<typeof getLatestSoRelease>>;
+ 	try {
+@@ -693,7 +715,9 @@ async function getSelfUpdatePlan(force: boolean): Promise<SelfUpdatePlan> {
+ 		});
+ 	}
+ 	if (!latestRelease) {
+-		throw new Error(`Could not determine latest ${APP_NAME} version.`);
++		throw new Error(
++			`Could not determine latest ${APP_NAME} version (looked at ${getLatestVersionUrl()}; set SO_UPDATE_URL to use another release feed).`,
++		);
+ 	}
+ 
+ 	const packageName = latestRelease.packageName ?? PACKAGE_NAME;
+@@ -1125,18 +1149,18 @@ export async function handlePackageCommand(
+ 						return true;
+ 					}
+ 					console.log(chalk.green(`Updated ${APP_NAME} from ${VERSION} to ${selfUpdatePlan.version}`));
+-					// The pi.dev installer migrates global npm installs to a managed install
+-					// that pins all dependencies. It does not migrate pnpm, yarn, or bun installs.
++					// A managed installer migrates global npm installs to an install that pins all dependencies. It does not
++					// migrate pnpm, yarn, or bun installs. The upstream project's installer installs Pi, so the hint is
++					// shown only when SO_INSTALLER_URL (shell) / SO_INSTALLER_PS1_URL (PowerShell) names an so installer.
+ 					if (installMethod === "npm") {
+-						const installerCommand =
+-							process.platform === "win32"
+-								? 'powershell -c "irm https://pi.dev/install.ps1 | iex"'
+-								: "curl -fsSL https://pi.dev/install.sh | sh";
+-						console.log();
+-						console.log(chalk.yellow(`This npm installation of ${APP_NAME} does not pin its dependencies.`));
+-						console.log(chalk.yellow("Run the installer to migrate to a managed installation that does:"));
+-						console.log();
+-						console.log(`  ${chalk.bold(installerCommand)}`);
++						const installerCommand = getManagedInstallerCommand();
++						if (installerCommand) {
++							console.log();
++							console.log(chalk.yellow(`This npm installation of ${APP_NAME} does not pin its dependencies.`));
++							console.log(chalk.yellow("Run the installer to migrate to a managed installation that does:"));
++							console.log();
++							console.log(`  ${chalk.bold(installerCommand)}`);
++						}
+ 					}
+ 				}
+ 				return true;
+diff --git a/packages/coding-agent/src/utils/version-check.ts b/packages/coding-agent/src/utils/version-check.ts
+index 792b723..788155e 100644
+--- a/packages/coding-agent/src/utils/version-check.ts
++++ b/packages/coding-agent/src/utils/version-check.ts
+@@ -1,8 +1,17 @@
+ import { compare, valid } from "semver";
++import { PACKAGE_NAME } from "../config.ts";
+ import { fetchWithRetry } from "./management-http.ts";
+ import { getSoUserAgent } from "./so-user-agent.ts";
+ 
+-const LATEST_VERSION_URL = "https://pi.dev/api/latest-version";
++/**
++ * Where the update check looks for the newest release. The upstream project's release feed would offer (and
++ * `so update --self` would install) upstream Pi, so the default is the npm registry entry of this package. Until the package is
++ * published the registry answers 404 and the check stays silent. `SO_UPDATE_URL` points at any other feed that
++ * returns `{ version, packageName?, note? }` (the shape upstream's feed uses); the registry's `{ name, version }` works too.
++ */
++export function getLatestVersionUrl(env: NodeJS.ProcessEnv = process.env): string {
++	return env.SO_UPDATE_URL?.trim() || `https://registry.npmjs.org/${PACKAGE_NAME.replace("/", "%2f")}/latest`;
++}
+ const DEFAULT_VERSION_CHECK_TIMEOUT_MS = 10000;
+ 
+ export interface LatestSoRelease {
+@@ -55,7 +64,7 @@ export async function getLatestSoRelease(
+ 	if (process.env.SO_OFFLINE) return undefined;
+ 
+ 	const response = await fetchWithRetry(
+-		LATEST_VERSION_URL,
++		getLatestVersionUrl(),
+ 		{
+ 			headers: {
+ 				"User-Agent": getSoUserAgent(currentVersion),
+@@ -70,6 +79,7 @@ export async function getLatestSoRelease(
+ 	if (!response.ok) return undefined;
+ 
+ 	const data = (await response.json()) as {
++		name?: unknown;
+ 		packageName?: unknown;
+ 		version?: unknown;
+ 		note?: unknown;
+@@ -77,8 +87,9 @@ export async function getLatestSoRelease(
+ 	if (typeof data.version !== "string" || !data.version.trim()) {
+ 		return undefined;
+ 	}
++	const feedPackageName = data.packageName ?? data.name;
+ 	const packageName =
+-		typeof data.packageName === "string" && data.packageName.trim() ? data.packageName.trim() : undefined;
++		typeof feedPackageName === "string" && feedPackageName.trim() ? feedPackageName.trim() : undefined;
+ 	const note = typeof data.note === "string" && data.note.trim() ? data.note.trim() : undefined;
+ 	return {
+ 		version: data.version.trim(),
+diff --git a/packages/coding-agent/test/model-catalog-protocol.test.ts b/packages/coding-agent/test/model-catalog-protocol.test.ts
+index 7707917..c44ab85 100644
+--- a/packages/coding-agent/test/model-catalog-protocol.test.ts
++++ b/packages/coding-agent/test/model-catalog-protocol.test.ts
+@@ -10,8 +10,8 @@ import {
+ 	parseModelCatalogRequest,
+ 	selectModelCatalog,
+ } from "../../../scripts/model-catalog-protocol.ts";
+-import { VERSION } from "../src/config.ts";
+ import { ModelRuntime } from "../src/core/model-runtime.ts";
++import { CATALOG_PROTOCOL_VERSION } from "../src/core/remote-catalog-provider.ts";
+ import { allowNetwork } from "./test-network-env.ts";
+ 
+ // Runs the current client against the catalog selection pi.dev performs, using
+@@ -120,10 +120,11 @@ describe("model catalog protocol with the current client", () => {
+ 		expect([...refresh.errors]).toEqual([]);
+ 
+ 		const catalogUrl = "/api/models/providers/openrouter?types=chat%2Cimage%2Cclassifier";
+-		expect(requests).toEqual([catalogUrl, `${catalogUrl}&pi-version=${VERSION}`]);
++		// so announces itself as `so/<version>` and sends `pi-version` itself, so the server never has to redirect.
++		expect(requests).toEqual([`${catalogUrl}&pi-version=${CATALOG_PROTOCOL_VERSION}`]);
+ 
+ 		const expectedModel =
+-			selectModelCatalog(index, VERSION)?.revision === legacyRevision ? legacyModel : mixedApiModel;
++			selectModelCatalog(index, CATALOG_PROTOCOL_VERSION)?.revision === legacyRevision ? legacyModel : mixedApiModel;
+ 		const model = runtime.getModel("openrouter", modelId);
+ 		expect(model).toMatchObject({ api: expectedModel.api, baseUrl: expectedModel.baseUrl });
+ 		if (!model) throw new Error(`Missing model: openrouter/${modelId}`);
+diff --git a/packages/coding-agent/test/network-defaults.test.ts b/packages/coding-agent/test/network-defaults.test.ts
+new file mode 100644
+index 0000000..67992c3
+--- /dev/null
++++ b/packages/coding-agent/test/network-defaults.test.ts
+@@ -0,0 +1,49 @@
++import type { Provider } from "@so-agent/ai/compat";
++import { describe, expect, it } from "vitest";
++import { getCatalogBaseUrl, withRemoteCatalog } from "../src/core/remote-catalog-provider.ts";
++import { getInstallReportUrl } from "../src/core/telemetry.ts";
++import { getManagedInstallerCommand } from "../src/package-manager-cli.ts";
++
++const provider = { id: "test", getModels: () => [], getAllModels: () => [] } as unknown as Provider;
++
++describe("remote model catalog", () => {
++	it("is on by default and can be pointed elsewhere or switched off", () => {
++		expect(getCatalogBaseUrl({})).toBe("https://pi.dev");
++		expect(getCatalogBaseUrl({ SO_CATALOG_URL: "https://catalog.example.test" })).toBe(
++			"https://catalog.example.test",
++		);
++		for (const off of ["off", "OFF", "0", "false", "none"])
++			expect(getCatalogBaseUrl({ SO_CATALOG_URL: off })).toBe("");
++	});
++
++	it("wraps the provider unless the catalog is switched off", () => {
++		expect(withRemoteCatalog(provider, "https://catalog.example.test")).not.toBe(provider);
++		expect(withRemoteCatalog(provider, "")).toBe(provider);
++	});
++});
++
++describe("install report", () => {
++	it("has no default endpoint, so nothing is sent unless one is configured", () => {
++		expect(getInstallReportUrl("1.2.3", {})).toBeUndefined();
++		expect(getInstallReportUrl("1.2.3", { SO_INSTALL_REPORT_URL: " " })).toBeUndefined();
++		expect(getInstallReportUrl("1.2.3", { SO_INSTALL_REPORT_URL: "https://count.example.test/in" })).toBe(
++			"https://count.example.test/in?version=1.2.3",
++		);
++		expect(getInstallReportUrl("1.2.3-beta+x", { SO_INSTALL_REPORT_URL: "https://count.example.test/in?k=1" })).toBe(
++			"https://count.example.test/in?k=1&version=1.2.3-beta%2Bx",
++		);
++	});
++});
++
++describe("managed installer hint", () => {
++	it("never points at the upstream installer", () => {
++		expect(getManagedInstallerCommand("linux", {})).toBeUndefined();
++		expect(getManagedInstallerCommand("win32", {})).toBeUndefined();
++		expect(getManagedInstallerCommand("linux", { SO_INSTALLER_URL: "https://so.example.test/install.sh" })).toBe(
++			"curl -fsSL https://so.example.test/install.sh | sh",
++		);
++		expect(getManagedInstallerCommand("win32", { SO_INSTALLER_PS1_URL: "https://so.example.test/install.ps1" })).toBe(
++			'powershell -c "irm https://so.example.test/install.ps1 | iex"',
++		);
++	});
++});
+diff --git a/packages/coding-agent/test/sdk-client-identity.test.ts b/packages/coding-agent/test/sdk-client-identity.test.ts
+index 4b533e1..1f7bb7c 100644
+--- a/packages/coding-agent/test/sdk-client-identity.test.ts
++++ b/packages/coding-agent/test/sdk-client-identity.test.ts
+@@ -149,7 +149,7 @@ describe("createAgentSession client identity", () => {
+ 			attribution: SO_ATTRIBUTION,
+ 		});
+ 		expect(getAttributionHeaders(model, options?.identity)).toEqual({
+-			"HTTP-Referer": "https://pi.dev",
++			"HTTP-Referer": "https://github.com/kevin9327/so-agent",
+ 			"X-OpenRouter-Title": "so",
+ 			"X-OpenRouter-Categories": "cli-agent",
+ 		});
+diff --git a/packages/coding-agent/test/test-network-env.ts b/packages/coding-agent/test/test-network-env.ts
+index 520344a..708232c 100644
+--- a/packages/coding-agent/test/test-network-env.ts
++++ b/packages/coding-agent/test/test-network-env.ts
+@@ -3,4 +3,6 @@ import { vi } from "vitest";
+ /** Enable network code paths for tests that replace external I/O with local fixtures or mocks. */
+ export function allowNetwork(): void {
+ 	vi.stubEnv("SO_OFFLINE", undefined);
++	// Tests that exercise the update check serve the upstream-shaped feed from this URL; the default is covered in version-check.test.ts.
++	vi.stubEnv("SO_UPDATE_URL", "https://pi.dev/api/latest-version");
+ }
+diff --git a/packages/coding-agent/test/version-check.test.ts b/packages/coding-agent/test/version-check.test.ts
+index 9acce6d..575afb3 100644
+--- a/packages/coding-agent/test/version-check.test.ts
++++ b/packages/coding-agent/test/version-check.test.ts
+@@ -5,6 +5,7 @@ import {
+ 	formatVersionCheckError,
+ 	getLatestSoRelease,
+ 	getLatestSoVersion,
++	getLatestVersionUrl,
+ 	isNewerPackageVersion,
+ } from "../src/utils/version-check.ts";
+ import { allowNetwork } from "./test-network-env.ts";
+@@ -129,3 +130,54 @@ describe("version checks", () => {
+ 		expect(fetchMock).toHaveBeenCalledOnce();
+ 	});
+ });
++
++describe("the update feed", () => {
++	it("defaults to the npm registry entry of this package, never to the upstream Pi feed", async () => {
++		vi.stubEnv("SO_UPDATE_URL", "");
++		expect(getLatestVersionUrl({})).toBe("https://registry.npmjs.org/@so-agent%2fcoding-agent/latest");
++		const fetchMock = vi.fn(async () => Response.json({ name: "@so-agent/coding-agent", version: "1.0.1" }));
++		vi.stubGlobal("fetch", fetchMock);
++
++		await expect(getLatestSoRelease("1.0.0")).resolves.toEqual({
++			version: "1.0.1",
++			packageName: "@so-agent/coding-agent",
++		});
++		expect(fetchMock).toHaveBeenCalledWith(
++			"https://registry.npmjs.org/@so-agent%2fcoding-agent/latest",
++			expect.anything(),
++		);
++	});
++
++	it("stays silent while the package is not published", async () => {
++		vi.stubEnv("SO_UPDATE_URL", "");
++		vi.stubGlobal(
++			"fetch",
++			vi.fn(async () => new Response("{}", { status: 404 })),
++		);
++		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
++	});
++
++	it("uses SO_UPDATE_URL and the upstream feed shape when set", async () => {
++		vi.stubEnv("SO_UPDATE_URL", "https://updates.example.test/latest");
++		const fetchMock = vi.fn(async () => Response.json({ version: "1.0.1", packageName: "@other/so", note: "hi" }));
++		vi.stubGlobal("fetch", fetchMock);
++
++		await expect(getLatestSoRelease("1.0.0")).resolves.toEqual({
++			version: "1.0.1",
++			packageName: "@other/so",
++			note: "hi",
++		});
++		expect(fetchMock).toHaveBeenCalledWith("https://updates.example.test/latest", expect.anything());
++	});
++
++	it("makes no request with SO_OFFLINE or SO_SKIP_VERSION_CHECK", async () => {
++		const fetchMock = vi.fn(async () => Response.json({ version: "9.9.9" }));
++		vi.stubGlobal("fetch", fetchMock);
++		vi.stubEnv("SO_OFFLINE", "1");
++		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
++		vi.stubEnv("SO_OFFLINE", undefined);
++		process.env.SO_SKIP_VERSION_CHECK = "1";
++		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
++		expect(fetchMock).not.toHaveBeenCalled();
++	});
++});
+diff --git a/packages/durable/package.json b/packages/durable/package.json
+index 5d70e33..786be75 100644
+--- a/packages/durable/package.json
++++ b/packages/durable/package.json
+@@ -143,7 +143,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/durable"
+ 	},
+ 	"engines": {
+diff --git a/packages/env/package.json b/packages/env/package.json
+index 9bb6caf..5d0e3fb 100644
+--- a/packages/env/package.json
++++ b/packages/env/package.json
+@@ -38,7 +38,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/env"
+ 	},
+ 	"engines": {
+diff --git a/packages/mcp/package.json b/packages/mcp/package.json
+index 4d122e6..dc9700e 100644
+--- a/packages/mcp/package.json
++++ b/packages/mcp/package.json
+@@ -44,7 +44,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/mcp"
+ 	},
+ 	"engines": {
+diff --git a/packages/telemetry/package.json b/packages/telemetry/package.json
+index 8e02837..5843f70 100644
+--- a/packages/telemetry/package.json
++++ b/packages/telemetry/package.json
+@@ -41,7 +41,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/telemetry"
+ 	},
+ 	"engines": {
+diff --git a/packages/tui/package.json b/packages/tui/package.json
+index 99c3b90..ce2e0c6 100644
+--- a/packages/tui/package.json
++++ b/packages/tui/package.json
+@@ -44,7 +44,7 @@
+ 	"license": "MIT",
+ 	"repository": {
+ 		"type": "git",
+-		"url": "git+https://github.com/earendil-works/pi.git",
++		"url": "git+https://github.com/kevin9327/so-agent.git",
+ 		"directory": "packages/tui"
+ 	},
+ 	"engines": {
+diff --git a/scripts/build-coding-agent-bundle.mjs b/scripts/build-coding-agent-bundle.mjs
+index a86d29e..997521f 100644
+--- a/scripts/build-coding-agent-bundle.mjs
++++ b/scripts/build-coding-agent-bundle.mjs
+@@ -245,10 +245,24 @@ if (dirname(configOutput) !== dirname(bedrockLoaderOutput)) {
+ const metafiles = [mainResult.metafile, lazyResult.metafile, codemodeWorkerResult.metafile];
+ validateExternalImports(metafiles);
+ const cliLauncher = `#!/usr/bin/env node
++import { readFileSync } from "node:fs";
+ import { createRequire, enableCompileCache } from "node:module";
+ 
+-enableCompileCache();
+-createRequire(import.meta.url)("./cli-runtime.js");
++// \`so --version\` alone prints the package version without evaluating the application module graph.
++// Anything else, and any run with SO_PACKAGE_DIR set (which relocates package.json), takes the normal path.
++const args = process.argv.slice(2);
++let version;
++if (args.length === 1 && (args[0] === "--version" || args[0] === "-v") && !process.env.SO_PACKAGE_DIR) {
++	try {
++		version = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;
++	} catch {}
++}
++if (typeof version === "string" && version) {
++	console.log(version);
++} else {
++	enableCompileCache();
++	createRequire(import.meta.url)("./cli-runtime.js");
++}
+ `;
+ writeFileSync(join(bundleDir, "cli.js"), cliLauncher);
+ chmodSync(join(bundleDir, "cli.js"), 0o755);
+diff --git a/scripts/cli-launcher.test.mjs b/scripts/cli-launcher.test.mjs
+new file mode 100644
+index 0000000..e4f1f54
+--- /dev/null
++++ b/scripts/cli-launcher.test.mjs
+@@ -0,0 +1,103 @@
++import assert from "node:assert/strict";
++import { spawnSync } from "node:child_process";
++import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { dirname, join, resolve } from "node:path";
++import test from "node:test";
++import { fileURLToPath } from "node:url";
++
++const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
++const launcher = join(root, "packages", "coding-agent", "dist", "bundle", "cli.js");
++const built = existsSync(launcher);
++
++// Preload that reports when the launcher loads the application graph.
++const dir = mkdtempSync(join(tmpdir(), "so-launcher-"));
++const preload = join(dir, "preload.cjs");
++writeFileSync(
++	preload,
++	`const M = require("node:module"); const orig = M.prototype.require;
++M.prototype.require = function (id) { if (String(id).endsWith("cli-runtime.js")) process.stderr.write("LOADED_RUNTIME\\n"); return orig.apply(this, arguments); };`,
++);
++
++function run(args) {
++	return spawnSync(process.execPath, ["--require", preload, launcher, ...args], {
++		encoding: "utf8",
++		env: { ...process.env, SO_OFFLINE: "1", SO_CODING_AGENT_DIR: join(dir, "agent") },
++	});
++}
++
++test("so --version and -v print the package version without loading the application", { skip: !built }, () => {
++	const version = JSON.parse(readFileSync(join(root, "packages", "coding-agent", "package.json"), "utf8")).version;
++	for (const flag of ["--version", "-v"]) {
++		const result = run([flag]);
++		assert.equal(result.status, 0, result.stderr);
++		assert.equal(result.stdout.trim(), version);
++		assert.ok(!result.stderr.includes("LOADED_RUNTIME"), `${flag} must not load the runtime`);
++	}
++});
++
++test("other invocations still load the application", { skip: !built }, () => {
++	const result = run(["--help"]);
++	assert.equal(result.status, 0, result.stderr);
++	assert.ok(result.stderr.includes("LOADED_RUNTIME"));
++	assert.match(result.stdout, /Usage:/);
++	// `--version` combined with other arguments takes the normal path
++	assert.ok(run(["--version", "--offline"]).stderr.includes("LOADED_RUNTIME"));
++});
++
++test("the fast path prints exactly what the full path prints, and SO_PACKAGE_DIR forces the full path", { skip: !built }, () => {
++	const fast = run(["--version"]);
++	const packageDir = join(root, "packages", "coding-agent");
++	const full = spawnSync(process.execPath, ["--require", preload, launcher, "--version"], {
++		encoding: "utf8",
++		env: { ...process.env, SO_OFFLINE: "1", SO_CODING_AGENT_DIR: join(dir, "agent"), SO_PACKAGE_DIR: packageDir },
++	});
++	assert.equal(full.status, 0, full.stderr);
++	assert.ok(full.stderr.includes("LOADED_RUNTIME"));
++	assert.equal(full.stdout, fast.stdout);
++});
++
++test("print mode never loads the interactive UI module graph", { skip: !built }, async () => {
++	const { startMockServer } = await import("../bench/mock-server.mjs");
++	const { spawn } = await import("node:child_process");
++	const log = join(dir, "loaded.txt");
++	writeFileSync(log, "");
++	const hooks = join(dir, "hooks.cjs");
++	writeFileSync(
++		hooks,
++		`const { registerHooks } = require("node:module"); const { appendFileSync } = require("node:fs");
++registerHooks({ resolve(s, c, next) { const r = next(s, c); if (r.url.includes("/chunks/")) appendFileSync(${JSON.stringify(log)}, r.url + "\\n"); return r; } });`,
++	);
++	const agentDir = join(dir, "print-agent");
++	const project = mkdtempSync(join(dir, "proj-"));
++	const { server, port } = await startMockServer({ logFile: join(dir, "requests.jsonl"), toolOutputTurns: 0 });
++	try {
++		mkdirSync(agentDir, { recursive: true });
++		writeFileSync(
++			join(agentDir, "models.json"),
++			JSON.stringify({
++				providers: { mock: { baseUrl: `http://127.0.0.1:${port}/v1`, api: "openai-completions", apiKey: "k", models: [{ id: "m", contextWindow: 100000, maxTokens: 1000 }] } },
++			}),
++		);
++		const child = spawn(process.execPath, ["--require", hooks, launcher, "-p", "--provider", "mock", "--model", "m", "--no-session", "--no-extensions", "hi"], {
++			cwd: project,
++			env: { ...process.env, SO_OFFLINE: "1", SO_CODING_AGENT_DIR: agentDir },
++			stdio: ["ignore", "pipe", "pipe"],
++		});
++		let output = "";
++		child.stdout.on("data", (c) => (output += c));
++		child.stderr.on("data", (c) => (output += c));
++		const code = await new Promise((resolveExit) => child.on("exit", resolveExit));
++		assert.equal(code, 0, output);
++		assert.match(output, /done/);
++		const loaded = [...new Set(readFileSync(log, "utf8").split("\n").filter(Boolean))];
++		assert.ok(loaded.length > 0, "the hook recorded no chunk loads");
++		// The interactive mode is its own chunk (`interactive-mode-<hash>.js`), reached only through a dynamic import.
++		const chunkDir = join(root, "packages", "coding-agent", "dist", "bundle", "chunks");
++		assert.ok(readdirSync(chunkDir).some((name) => /^interactive-mode-.*\.js$/.test(name)), "no interactive mode chunk was built");
++		const interactive = loaded.filter((url) => /\/interactive-mode-[^/]*\.js$/.test(url));
++		assert.deepEqual(interactive, [], "print mode evaluated the interactive mode module");
++	} finally {
++		server.close();
++	}
++});
+diff --git a/scripts/rename-codemod.test.mjs b/scripts/rename-codemod.test.mjs
+new file mode 100644
+index 0000000..00c326a
+--- /dev/null
++++ b/scripts/rename-codemod.test.mjs
+@@ -0,0 +1,71 @@
++import assert from "node:assert/strict";
++import { execFileSync } from "node:child_process";
++import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { dirname, join } from "node:path";
++import test from "node:test";
++import { fileURLToPath } from "node:url";
++import { expandLegacyAliasLines, transform } from "../rename/rename.mjs";
++
++const codemod = join(dirname(fileURLToPath(import.meta.url)), "..", "rename", "rename.mjs");
++
++test("transform renames the brand but not unrelated words", () => {
++	assert.equal(transform("PI_OFFLINE pipe api pixel Math.PI .pi/skills"), "SO_OFFLINE pipe api pixel Math.PI .so/skills");
++	assert.equal(transform('import "@earendil-works/pi-ai/compat"'), 'import "@so-agent/ai/compat"');
++	assert.equal(transform("see https://pi.dev/docs and earendil-works/pi"), "see https://pi.dev/docs and earendil-works/pi");
++});
++
++const LOADER = [
++	'const piTuiEntry = resolveWorkspaceOrImport("tui/dist/index.js", "@earendil-works/pi-tui");',
++	"const aliases = {",
++	'\t"@earendil-works/pi-tui": piTuiEntry,',
++	'\t"@mariozechner/pi-tui": piTuiEntry,',
++	"};",
++].join("\n");
++
++test("alias tables keep resolving Pi's package names next to the renamed ones", () => {
++	const file = "packages/coding-agent/src/core/extensions/loader.ts";
++	const out = expandLegacyAliasLines(LOADER, transform(LOADER), file);
++	const lines = out.split("\n");
++	// The module actually imported is renamed; both Pi scopes stay as keys that point at the renamed entry.
++	assert.ok(lines.includes('const soTuiEntry = resolveWorkspaceOrImport("tui/dist/index.js", "@so-agent/tui");'));
++	assert.ok(lines.includes('\t"@so-agent/tui": soTuiEntry,'));
++	assert.ok(lines.includes('\t"@earendil-works/pi-tui": soTuiEntry,'));
++	assert.ok(lines.includes('\t"@mariozechner/pi-tui": soTuiEntry,'));
++	// Running the expansion over its own output changes nothing.
++	assert.equal(expandLegacyAliasLines(out, transform(out), file), out);
++});
++
++test("the codemod deletes nothing, disables upstream governance workflows by renaming them, and is idempotent", () => {
++	const root = mkdtempSync(join(tmpdir(), "rename-codemod-"));
++	try {
++		const files = {
++			".github/workflows/issue-gate.yml": "name: pi issue gate\n",
++			".github/workflows/ci.yml": "name: pi ci\n",
++			"scripts/issues/main.ts": "export const tool = 'pi';\n",
++			"packages/coding-agent/src/core/extensions/loader.ts": LOADER,
++			"LICENSE": "Copyright pi authors\n",
++		};
++		for (const [path, text] of Object.entries(files)) {
++			mkdirSync(dirname(join(root, path)), { recursive: true });
++			writeFileSync(join(root, path), text);
++		}
++		const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" });
++		git("init", "-q");
++		git("add", "-A");
++		execFileSync(process.execPath, [codemod, "--root", root], { stdio: "ignore" });
++		git("add", "-A");
++		assert.equal(readFileSync(join(root, ".github/workflows/issue-gate.yml.disabled"), "utf8"), "name: so issue gate\n");
++		assert.ok(!existsSync(join(root, ".github/workflows/issue-gate.yml")));
++		assert.equal(readFileSync(join(root, ".github/workflows/ci.yml"), "utf8"), "name: so ci\n");
++		assert.ok(existsSync(join(root, "scripts/issues/main.ts")));
++		assert.equal(readFileSync(join(root, "LICENSE"), "utf8"), files.LICENSE);
++		const once = git("ls-files", "-s") + readFileSync(join(root, "packages/coding-agent/src/core/extensions/loader.ts"), "utf8");
++		execFileSync(process.execPath, [codemod, "--root", root], { stdio: "ignore" });
++		git("add", "-A");
++		const twice = git("ls-files", "-s") + readFileSync(join(root, "packages/coding-agent/src/core/extensions/loader.ts"), "utf8");
++		assert.equal(twice, once);
++	} finally {
++		rmSync(root, { recursive: true, force: true });
++	}
++});

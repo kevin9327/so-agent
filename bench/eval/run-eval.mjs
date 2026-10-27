@@ -6,7 +6,7 @@
 //     --build upstream=/path/to/baseline/packages/coding-agent/dist/bundle/cli.js:PI \
 //     --build so=/path/to/so/packages/coding-agent/dist/bundle/cli.js:SO \
 //     --base-url https://api.example.com/v1 --model some-model [--api-key-env EXAMPLE_API_KEY] \
-//     [--runs 3] [--retry-invalid 2] [--transcripts dir] [--tasks fix-off-by-one,add-function] [--reasoning] [--timeout-ms 600000] [--out results.json]
+//     [--runs 3] [--retry-invalid 2] [--max-tokens 8192] [--transcripts dir] [--tasks fix-off-by-one,add-function] [--reasoning] [--timeout-ms 600000] [--out results.json]
 //
 // The API key is read from the named environment variable and written only to a temp models.json that is deleted at the
 // end. Each build gets the same temp project (re-created per run); build order alternates per task to spread drift.
@@ -55,7 +55,7 @@ function runOnce(build, task, tag = "") {
 	}
 	writeFileSync(
 		join(agentDir, "models.json"),
-		JSON.stringify({ providers: { eval: { baseUrl, api: "openai-completions", apiKey, models: [{ id: model, reasoning: flag("reasoning"), contextWindow: 128000, maxTokens: 8192 }] } } }),
+		JSON.stringify({ providers: { eval: { baseUrl, api: "openai-completions", apiKey, models: [{ id: model, reasoning: flag("reasoning"), contextWindow: 128000, maxTokens: Number(one("max-tokens", "8192")) }] } } }),
 		{ mode: 0o600 },
 	);
 	const env = {

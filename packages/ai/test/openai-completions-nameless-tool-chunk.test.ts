@@ -68,13 +68,20 @@ describe("OpenAI completions tool-call chunks without id and name", () => {
 
 	it("still treats a second call that has an id and a name as a separate call", async () => {
 		mockState.chunks = [
-			chunk([{ index: 0, id: "call_1", type: "function", function: { name: "read", arguments: '{"path":"a.js"}' } }]),
-			chunk([{ index: 1, id: "call_2", type: "function", function: { name: "bash", arguments: '{"command":"ls"}' } }], "tool_calls"),
+			chunk([
+				{ index: 0, id: "call_1", type: "function", function: { name: "read", arguments: '{"path":"a.js"}' } },
+			]),
+			chunk(
+				[{ index: 1, id: "call_2", type: "function", function: { name: "bash", arguments: '{"command":"ls"}' } }],
+				"tool_calls",
+			),
 		];
 
 		const message = await streamOpenAICompletions(model, context, { apiKey: "test" }).result();
 
-		expect(message.content.filter((block) => block.type === "toolCall").map((block) => (block as { name: string }).name)).toEqual(["read", "bash"]);
+		expect(
+			message.content.filter((block) => block.type === "toolCall").map((block) => (block as { name: string }).name),
+		).toEqual(["read", "bash"]);
 	});
 
 	it("keeps a bare first chunk as before when there is no previous call to continue", async () => {

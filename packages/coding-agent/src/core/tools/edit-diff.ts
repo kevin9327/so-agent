@@ -250,14 +250,61 @@ function countOccurrences(content: string, oldText: string): number {
 	return fuzzyContent.split(fuzzyOldText).length - 1;
 }
 
-function getNotFoundError(path: string, editIndex: number, totalEdits: number): Error {
+const CLOSEST_REGION_MAX_LINES = 12;
+const CLOSEST_REGION_MIN_SIMILARITY = 0.6;
+
+function tokenSimilarity(a: string, b: string): number {
+	const tokens = (text: string) => new Set(text.split(/[^A-Za-z0-9_$]+/).filter(Boolean));
+	const left = tokens(a);
+	const right = tokens(b);
+	if (left.size === 0 || right.size === 0) return 0;
+	let shared = 0;
+	for (const token of left) if (right.has(token)) shared++;
+	return shared / (left.size + right.size - shared);
+}
+
+/**
+ * When oldText is not found, point at where the file most likely holds that text so the model can copy the exact lines
+ * instead of spending a read call. Anchors on the first non-blank line of oldText: an identical line after trimming, else
+ * the most similar line (shared identifiers). Returns "" when nothing in the file is close.
+ */
+export function describeClosestRegion(content: string, oldText: string): string {
+	const oldLines = oldText.split("\n");
+	const anchor = oldLines.find((line) => line.trim().length > 0)?.trim();
+	if (!anchor) return "";
+	const lines = content.split("\n");
+	let best = -1;
+	let bestScore = 0;
+	for (let i = 0; i < lines.length; i++) {
+		const trimmed = lines[i].trim();
+		const score = trimmed === anchor ? 1 : tokenSimilarity(trimmed, anchor);
+		if (score > bestScore) {
+			best = i;
+			bestScore = score;
+			if (score === 1) break;
+		}
+	}
+	if (best < 0 || bestScore < CLOSEST_REGION_MIN_SIMILARITY) return "";
+	const first = oldLines.findIndex((line) => line.trim().length > 0);
+	const start = Math.max(0, best - first);
+	const end = Math.min(lines.length, start + Math.min(oldLines.length, CLOSEST_REGION_MAX_LINES));
+	const width = String(end).length;
+	const region = lines
+		.slice(start, end)
+		.map((line, offset) => `${String(start + offset + 1).padStart(width)}| ${line}`)
+		.join("\n");
+	return `\n\nThe closest match in the file is at line ${start + 1}. Its current content (line number, then the line as it is in the file):\n${region}`;
+}
+
+function getNotFoundError(path: string, editIndex: number, totalEdits: number, content = "", oldText = ""): Error {
+	const hint = describeClosestRegion(content, oldText);
 	if (totalEdits === 1) {
 		return new Error(
-			`Could not find the exact text in ${path}. The old text must match exactly including all whitespace and newlines.`,
+			`Could not find the exact text in ${path}. The old text must match exactly including all whitespace and newlines.${hint}`,
 		);
 	}
 	return new Error(
-		`Could not find edits[${editIndex}] in ${path}. The oldText must match exactly including all whitespace and newlines.`,
+		`Could not find edits[${editIndex}] in ${path}. The oldText must match exactly including all whitespace and newlines.${hint}`,
 	);
 }
 
@@ -322,7 +369,7 @@ export function applyEditsToNormalizedContent(
 		const edit = normalizedEdits[i];
 		const matchResult = fuzzyFindText(replacementBaseContent, edit.oldText);
 		if (!matchResult.found) {
-			throw getNotFoundError(path, i, normalizedEdits.length);
+			throw getNotFoundError(path, i, normalizedEdits.length, replacementBaseContent, edit.oldText);
 		}
 
 		const occurrences = countOccurrences(replacementBaseContent, edit.oldText);

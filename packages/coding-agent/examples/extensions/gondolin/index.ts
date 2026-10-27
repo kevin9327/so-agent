@@ -15,11 +15,12 @@
  *   so -e /path/to/so/packages/coding-agent/examples/extensions/gondolin
  *
  * Requirements:
- *   - Node.js >= 23.6.0 for @so-agent/gondolin
+ *   - Node.js >= 23.6.0 for @earendil-works/gondolin
  *   - QEMU installed (for example, `brew install qemu` on macOS)
  */
 
 import path from "node:path";
+import { RealFSProvider, VM } from "@earendil-works/gondolin";
 import type { ExtensionAPI, ExtensionContext } from "@so-agent/coding-agent";
 import {
 	type BashOperations,
@@ -42,7 +43,6 @@ import {
 	truncateLine,
 	type WriteOperations,
 } from "@so-agent/coding-agent";
-import { RealFSProvider, VM } from "@so-agent/gondolin";
 
 const GUEST_WORKSPACE = "/workspace";
 const DEFAULT_GREP_LIMIT = 100;

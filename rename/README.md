@@ -14,7 +14,7 @@ What `rename.mjs` does (idempotent, works on `git ls-files` text files):
 | From | To |
 |---|---|
 | `@earendil-works/pi-X`, `@mariozechner/pi-X` | `@so-agent/X` |
-| `@earendil-works/*` | `@so-agent/*` |
+| `@earendil-works/*` | `@so-agent/*` (except third-party `@earendil-works/gondolin*`, which stays: it is the Gondolin micro-VM package, not a Pi package) |
 | `PI_*` env vars | `SO_*` |
 | `pi`, `Pi`, `PI` as a word (including `.pi`, `pi-ai`, `pi.on`) | `so`, `So`, `SO` |
 | camelCase `piX`, `PiX`, `getPiX` | `soX`, `SoX`, `getSoX` |

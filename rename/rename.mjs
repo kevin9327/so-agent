@@ -113,6 +113,7 @@ const PROTECT = [
 	/(?:github\.com\/|(?<![@A-Za-z0-9]))(?:earendil-works|badlogic)\/pi\.git/g,
 	/(?<![A-Za-z0-9+/=])[A-Za-z0-9+/]{60,}={0,2}(?![A-Za-z0-9+/])/g, // base64 / integrity hashes
 	/\(\?:badlogic\|earendil-works\)\\\/pi-mono/g, // escaped form inside regex literals
+	/@earendil-works\/gondolin[A-Za-z0-9-]*/g, // third-party package (Gondolin micro-VM) used by an example extension; not a Pi package
 	/\bpi-version\b/g, // query parameter of the upstream model catalog API
 	/\bAI_AGENT\b/g,
 ];

@@ -12,6 +12,11 @@ const codemod = join(dirname(fileURLToPath(import.meta.url)), "..", "rename", "r
 test("transform renames the brand but not unrelated words", () => {
 	assert.equal(transform("PI_OFFLINE pipe api pixel Math.PI .pi/skills"), "SO_OFFLINE pipe api pixel Math.PI .so/skills");
 	assert.equal(transform('import "@earendil-works/pi-ai/compat"'), 'import "@so-agent/ai/compat"');
+	// Third-party packages published under the same scope are not Pi packages and must keep their names.
+	assert.equal(
+		transform('import { VM } from "@earendil-works/gondolin"; "@earendil-works/gondolin-krun-runner-linux-x64"'),
+		'import { VM } from "@earendil-works/gondolin"; "@earendil-works/gondolin-krun-runner-linux-x64"',
+	);
 	assert.equal(transform("see https://pi.dev/docs and earendil-works/pi"), "see https://pi.dev/docs and earendil-works/pi");
 });
 

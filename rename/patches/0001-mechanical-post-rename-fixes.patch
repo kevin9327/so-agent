@@ -56,26 +56,6 @@ index 65355cd..6fc64f8 100644
  				if (specifier.startsWith(".") && !resolve(dirname(file), specifier).startsWith(`${sourceDirectory}/`)) {
  					violations.push(`${path}: ${specifier}`);
  				}
-diff --git a/packages/coding-agent/examples/extensions/gondolin/index.ts b/packages/coding-agent/examples/extensions/gondolin/index.ts
-index 8128b4d..79d4d2d 100644
---- a/packages/coding-agent/examples/extensions/gondolin/index.ts
-+++ b/packages/coding-agent/examples/extensions/gondolin/index.ts
-@@ -20,7 +20,6 @@
-  */
- 
- import path from "node:path";
--import { RealFSProvider, VM } from "@so-agent/gondolin";
- import type { ExtensionAPI, ExtensionContext } from "@so-agent/coding-agent";
- import {
- 	type BashOperations,
-@@ -43,6 +42,7 @@ import {
- 	truncateLine,
- 	type WriteOperations,
- } from "@so-agent/coding-agent";
-+import { RealFSProvider, VM } from "@so-agent/gondolin";
- 
- const GUEST_WORKSPACE = "/workspace";
- const DEFAULT_GREP_LIMIT = 100;
 diff --git a/packages/coding-agent/examples/extensions/question.ts b/packages/coding-agent/examples/extensions/question.ts
 index b1439a6..11f18c6 100644
 --- a/packages/coding-agent/examples/extensions/question.ts
@@ -173,9 +153,27 @@ index 60b0551..c9966c4 100644
  // Disable context files entirely by returning an empty list in agentsFilesOverride.
  const loader = new DefaultResourceLoader({
 diff --git a/packages/coding-agent/install-lock/package-lock.json b/packages/coding-agent/install-lock/package-lock.json
-index 3d79aac..654b6e1 100644
+index 3d79aac..3845155 100644
 --- a/packages/coding-agent/install-lock/package-lock.json
 +++ b/packages/coding-agent/install-lock/package-lock.json
+@@ -1,14 +1,14 @@
+ {
+ 	"name": "@so-agent/coding-agent-install",
+-	"version": "1.4.0",
++	"version": "0.0.2",
+ 	"lockfileVersion": 3,
+ 	"requires": true,
+ 	"packages": {
+ 		"": {
+ 			"name": "@so-agent/coding-agent-install",
+-			"version": "1.4.0",
++			"version": "0.0.2",
+ 			"dependencies": {
+-				"@so-agent/coding-agent": "1.4.0"
++				"@so-agent/coding-agent": "0.0.2"
+ 			},
+ 			"engines": {
+ 				"node": ">=22.19.0"
 @@ -385,179 +385,6 @@
  				"node": ">=6.9.0"
  			}
@@ -361,11 +359,11 @@ index 3d79aac..654b6e1 100644
  			}
  		},
 +		"node_modules/@so-agent/agent-core": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/agent-core/-/agent-core-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/agent-core/-/agent-core-0.0.2.tgz",
 +			"license": "MIT",
 +			"dependencies": {
-+				"@so-agent/ai": "1.4.0",
++				"@so-agent/ai": "0.0.2",
 +				"typebox": "1.3.27"
 +			},
 +			"engines": {
@@ -373,13 +371,13 @@ index 3d79aac..654b6e1 100644
 +			}
 +		},
 +		"node_modules/@so-agent/ai": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/ai/-/ai-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/ai/-/ai-0.0.2.tgz",
 +			"license": "MIT",
 +			"dependencies": {
 +				"@anthropic-ai/sdk": "0.129.0",
 +				"@aws-sdk/client-bedrock-runtime": "3.1127.0",
-+				"@so-agent/telemetry": "1.4.0",
++				"@so-agent/telemetry": "0.0.2",
 +				"@google/genai": "2.21.0",
 +				"@smithy/node-http-handler": "4.12.1",
 +				"http-proxy-agent": "9.1.0",
@@ -456,8 +454,8 @@ index 3d79aac..654b6e1 100644
 +			}
 +		},
 +		"node_modules/@so-agent/codemode": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/codemode/-/codemode-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/codemode/-/codemode-0.0.2.tgz",
 +			"license": "MIT",
 +			"dependencies": {
 +				"quickjs-wasi": "3.6.2"
@@ -467,15 +465,15 @@ index 3d79aac..654b6e1 100644
 +			}
 +		},
 +		"node_modules/@so-agent/coding-agent": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/coding-agent/-/coding-agent-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/coding-agent/-/coding-agent-0.0.2.tgz",
 +			"license": "MIT",
 +			"dependencies": {
-+				"@so-agent/agent-core": "1.4.0",
-+				"@so-agent/ai": "1.4.0",
-+				"@so-agent/codemode": "1.4.0",
-+				"@so-agent/mcp": "1.4.0",
-+				"@so-agent/tui": "1.4.0",
++				"@so-agent/agent-core": "0.0.2",
++				"@so-agent/ai": "0.0.2",
++				"@so-agent/codemode": "0.0.2",
++				"@so-agent/mcp": "0.0.2",
++				"@so-agent/tui": "0.0.2",
 +				"@silvia-odwyer/photon-node": "0.3.4",
 +				"brace-expansion": "5.0.12",
 +				"chalk": "6.0.0",
@@ -502,8 +500,8 @@ index 3d79aac..654b6e1 100644
 +			}
 +		},
 +		"node_modules/@so-agent/mcp": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/mcp/-/mcp-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/mcp/-/mcp-0.0.2.tgz",
 +			"license": "MIT",
 +			"dependencies": {
 +				"cross-spawn": "7.0.6"
@@ -513,16 +511,16 @@ index 3d79aac..654b6e1 100644
 +			}
 +		},
 +		"node_modules/@so-agent/telemetry": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/telemetry/-/telemetry-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/telemetry/-/telemetry-0.0.2.tgz",
 +			"license": "MIT",
 +			"engines": {
 +				"node": ">=22.19.0"
 +			}
 +		},
 +		"node_modules/@so-agent/tui": {
-+			"version": "1.4.0",
-+			"resolved": "https://registry.npmjs.org/@so-agent/tui/-/tui-1.4.0.tgz",
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@so-agent/tui/-/tui-0.0.2.tgz",
 +			"license": "MIT",
 +			"dependencies": {
 +				"get-east-asian-width": "1.6.0",

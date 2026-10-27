@@ -1,143 +1,3 @@
-From ffabf8fa5789cb8c3f83a7d81c1274ebbcb4fd7d Mon Sep 17 00:00:00 2001
-From: kevin9327 <kevin9327@users.noreply.github.com>
-Date: Tue, 27 Oct 2026 14:22:15 +0900
-Subject: [PATCH] fix: post-rename fixes: docs/README, decouple from
- upstream-hosted services, drop upstream announcement, biome format
-
-- update checks, remote model catalog and install ping are off unless SO_UPDATE_URL / SO_CATALOG_URL are set
-- new ATTRIBUTION-aware README, SECURITY, CONTRIBUTING; docs/UPSTREAM-ENDPOINTS.md
-- format after rename (biome)
----
- CONTRIBUTING.md                               | 109 +-----
- README.md                                     | 103 ++----
- SECURITY.md                                   |   8 +-
- docs/UPSTREAM-ENDPOINTS.md                    |  18 +
- packages/agent/examples/mcp-codemode/tools.ts |   7 +-
- packages/agent/package.json                   |   2 +-
- packages/ai/package.json                      |   2 +-
- packages/ai/src/utils/identity.ts             |   6 +-
- packages/chord/package.json                   |   2 +-
- packages/chord/src/host.ts                    |   4 +-
- packages/chord/test/boundary.test.ts          |   7 +-
- packages/codemode/package.json                |   2 +-
- packages/coding-agent/CHANGELOG.md            |   2 +
- packages/coding-agent/README.md               |  58 +--
- packages/coding-agent/docs/quickstart.md      |  28 +-
- .../examples/extensions/gondolin/index.ts     |   2 +-
- .../examples/extensions/question.ts           |  10 +-
- .../examples/extensions/questionnaire.ts      |  10 +-
- .../examples/sdk/03-custom-prompt.ts          |   7 +-
- .../examples/sdk/06-extensions.ts             |   7 +-
- .../examples/sdk/07-context-files.ts          |   7 +-
- .../install-lock/package-lock.json            | 346 +++++++++---------
- packages/coding-agent/package.json            |   2 +-
- packages/coding-agent/src/cli/startup-ui.ts   |   8 +-
- packages/coding-agent/src/config.ts           |   2 +-
- .../src/core/extensions/loader.ts             |   5 +-
- .../coding-agent/src/core/model-resolver.ts   |   8 +-
- .../coding-agent/src/core/package-manager.ts  |   2 +-
- .../src/core/remote-catalog-provider.ts       |  17 +-
- .../interactive/components/easter-egg-3d.ts   |   9 +-
- .../interactive/components/model-selector.ts  |  11 +-
- .../interactive/components/oauth-selector.ts  |  10 +-
- .../src/modes/interactive/interactive-mode.ts |  39 +-
- .../coding-agent/src/package-manager-cli.ts   |  15 +-
- .../coding-agent/src/utils/version-check.ts   |   8 +-
- .../test/agent-session-stats.test.ts          |   8 +-
- packages/coding-agent/test/config.test.ts     |   9 +-
- .../rpc-prompt-response-semantics.test.ts     |   7 +-
- .../test/sdk-client-identity.test.ts          |   2 +-
- ...89-context-handler-system-messages.test.ts |   7 +-
- packages/durable/package.json                 |   2 +-
- packages/durable/src/codemode/codemode.ts     |   3 +-
- packages/durable/src/codemode/models.ts       |  11 +-
- packages/durable/src/harness/compaction.ts    |   2 +-
- packages/durable/src/harness/context.ts       |   2 +-
- packages/durable/src/harness/define.ts        |   2 +-
- packages/durable/src/harness/events.ts        |  10 +-
- packages/durable/src/harness/generation.ts    |   2 +-
- packages/durable/src/harness/harness.ts       |   4 +-
- packages/durable/src/harness/live.ts          |   2 +-
- .../durable/src/harness/partial-changes.ts    |   5 +-
- packages/durable/src/harness/prompt.ts        |   2 +-
- packages/durable/src/harness/provider.ts      |   2 +-
- packages/durable/src/harness/scheduler.ts     |   2 +-
- packages/durable/src/harness/tool.ts          |   4 +-
- packages/durable/src/harness/types.ts         |   2 +-
- packages/durable/src/harness/usage.ts         |   2 +-
- packages/durable/src/types.ts                 |   2 +-
- packages/durable/test/chat-support.ts         |   2 +-
- packages/durable/test/codemode-bench.ts       |   2 +-
- packages/durable/test/codemode-models.test.ts |   2 +-
- packages/durable/test/codemode.test.ts        |   2 +-
- packages/durable/test/examples/05-harness.ts  |   3 +-
- .../durable/test/examples/06-configuration.ts |   3 +-
- .../test/examples/07-harness-conversations.ts |   3 +-
- packages/durable/test/examples/08-context.ts  |   3 +-
- .../test/examples/09-registry-reload.ts       |   3 +-
- .../test/examples/10-extension-state.ts       |   3 +-
- packages/durable/test/examples/11-tasks.ts    |   3 +-
- packages/durable/test/examples/12-recovery.ts |   2 +-
- packages/durable/test/examples/13-chat.ts     |   3 +-
- .../durable/test/examples/14-system-prompt.ts |   3 +-
- .../durable/test/examples/15-real-model.ts    |   3 +-
- .../durable/test/examples/16-coding-tools.ts  |   2 +-
- packages/durable/test/examples/17-print.ts    |   3 +-
- packages/durable/test/examples/18-json.ts     |   2 +-
- packages/durable/test/examples/19-inbox.ts    |   3 +-
- .../durable/test/examples/20-late-join.ts     |   3 +-
- .../test/examples/21-subagent-foreground.ts   |   5 +-
- .../test/examples/22-subagent-background.ts   |   2 +-
- .../durable/test/examples/23-child-tasks.ts   |   2 +-
- .../durable/test/examples/24-compaction.ts    |   3 +-
- .../durable/test/examples/25-coding-agent.ts  |   2 +-
- .../durable/test/examples/26-plan-mode.ts     |   2 +-
- packages/durable/test/examples/27-reviewer.ts |   2 +-
- .../examples/28-sandbox-per-conversation.ts   |   2 +-
- .../durable/test/examples/29-tool-override.ts |   2 +-
- .../test/examples/30-reload-and-restart.ts    |   2 +-
- .../test/harness-cancellation-barrier.test.ts |   9 +-
- packages/durable/test/harness-context.test.ts |   2 +-
- .../test/harness-deferred-progress.test.ts    |   3 +-
- packages/durable/test/harness-events.test.ts  |   2 +-
- .../durable/test/harness-generation.test.ts   |   2 +-
- packages/durable/test/harness-inbox.test.ts   |   2 +-
- .../durable/test/harness-lifecycle.test.ts    |   2 +-
- .../durable/test/harness-live-deltas.test.ts  |   2 +-
- .../test/harness-nested-tools-restart.test.ts |   2 +-
- .../durable/test/harness-nested-tools.test.ts |   4 +-
- .../test/harness-partial-changes.test.ts      |   4 +-
- .../test/harness-scheduler-retention.test.ts  |   9 +-
- .../test/harness-storage-failure.test.ts      |   2 +-
- .../test/harness-structured-output.test.ts    |   2 +-
- .../durable/test/harness-structured.test.ts   |   9 +-
- .../test/harness-tasks-recovery.test.ts       |   2 +-
- packages/durable/test/harness-tasks.test.ts   |   2 +-
- .../durable/test/harness-telemetry.test.ts    |   2 +-
- .../test/harness-tools-recovery.test.ts       |   2 +-
- packages/durable/test/harness-tools.test.ts   |   2 +-
- packages/durable/test/harness-view.test.ts    |   2 +-
- packages/durable/test/nested-images-bench.ts  |   2 +-
- packages/durable/test/nested-tools-bench.ts   |   2 +-
- .../durable/test/scheduler-fanout-bench.ts    |   3 +-
- .../durable/test/scheduler-memory-bench.ts    |   2 +-
- .../durable/test/session-adoption.test.ts     |   8 +-
- .../session-checkpoints-migrations.test.ts    |   8 +-
- .../test/session-document-cache-bench.ts      |   2 +-
- .../test/session-document-retention.test.ts   |   3 +-
- .../durable/test/session-documents.test.ts    |   8 +-
- packages/durable/test/spec-usage.test.ts      |   3 +-
- packages/durable/test/tool-output-bench.ts    |   2 +-
- packages/durable/test/tools-images.test.ts    |   4 +-
- packages/durable/test/tools.test.ts           |   7 +-
- packages/env/package.json                     |   2 +-
- packages/evals/test/report.test.ts            |   2 +-
- packages/mcp/package.json                     |   2 +-
- packages/telemetry/package.json               |   2 +-
- packages/tui/package.json                     |   2 +-
- 127 files changed, 418 insertions(+), 768 deletions(-)
- create mode 100644 docs/UPSTREAM-ENDPOINTS.md
-
 diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
 index 9aa2389..38cf113 100644
 --- a/CONTRIBUTING.md
@@ -435,6 +295,312 @@ index d393c7f..0bf4985 100644
  
  ## Out Of Scope
  
+diff --git a/bench/README.md b/bench/README.md
+new file mode 100644
+index 0000000..0b0a543
+--- /dev/null
++++ b/bench/README.md
+@@ -0,0 +1,27 @@
++# Benchmarks
++
++Everything here runs against a local mock provider, so no API key or network is needed.
++
++```bash
++npm ci --ignore-scripts && npm run build
++# before/after: build the upstream or an earlier commit in another checkout, then compare
++node bench/run.mjs --cli "$PWD/packages/coding-agent/dist/bundle/cli.js" --prefix SO --runs 21 --label so
++node bench/run.mjs --cli /path/to/other/checkout/packages/coding-agent/dist/bundle/cli.js --prefix PI --runs 21 --label upstream
++```
++
++`--prefix` is the env var prefix of the build under test (`SO` for so agent, `PI` for upstream Pi).
++
++`run.mjs` reports, as medians over `--runs` cold processes (plus one discarded warm-up):
++
++- `firstRequestMs`: process spawn to the first byte of the first provider request. This is startup cost as a user
++  would feel it before the model is even asked.
++- `totalMs`: whole print-mode run with three model turns (a `bash` call, a `read` call, then a text answer).
++- `peakRssMiB`: peak resident set size of the CLI process (`VmHWM`).
++- `turns[]`: for every model request, the request body size, system prompt characters, tool schema characters,
++  tool count, and message characters.
++
++`--json out.json` also writes `out.request1.json` and `out.request3.json`, the exact request bodies, which can be
++tokenized with any tokenizer to turn characters into tokens.
++
++Other knobs: `BENCH_EXTRA_ENV='{"SO_TIMING":"1"}'`, `BENCH_NODE_ARGS="--cpu-prof --cpu-prof-dir=/tmp/prof"`,
++`BENCH_SHOW_OUTPUT=1`.
+diff --git a/bench/mock-server.mjs b/bench/mock-server.mjs
+new file mode 100644
+index 0000000..0d0c6b1
+--- /dev/null
++++ b/bench/mock-server.mjs
+@@ -0,0 +1,39 @@
++// Minimal OpenAI-compatible chat-completions server that records every request body.
++// Turn 1 answers with a `bash` tool call, turn 2 with `read`, turn 3 with plain text.
++import { appendFileSync, writeFileSync } from "node:fs";
++import { createServer } from "node:http";
++
++export function startMockServer({ logFile, port = 0, toolOutputTurns = 2 }) {
++	writeFileSync(logFile, "");
++	let turn = 0;
++	const server = createServer((req, res) => {
++		let body = "";
++		req.on("data", (c) => (body += c));
++		req.on("end", () => {
++			if (req.method !== "POST" || !req.url.includes("/chat/completions")) {
++				res.writeHead(404).end();
++				return;
++			}
++			appendFileSync(logFile, `${JSON.stringify({ t: Date.now(), url: req.url, bytes: Buffer.byteLength(body), body: JSON.parse(body) })}\n`);
++			turn++;
++			res.writeHead(200, { "content-type": "text/event-stream" });
++			const send = (delta, finish) =>
++				res.write(`data: ${JSON.stringify({ id: "x", object: "chat.completion.chunk", created: 1, model: "m", choices: [{ index: 0, delta, finish_reason: finish ?? null }] })}\n\n`);
++			if (turn <= toolOutputTurns) {
++				const call =
++					turn === 1
++						? { name: "bash", arguments: JSON.stringify({ command: "seq 1 4000" }) }
++						: { name: "read", arguments: JSON.stringify({ path: "package.json" }) };
++				send({ role: "assistant", tool_calls: [{ index: 0, id: `call_${turn}`, type: "function", function: call }] });
++				send({}, "tool_calls");
++			} else {
++				send({ role: "assistant", content: "done" });
++				send({}, "stop");
++			}
++			res.write(`data: ${JSON.stringify({ id: "x", object: "chat.completion.chunk", created: 1, model: "m", choices: [], usage: { prompt_tokens: 100, completion_tokens: 5, total_tokens: 105 } })}\n\n`);
++			res.write("data: [DONE]\n\n");
++			res.end();
++		});
++	});
++	return new Promise((resolve) => server.listen(port, "127.0.0.1", () => resolve({ server, port: server.address().port })));
++}
+diff --git a/bench/run.mjs b/bench/run.mjs
+new file mode 100644
+index 0000000..2cb7aea
+--- /dev/null
++++ b/bench/run.mjs
+@@ -0,0 +1,129 @@
++#!/usr/bin/env node
++// Benchmark one build of the CLI against the local mock provider.
++//   node bench/run.mjs --cli <path/to/cli.js> --prefix SO|PI [--runs 15] [--json out.json] [--label name]
++// Measures: wall time to the first provider request (cold start to first byte on the wire), total print-mode run,
++// peak RSS of the process tree, request payload size per turn (system prompt, tool schema, messages).
++import { spawn } from "node:child_process";
++import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { startMockServer } from "./mock-server.mjs";
++
++const arg = (n, d) => {
++	const i = process.argv.indexOf(`--${n}`);
++	return i >= 0 ? process.argv[i + 1] : d;
++};
++const cli = arg("cli");
++const prefix = arg("prefix", "SO");
++const runs = Number(arg("runs", "15"));
++const label = arg("label", prefix);
++
++const home = mkdtempSync(join(tmpdir(), "bench-home-"));
++const agentDir = join(home, "agent");
++const project = mkdtempSync(join(tmpdir(), "bench-proj-"));
++mkdirSync(agentDir, { recursive: true });
++writeFileSync(join(project, "package.json"), JSON.stringify({ name: "bench", version: "1.0.0", description: "x".repeat(200) }, null, 2));
++
++const logFile = join(home, "requests.jsonl");
++const { server, port } = await startMockServer({ logFile });
++writeFileSync(
++	join(agentDir, "models.json"),
++	JSON.stringify({
++		providers: { mock: { baseUrl: `http://127.0.0.1:${port}/v1`, api: "openai-completions", apiKey: "k", models: [{ id: "m", contextWindow: 200000, maxTokens: 4096 }] } },
++	}),
++);
++
++function median(a) {
++	const s = [...a].sort((x, y) => x - y);
++	return s[Math.floor(s.length / 2)];
++}
++function readRss(pid) {
++	try {
++		const m = /VmHWM:\s+(\d+) kB/.exec(readFileSync(`/proc/${pid}/status`, "utf8"));
++		return m ? Number(m[1]) / 1024 : 0;
++	} catch {
++		return 0;
++	}
++}
++
++async function once() {
++	writeFileSync(logFile, "");
++	// reset turn counter by restarting the server state: a fresh server per run is simplest
++	const srv = await startMockServer({ logFile });
++	writeFileSync(
++		join(agentDir, "models.json"),
++		JSON.stringify({ providers: { mock: { baseUrl: `http://127.0.0.1:${srv.port}/v1`, api: "openai-completions", apiKey: "k", models: [{ id: "m", contextWindow: 200000, maxTokens: 4096 }] } } }),
++	);
++	const env = {
++		PATH: process.env.PATH,
++		HOME: home,
++		TMPDIR: tmpdir(),
++		[`${prefix}_CODING_AGENT_DIR`]: agentDir,
++		[`${prefix}_OFFLINE`]: "1",
++		[`${prefix}_SKIP_VERSION_CHECK`]: "1",
++		[`${prefix}_TELEMETRY`]: "0",
++		...JSON.parse(process.env.BENCH_EXTRA_ENV ?? "{}"),
++	};
++	const t0 = performance.now();
++	const child = spawn(process.execPath, [...(process.env.BENCH_NODE_ARGS ?? "").split(" ").filter(Boolean), cli, "-p", "--provider", "mock", "--model", "m", "--no-session", "--no-extensions", "run the commands", "--mode", "text"], { cwd: project, env, stdio: ["ignore", "pipe", "pipe"] });
++	let peak = 0;
++	const poll = setInterval(() => (peak = Math.max(peak, readRss(child.pid))), 20);
++	let firstReq;
++	const watch = setInterval(() => {
++		if (firstReq === undefined) {
++			try {
++				const l = readFileSync(logFile, "utf8").split("\n").filter(Boolean);
++				if (l.length) firstReq = performance.now() - t0;
++			} catch {}
++		}
++	}, 2);
++	let out = "";
++	child.stdout.on("data", (c) => (out += c));
++	child.stderr.on("data", (c) => (out += c));
++	const code = await new Promise((r) => child.on("exit", r));
++	clearInterval(poll);
++	clearInterval(watch);
++	const total = performance.now() - t0;
++	srv.server.close();
++	const reqs = readFileSync(logFile, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
++	return { code, out, firstReq, total, peak, reqs };
++}
++
++server.close();
++const results = [];
++await once(); // warmup (page cache)
++for (let i = 0; i < runs; i++) results.push(await once());
++const ok = results.filter((r) => r.code === 0 && r.reqs.length >= 3);
++if (ok.length === 0) {
++	console.error("no successful runs", results[0]?.code, results[0]?.out.slice(0, 2000));
++	process.exit(1);
++}
++const first = ok[0].reqs;
++const turn = (r) => {
++	const b = r.body;
++	const sys = (b.messages.find((m) => m.role === "system" || m.role === "developer")?.content) ?? "";
++	const sysText = typeof sys === "string" ? sys : JSON.stringify(sys);
++	return {
++		requestBytes: r.bytes,
++		systemPromptChars: sysText.length,
++		toolSchemaChars: JSON.stringify(b.tools ?? []).length,
++		toolCount: (b.tools ?? []).length,
++		messageChars: JSON.stringify(b.messages.filter((m) => m.role !== "system" && m.role !== "developer")).length,
++	};
++};
++if (process.env.BENCH_SHOW_OUTPUT) console.error(ok[0].out);
++const summary = {
++	label,
++	runs: ok.length,
++	firstRequestMs: { median: Math.round(median(ok.map((r) => r.firstReq))), min: Math.round(Math.min(...ok.map((r) => r.firstReq))) },
++	totalMs: { median: Math.round(median(ok.map((r) => r.total))) },
++	peakRssMiB: Math.round(median(ok.map((r) => r.peak))),
++	turns: first.map(turn),
++};
++console.log(JSON.stringify(summary, null, 2));
++const jf = arg("json");
++if (jf) {
++	writeFileSync(jf, JSON.stringify(summary, null, 2));
++	writeFileSync(jf.replace(/\.json$/, ".request1.json"), JSON.stringify(first[0].body, null, 2));
++	writeFileSync(jf.replace(/\.json$/, ".request3.json"), JSON.stringify(first[2].body, null, 2));
++}
+diff --git a/docs/EFFICIENCY.md b/docs/EFFICIENCY.md
+new file mode 100644
+index 0000000..e63f080
+--- /dev/null
++++ b/docs/EFFICIENCY.md
+@@ -0,0 +1,87 @@
++# Efficiency work
++
++Baseline: upstream Pi at commit `6c384aa` (1.4.0), built with the same Node and run on the same machine as so agent.
++All numbers come from `bench/run.mjs` (see [bench/README.md](../bench/README.md)) against a local mock provider
++unless stated otherwise. Machine: 8 vCPU Linux box, Node v22.23.4, warm disk cache, compile cache enabled.
++`node -e 0` takes 19 ms here, which is the floor for any Node CLI.
++
++## Results
++
++| Metric | Upstream Pi | so agent | Change |
++|---|---|---|---|
++| `--version` wall time (median of 40) | 167 ms | 24 ms | -86% (7x) |
++| Fixed prompt prefix per model turn, o200k tokens (system prompt + 4 tool schemas) | 1205 | 974 | -19% |
++| System prompt characters | 2682 | 1890 | -30% |
++| Tool schema characters | 2841 | 2509 | -12% |
++| npm tarball (`npm pack`) packed / unpacked | 7.70 MB / 23.7 MB | 4.16 MB / 15.8 MB | -46% / -34% |
++| Process start to first provider request (median of 41, two rounds) | 236 / 231 ms | 227 / 228 ms | about -3% (near noise) |
++| Print-mode run, 3 turns (median of 41, two rounds) | 319 / 313 ms | 306 / 306 ms | about -3% |
++| Peak RSS, print mode | 122 MiB | 117 MiB | -4% |
++| Bundle size (`dist/bundle`) | 9.0 MiB | 9.0 MiB | none |
++
++The prompt measurement includes a few characters of path length difference (the upstream checkout path is
++longer); it is under 30 characters. Tokens were counted with `gpt-tokenizer` (o200k_base) on the real request bodies.
++
++## What each change does, and what limits the number
++
++### 1. Condensed fixed prompt (-231 tokens on every turn)
++
++The prefix is resent on every turn, so every token saved is saved on every model call (provider prompt caching
++makes repeated prefix tokens cheaper, not free, and the first call and every cache miss pay full price).
++
++- The `<docs>` section listed a file for each of 13 topics in prose, about 1250 characters, although the model reads
++  it only when asked about the harness itself. It is now three lines that name the same files by pattern
++  (`docs/<topic>.md`) and keep the three behavioral rules: resolve paths against the docs root, read completely,
++  follow cross-references.
++- The edit tool stated the "match the original file, do not overlap, merge nearby changes" rule up to six times: in
++  four system rules, the tool description and two parameter descriptions. It now states it in the tool
++  description and parameter descriptions (where the model sees it next to the schema) and in two short rules.
++
++What limits it: the remaining 974 tokens are the tool schemas (547) and the rules that change behavior. The
++read, bash and write descriptions and the four rule bullets are already short; cutting more removes information, not
++repetition. Risk: this is a prompt change. I could not run a model-quality evaluation here, so edit accuracy on real
++models is unverified. `test/system-prompt.test.ts` pins a size budget and the single statement of the edit rule.
++
++### 2. `so --version` skips the application (-143 ms)
++
++The bundle launcher now prints the version from `package.json` when `--version` or `-v` is the only argument and
++falls back to the normal path otherwise. Before, it evaluated the whole 12 MB module graph first. What limits it: 19 ms
++Node boot plus a small `package.json` read. Covered by `scripts/cli-launcher.test.mjs`, which checks that the
++runtime is not loaded for `--version` and is loaded for everything else.
++
++### 3. Modes load on demand (-5 MiB RSS, a few ms)
++
++`main.ts` imported the interactive UI, print mode and RPC mode statically. Each is now imported when its mode runs,
++so print and RPC runs do not evaluate `interactive-mode.ts`. The gain is small because the TUI library and the
++built-in tool renderers are still needed in every mode.
++
++What limits startup (profile of the upstream bundle, 195 ms with profiler overhead): about 19 ms Node boot, about
++150 ms evaluating the module graph (ESM compilation 21 ms, TUI/highlight/markdown top level 27 ms, core and model
++data 11 ms, GC 10 ms, the rest spread over many modules), and 34 ms in `main()` (28 ms to create the session runtime).
++The compile cache already saves 58 ms (226 ms without it). Removing more needs a different structure (a V8 startup
++snapshot or splitting the TUI out of non-interactive runs), which I did not attempt.
++
++### 4. Smaller npm tarball (-3.5 MB packed, -7.9 MB unpacked)
++
++`files` now excludes `dist/**/*.map` (5.5 MB of sourcemaps for the unbundled build) and `docs/images` (2.9 MB of
++documentation screenshots). Docs, examples, the changelog, schemas and runtime assets still ship.
++`scripts/package-contents.test.mjs` pins this. What limits it: the 9 MB bundle (about 3 MB is generated model data and
++provider SDKs) and the unbundled `dist/` that SDK users import.
++
++## Not changed
++
++- Bundle size and startup of the TUI path: see above.
++- Tool output limits (2000 lines / 50 KB) and compaction: changing them changes behavior, not just cost.
++- Provider cache hints: untouched. Verifying them needs live provider calls.
++- Upstream network calls at startup (update check, remote model catalog, install ping) are now off by default. That
++  was a decoupling decision, not a measured gain: they run in the background, so they did not delay the first request.
++
++## Reproduce
++
++```bash
++git clone --depth 1 https://github.com/earendil-works/pi /tmp/pi-baseline   # read-only
++(cd /tmp/pi-baseline && npm ci --ignore-scripts && npm run build)
++npm ci --ignore-scripts && npm run build
++node bench/run.mjs --cli /tmp/pi-baseline/packages/coding-agent/dist/bundle/cli.js --prefix PI --runs 41 --label upstream
++node bench/run.mjs --cli "$PWD/packages/coding-agent/dist/bundle/cli.js" --prefix SO --runs 41 --label so
++```
 diff --git a/docs/UPSTREAM-ENDPOINTS.md b/docs/UPSTREAM-ENDPOINTS.md
 new file mode 100644
 index 0000000..b8fa0ab
@@ -520,6 +686,19 @@ index 7deecfc..21c6c3f 100644
  
  /**
   * How so-ai identifies the calling app to providers. Every field is optional; absent fields use so-ai's defaults:
+diff --git a/packages/ai/test/identity.test.ts b/packages/ai/test/identity.test.ts
+index d7ca6a0..c44a854 100644
+--- a/packages/ai/test/identity.test.ts
++++ b/packages/ai/test/identity.test.ts
+@@ -101,7 +101,7 @@ describe("client identity", () => {
+ 	it("attributes OpenRouter requests", () => {
+ 		const openRouter = target("openrouter", "https://openrouter.ai/api/v1");
+ 		expect(getAttributionHeaders(openRouter, { attribution: SO_ATTRIBUTION })).toEqual({
+-			"HTTP-Referer": "https://pi.dev",
++			"HTTP-Referer": "https://github.com/kevin9327/so-agent",
+ 			"X-OpenRouter-Title": "so",
+ 			"X-OpenRouter-Categories": "cli-agent",
+ 		});
 diff --git a/packages/chord/package.json b/packages/chord/package.json
 index a2f8856..c0ec06d 100644
 --- a/packages/chord/package.json
@@ -1207,10 +1386,20 @@ index 3d79aac..654b6e1 100644
  			"version": "1.0.1",
  			"resolved": "https://registry.npmjs.org/@stablelib/base64/-/base64-1.0.1.tgz",
 diff --git a/packages/coding-agent/package.json b/packages/coding-agent/package.json
-index 2e4c0d9..2f18890 100644
+index 2e4c0d9..2b24dab 100644
 --- a/packages/coding-agent/package.json
 +++ b/packages/coding-agent/package.json
-@@ -89,7 +89,7 @@
+@@ -22,7 +22,9 @@
+ 	},
+ 	"files": [
+ 		"dist",
++		"!dist/**/*.map",
+ 		"docs",
++		"!docs/images",
+ 		"examples",
+ 		"schemas",
+ 		"containerization.md",
+@@ -89,7 +91,7 @@
  	"license": "MIT",
  	"repository": {
  		"type": "git",
@@ -1350,6 +1539,109 @@ index ff92610..04fef6b 100644
  				if (!response.ok) throw new Error(`Model catalog request failed for ${provider.id}: ${response.status}`);
  				const catalog = await readCatalog(provider.id, response);
  				if (isNewer(catalog.lastModified, localGeneratedAt)) remote = catalog.models;
+diff --git a/packages/coding-agent/src/core/system-prompt.ts b/packages/coding-agent/src/core/system-prompt.ts
+index 96b2ea4..9dde166 100644
+--- a/packages/coding-agent/src/core/system-prompt.ts
++++ b/packages/coding-agent/src/core/system-prompt.ts
+@@ -160,13 +160,9 @@ export function buildSystemPromptSections(input: BuildSystemPromptOptions): Syst
+ 		promptSections.tools = `${tools}\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.`;
+ 		promptSections.rules = buildRules(declaredTools, toolGuidelines, promptGuidelines);
+ 		promptSections.docs = `So documentation (read only when the user asks about so itself, its SDK, extensions, themes, skills, or TUI):
+-- Main documentation: ${getReadmePath()}
+-- Additional docs: ${getDocsPath()}
+-- Examples: ${getExamplesPath()} (extensions, custom tools, SDK)
+-- When reading so docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory
+-- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), so packages (docs/packages.md), environment variables (docs/environment-variables.md), MCP servers (docs/mcp.md), codemode scripts and non-LLM models such as classifiers and image models (docs/codemode.md)
+-- When working on so topics, read the docs and examples, and follow .md cross-references before implementing
+-- Always read so .md files completely and follow links to related docs (e.g., tui.md for TUI API details)`;
++- README: ${getReadmePath()}; docs: ${getDocsPath()}; examples: ${getExamplesPath()} (extensions, custom tools, SDK). Resolve docs/... and examples/... against these paths, not the current working directory.
++- Topics are docs/<topic>.md: extensions (also examples/extensions/), themes, skills, prompt-templates, tui, keybindings, sdk, custom-provider, models, packages, environment-variables, mcp, codemode (codemode scripts, non-LLM models such as classifiers and image models).
++- Read the relevant .md files completely and follow their cross-references before implementing.`;
+ 	}
+ 
+ 	if (appendSystemPrompt) promptSections.addendum = appendSystemPrompt;
+diff --git a/packages/coding-agent/src/core/tools/edit.ts b/packages/coding-agent/src/core/tools/edit.ts
+index 3b032e4..33196f8 100644
+--- a/packages/coding-agent/src/core/tools/edit.ts
++++ b/packages/coding-agent/src/core/tools/edit.ts
+@@ -21,10 +21,9 @@ import { wrapToolDefinition } from "./tool-definition-wrapper.ts";
+ const replaceEditSchema = Type.Object(
+ 	{
+ 		oldText: Type.String({
+-			description:
+-				"Exact text for one targeted replacement. It must be unique in the original file and must not overlap with any other edits[].oldText in the same call.",
++			description: "Exact text to replace. Unique in the original file; must not overlap other edits.",
+ 		}),
+-		newText: Type.String({ description: "Replacement text for this targeted edit." }),
++		newText: Type.String({ description: "Replacement text." }),
+ 	},
+ 	{},
+ );
+@@ -34,7 +33,7 @@ const editSchema = Type.Object(
+ 		path: Type.String({ description: "Path to the file to edit (relative or absolute)" }),
+ 		edits: Type.Array(replaceEditSchema, {
+ 			description:
+-				"One or more targeted replacements. Each edit is matched against the original file, not incrementally. Do not include overlapping or nested edits. If two changes touch the same block or nearby lines, merge them into one edit instead.",
++				"Targeted replacements, each matched against the original file (not incrementally). Merge nearby changes into one edit.",
+ 		}),
+ 	},
+ 	{},
+@@ -43,10 +42,8 @@ const editSchema = Type.Object(
+ export const editToolSystemPromptContribution = {
+ 	snippet: "Make precise file edits with exact text replacement, including multiple disjoint edits in one call",
+ 	guidelines: [
+-		"Use edit for precise changes (edits[].oldText must match exactly)",
+-		"When changing multiple separate locations in one file, use one edit call with multiple entries in edits[] instead of multiple edit calls",
+-		"Each edits[].oldText is matched against the original file, not after earlier edits are applied. Do not emit overlapping or nested edits. Merge nearby changes into one edit.",
+-		"Keep edits[].oldText as small as possible while still being unique in the file. Do not pad with large unchanged regions.",
++		"Use edit for precise changes: put every change to one file in a single call as entries of edits[]",
++		"Keep each edits[].oldText as small as possible while still unique in the file, with no padding and no overlap",
+ 	],
+ } as const;
+ 
+@@ -149,7 +146,7 @@ export function createEditToolDefinition(
+ 		name: "edit",
+ 		label: "edit",
+ 		description:
+-			"Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. If two changes affect the same block or nearby lines, merge them into one edit instead of emitting overlapping edits. Do not include large unchanged regions just to connect distant changes.",
++			"Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. Merge changes to the same block or nearby lines into one edit.",
+ 		promptSnippet: editToolSystemPromptContribution.snippet,
+ 		promptGuidelines: [...editToolSystemPromptContribution.guidelines],
+ 		parameters: editSchema,
+diff --git a/packages/coding-agent/src/main.ts b/packages/coding-agent/src/main.ts
+index a9df0ec..8f167ec 100644
+--- a/packages/coding-agent/src/main.ts
++++ b/packages/coding-agent/src/main.ts
+@@ -64,7 +64,6 @@ import { hasTrustRequiringProjectResources, ProjectTrustStore } from "./core/tru
+ import { builtInExtensions } from "./extensions/index.ts";
+ import { loadMcpCommand } from "./extensions/mcp/cli.lazy.ts";
+ import { runMigrations, showDeprecationWarnings } from "./migrations.ts";
+-import { InteractiveMode, runPrintMode, runRpcMode } from "./modes/index.ts";
+ import { initTheme, setThemeJsonValidator, stopThemeWatcher } from "./modes/interactive/theme/theme.ts";
+ import { validateThemeJson } from "./modes/interactive/theme/theme-schema.ts";
+ import { cleanupManagedInstall, handleConfigCommand, handlePackageCommand } from "./package-manager-cli.ts";
+@@ -947,10 +946,13 @@ export async function main(args: string[], options?: MainOptions) {
+ 			.finally(() => clearTimeout(timeout));
+ 	}
+ 
++	// Each mode is imported on demand: print and RPC runs never evaluate the interactive UI module graph.
+ 	if (appMode === "rpc") {
+ 		printTimings();
++		const { runRpcMode } = await import("./modes/rpc/rpc-mode.ts");
+ 		await runRpcMode(runtime);
+ 	} else if (appMode === "interactive") {
++		const { InteractiveMode } = await import("./modes/interactive/interactive-mode.ts");
+ 		const interactiveMode = new InteractiveMode(runtime, {
+ 			migratedProviders,
+ 			startupDiagnostics,
+@@ -985,6 +987,7 @@ export async function main(args: string[], options?: MainOptions) {
+ 		await interactiveMode.run();
+ 	} else {
+ 		printTimings();
++		const { runPrintMode } = await import("./modes/print-mode.ts");
+ 		const exitCode = await runPrintMode(runtime, {
+ 			mode: toPrintOutputMode(appMode),
+ 			messages: parsed.messages,
 diff --git a/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts b/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
 index 271e16b..bdb571b 100644
 --- a/packages/coding-agent/src/modes/interactive/components/easter-egg-3d.ts
@@ -1629,6 +1921,42 @@ index fbb6e70..c788106 100644
  		);
  		mkdirSync(globalPackageDir, { recursive: true });
  		mkdirSync(storePackageDir, { recursive: true });
+diff --git a/packages/coding-agent/test/model-catalog-protocol.test.ts b/packages/coding-agent/test/model-catalog-protocol.test.ts
+index 7707917..beac893 100644
+--- a/packages/coding-agent/test/model-catalog-protocol.test.ts
++++ b/packages/coding-agent/test/model-catalog-protocol.test.ts
+@@ -120,7 +120,9 @@ describe("model catalog protocol with the current client", () => {
+ 		expect([...refresh.errors]).toEqual([]);
+ 
+ 		const catalogUrl = "/api/models/providers/openrouter?types=chat%2Cimage%2Cclassifier";
+-		expect(requests).toEqual([catalogUrl, `${catalogUrl}&pi-version=${VERSION}`]);
++		// so identifies itself as `so/<version>`, which the upstream protocol does not negotiate by version, so there
++		// is a single request and no `pi-version` redirect.
++		expect(requests).toEqual([catalogUrl]);
+ 
+ 		const expectedModel =
+ 			selectModelCatalog(index, VERSION)?.revision === legacyRevision ? legacyModel : mixedApiModel;
+diff --git a/packages/coding-agent/test/remote-catalog-optional.test.ts b/packages/coding-agent/test/remote-catalog-optional.test.ts
+new file mode 100644
+index 0000000..861c0b6
+--- /dev/null
++++ b/packages/coding-agent/test/remote-catalog-optional.test.ts
+@@ -0,0 +1,15 @@
++import type { Provider } from "@so-agent/ai/compat";
++import { describe, expect, it } from "vitest";
++import { withRemoteCatalog } from "../src/core/remote-catalog-provider.ts";
++
++const provider = { id: "test", getModels: () => [], getAllModels: () => [] } as unknown as Provider;
++
++describe("remote model catalog", () => {
++	it("is a no-op without a catalog URL, so so makes no catalog request by default", () => {
++		expect(withRemoteCatalog(provider, undefined)).toBe(provider);
++	});
++
++	it("wraps the provider when a catalog URL is configured", () => {
++		expect(withRemoteCatalog(provider, "https://catalog.example.test")).not.toBe(provider);
++	});
++});
 diff --git a/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts b/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts
 index a512e01..af7a310 100644
 --- a/packages/coding-agent/test/rpc-prompt-response-semantics.test.ts
@@ -1648,7 +1976,7 @@ index a512e01..af7a310 100644
  import { AgentSession } from "../src/core/agent-session.ts";
  import type { AgentSessionRuntime } from "../src/core/agent-session-runtime.ts";
 diff --git a/packages/coding-agent/test/sdk-client-identity.test.ts b/packages/coding-agent/test/sdk-client-identity.test.ts
-index eb29823..4b533e1 100644
+index eb29823..1f7bb7c 100644
 --- a/packages/coding-agent/test/sdk-client-identity.test.ts
 +++ b/packages/coding-agent/test/sdk-client-identity.test.ts
 @@ -8,8 +8,8 @@ import {
@@ -1661,6 +1989,29 @@ index eb29823..4b533e1 100644
  } from "@so-agent/ai";
  import { afterEach, beforeEach, describe, expect, it } from "vitest";
  import { VERSION } from "../src/config.ts";
+@@ -149,7 +149,7 @@ describe("createAgentSession client identity", () => {
+ 			attribution: SO_ATTRIBUTION,
+ 		});
+ 		expect(getAttributionHeaders(model, options?.identity)).toEqual({
+-			"HTTP-Referer": "https://pi.dev",
++			"HTTP-Referer": "https://github.com/kevin9327/so-agent",
+ 			"X-OpenRouter-Title": "so",
+ 			"X-OpenRouter-Categories": "cli-agent",
+ 		});
+diff --git a/packages/coding-agent/test/suite/agent-session-boundaries.test.ts b/packages/coding-agent/test/suite/agent-session-boundaries.test.ts
+index 7c73aed..d7f44ef 100644
+--- a/packages/coding-agent/test/suite/agent-session-boundaries.test.ts
++++ b/packages/coding-agent/test/suite/agent-session-boundaries.test.ts
+@@ -128,7 +128,8 @@ describe("AgentSession actionable boundaries", () => {
+ 	it("keeps a boundary replacement verbatim through threshold compaction", async () => {
+ 		let handled = false;
+ 		const requests: string[] = [];
+-		const instruction = "EXACT-REPLACEMENT-INSTRUCTION ".repeat(100);
++		// Must push the context past the 2_000-token window; sized with margin so prompt-size tuning cannot flip it.
++		const instruction = "EXACT-REPLACEMENT-INSTRUCTION ".repeat(200);
+ 		const harness = await createHarness({
+ 			models: [{ id: "faux-1", contextWindow: 2_000, maxTokens: 100 }],
+ 			settings: { compaction: { enabled: true, keepRecentTokens: 1, reserveTokens: 0 } },
 diff --git a/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts b/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts
 index 1bf3af8..9235390 100644
 --- a/packages/coding-agent/test/suite/regressions/9789-context-handler-system-messages.test.ts
@@ -1677,6 +2028,91 @@ index 1bf3af8..9235390 100644
  import { afterEach, describe, expect, it } from "vitest";
  import type { ExtensionFactory } from "../../../src/index.ts";
  import { createHarness, type Harness } from "../harness.ts";
+diff --git a/packages/coding-agent/test/system-prompt.test.ts b/packages/coding-agent/test/system-prompt.test.ts
+index 0da410d..dfa7d08 100644
+--- a/packages/coding-agent/test/system-prompt.test.ts
++++ b/packages/coding-agent/test/system-prompt.test.ts
+@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
+ import type { Skill } from "../src/core/skills.ts";
+ import { createSyntheticSourceInfo } from "../src/core/source-info.ts";
+ import { buildSystemPrompt } from "../src/core/system-prompt.ts";
++import { editToolSystemPromptContribution } from "../src/core/tools/edit.ts";
+ 
+ const testSkill: Skill = {
+ 	name: "test-skill",
+@@ -116,9 +117,30 @@ describe("buildSystemPrompt", () => {
+ 			});
+ 
+ 			expect(prompt).toContain(
+-				"- When reading so docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory",
++				"Resolve docs/... and examples/... against these paths, not the current working directory",
+ 			);
+-			expect(prompt).toContain("environment variables (docs/environment-variables.md), MCP servers (docs/mcp.md)");
++			expect(prompt).toContain("environment-variables, mcp, codemode");
++			expect(prompt).toContain("Read the relevant .md files completely and follow their cross-references");
++		});
++
++		test("keeps the default prompt and tool declarations within a size budget", () => {
++			// Guards the per-turn token cost of the fixed prefix (see docs/EFFICIENCY.md).
++			const prompt = buildSystemPrompt({
++				selectedTools: ["read", "bash", "edit", "write"],
++				toolSnippets: {
++					read: "Read file contents",
++					bash: "Execute bash commands (ls, grep, find, etc.)",
++					edit: editToolSystemPromptContribution.snippet,
++					write: "Create or overwrite files",
++				},
++				toolGuidelines: { edit: [...editToolSystemPromptContribution.guidelines] },
++				contextFiles: [],
++				skills: [],
++				cwd: "/tmp/project",
++			});
++			expect(prompt.length).toBeLessThan(2300);
++			// each edit rule is stated once
++			expect(prompt.match(/overlap/g)?.length ?? 0).toBeLessThanOrEqual(1);
+ 		});
+ 	});
+ 
+diff --git a/packages/coding-agent/test/test-network-env.ts b/packages/coding-agent/test/test-network-env.ts
+index 520344a..3232b76 100644
+--- a/packages/coding-agent/test/test-network-env.ts
++++ b/packages/coding-agent/test/test-network-env.ts
+@@ -3,4 +3,6 @@ import { vi } from "vitest";
+ /** Enable network code paths for tests that replace external I/O with local fixtures or mocks. */
+ export function allowNetwork(): void {
+ 	vi.stubEnv("SO_OFFLINE", undefined);
++	// so has no hosted release feed; tests that exercise the update check mock this URL.
++	vi.stubEnv("SO_UPDATE_URL", "https://pi.dev/api/latest-version");
+ }
+diff --git a/packages/coding-agent/test/version-check.test.ts b/packages/coding-agent/test/version-check.test.ts
+index 9acce6d..d9ba09c 100644
+--- a/packages/coding-agent/test/version-check.test.ts
++++ b/packages/coding-agent/test/version-check.test.ts
+@@ -129,3 +129,24 @@ describe("version checks", () => {
+ 		expect(fetchMock).toHaveBeenCalledOnce();
+ 	});
+ });
++
++describe("version checks without a configured feed", () => {
++	it("makes no request unless SO_UPDATE_URL is set", async () => {
++		vi.stubEnv("SO_UPDATE_URL", "");
++		const fetchMock = vi.fn(async () => Response.json({ version: "9.9.9" }));
++		vi.stubGlobal("fetch", fetchMock);
++
++		await expect(getLatestSoRelease("1.0.0")).resolves.toBeUndefined();
++		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
++		expect(fetchMock).not.toHaveBeenCalled();
++	});
++
++	it("uses SO_UPDATE_URL when set", async () => {
++		vi.stubEnv("SO_UPDATE_URL", "https://updates.example.test/latest");
++		const fetchMock = vi.fn(async () => Response.json({ version: "1.0.1" }));
++		vi.stubGlobal("fetch", fetchMock);
++
++		await expect(getLatestSoVersion("1.0.0")).resolves.toBe("1.0.1");
++		expect(fetchMock).toHaveBeenCalledWith("https://updates.example.test/latest", expect.anything());
++	});
++});
 diff --git a/packages/durable/package.json b/packages/durable/package.json
 index 5d70e33..786be75 100644
 --- a/packages/durable/package.json
@@ -3045,6 +3481,142 @@ index 99c3b90..ce2e0c6 100644
  		"directory": "packages/tui"
  	},
  	"engines": {
--- 
-2.47.3
-
+diff --git a/scripts/build-coding-agent-bundle.mjs b/scripts/build-coding-agent-bundle.mjs
+index a86d29e..1b5c8a1 100644
+--- a/scripts/build-coding-agent-bundle.mjs
++++ b/scripts/build-coding-agent-bundle.mjs
+@@ -244,11 +244,24 @@ if (dirname(configOutput) !== dirname(bedrockLoaderOutput)) {
+ 
+ const metafiles = [mainResult.metafile, lazyResult.metafile, codemodeWorkerResult.metafile];
+ validateExternalImports(metafiles);
++// `so --version` prints the package version without evaluating the application module graph (about 8x faster).
+ const cliLauncher = `#!/usr/bin/env node
++import { readFileSync } from "node:fs";
+ import { createRequire, enableCompileCache } from "node:module";
+ 
+-enableCompileCache();
+-createRequire(import.meta.url)("./cli-runtime.js");
++const args = process.argv.slice(2);
++let version;
++if (args.length === 1 && (args[0] === "--version" || args[0] === "-v")) {
++	try {
++		version = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;
++	} catch {}
++}
++if (typeof version === "string" && version) {
++	console.log(version);
++} else {
++	enableCompileCache();
++	createRequire(import.meta.url)("./cli-runtime.js");
++}
+ `;
+ writeFileSync(join(bundleDir, "cli.js"), cliLauncher);
+ chmodSync(join(bundleDir, "cli.js"), 0o755);
+diff --git a/scripts/cli-launcher.test.mjs b/scripts/cli-launcher.test.mjs
+new file mode 100644
+index 0000000..38e7c15
+--- /dev/null
++++ b/scripts/cli-launcher.test.mjs
+@@ -0,0 +1,46 @@
++import assert from "node:assert/strict";
++import { spawnSync } from "node:child_process";
++import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { dirname, join, resolve } from "node:path";
++import test from "node:test";
++import { fileURLToPath } from "node:url";
++
++const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
++const launcher = join(root, "packages", "coding-agent", "dist", "bundle", "cli.js");
++const built = existsSync(launcher);
++
++// Preload that reports when the launcher loads the application graph.
++const dir = mkdtempSync(join(tmpdir(), "so-launcher-"));
++const preload = join(dir, "preload.cjs");
++writeFileSync(
++	preload,
++	`const M = require("node:module"); const orig = M.prototype.require;
++M.prototype.require = function (id) { if (String(id).endsWith("cli-runtime.js")) process.stderr.write("LOADED_RUNTIME\\n"); return orig.apply(this, arguments); };`,
++);
++
++function run(args) {
++	return spawnSync(process.execPath, ["--require", preload, launcher, ...args], {
++		encoding: "utf8",
++		env: { ...process.env, SO_OFFLINE: "1", SO_CODING_AGENT_DIR: join(dir, "agent") },
++	});
++}
++
++test("so --version and -v print the package version without loading the application", { skip: !built }, () => {
++	const version = JSON.parse(readFileSync(join(root, "packages", "coding-agent", "package.json"), "utf8")).version;
++	for (const flag of ["--version", "-v"]) {
++		const result = run([flag]);
++		assert.equal(result.status, 0, result.stderr);
++		assert.equal(result.stdout.trim(), version);
++		assert.ok(!result.stderr.includes("LOADED_RUNTIME"), `${flag} must not load the runtime`);
++	}
++});
++
++test("other invocations still load the application", { skip: !built }, () => {
++	const result = run(["--help"]);
++	assert.equal(result.status, 0, result.stderr);
++	assert.ok(result.stderr.includes("LOADED_RUNTIME"));
++	assert.match(result.stdout, /Usage:/);
++	// `--version` combined with other arguments takes the normal path
++	assert.ok(run(["--version", "--offline"]).stderr.includes("LOADED_RUNTIME"));
++});
+diff --git a/scripts/package-contents.test.mjs b/scripts/package-contents.test.mjs
+new file mode 100644
+index 0000000..674768b
+--- /dev/null
++++ b/scripts/package-contents.test.mjs
+@@ -0,0 +1,28 @@
++import assert from "node:assert/strict";
++import { execFileSync } from "node:child_process";
++import { dirname, join, resolve } from "node:path";
++import test from "node:test";
++import { fileURLToPath } from "node:url";
++
++const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
++
++test("coding-agent npm tarball leaves out sourcemaps and documentation screenshots", () => {
++	const out = execFileSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], {
++		cwd: join(root, "packages", "coding-agent"),
++		encoding: "utf8",
++		env: { ...process.env, npm_config_loglevel: "silent" },
++	});
++	const files = JSON.parse(out)[0].files.map((file) => file.path);
++	assert.deepEqual(
++		files.filter((path) => path.endsWith(".map")),
++		[],
++	);
++	assert.deepEqual(
++		files.filter((path) => path.startsWith("docs/images/")),
++		[],
++	);
++	// still shipped: docs, examples, changelog, runtime assets
++	assert.ok(files.includes("docs/quickstart.md"));
++	assert.ok(files.includes("CHANGELOG.md"));
++	assert.ok(files.some((path) => path.startsWith("examples/extensions/")));
++});
+diff --git a/scripts/sync-versions.test.mjs b/scripts/sync-versions.test.mjs
+index f3e3683..5e71da0 100644
+--- a/scripts/sync-versions.test.mjs
++++ b/scripts/sync-versions.test.mjs
+@@ -52,7 +52,7 @@ test("pins published and private dependencies without touching registry aliases,
+ 			private: true,
+ 			dependencies: {
+ 				"@so-agent/coding-agent": "^1.0.0",
+-				"@so-agent/ai": "npm:@so-agent/ai@1.0.0",
++				"legacy-ai": "npm:@so-agent/ai@1.0.0",
+ 			},
+ 		});
+ 		await writeManifest(root, "packages/coding-agent/install-lock", {
+@@ -73,7 +73,7 @@ test("pins published and private dependencies without touching registry aliases,
+ 		}
+ 		const evalsManifest = await readManifest(root, "packages/evals");
+ 		assert.equal(evalsManifest.dependencies["@so-agent/coding-agent"], "2.0.0");
+-		assert.equal(evalsManifest.dependencies["@so-agent/ai"], "npm:@so-agent/ai@1.0.0");
++		assert.equal(evalsManifest.dependencies["legacy-ai"], "npm:@so-agent/ai@1.0.0");
+ 		const generatedManifest = await readManifest(root, "packages/coding-agent/install-lock");
+ 		assert.equal(generatedManifest.dependencies["@so-agent/coding-agent"], "^1.0.0");
+ 

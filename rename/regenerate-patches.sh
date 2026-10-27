@@ -8,7 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 BASE="${BASE:-6c384aa}"
 UPSTREAM_REPO="${UPSTREAM_REPO:-/workspace/so-agent-baseline}"
-[ -z "$(git status --porcelain)" ] || { echo "commit or stash changes first" >&2; exit 1; }
+[ -z "$(git status --porcelain -- . ':!bench/eval/results-*.json')" ] || { echo "commit or stash changes first" >&2; exit 1; }
 repo="$PWD"; work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
 git clone -q --no-checkout "$UPSTREAM_REPO" "$work/w" && cd "$work/w"
 git checkout -q "$BASE"

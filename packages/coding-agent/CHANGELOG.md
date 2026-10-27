@@ -26,6 +26,16 @@
 - Fixed streamed tool calls re-running their call renderer on every argument delta; the interactive mode now renders the latest arguments once per frame, so a large streamed `write` no longer re-highlights its whole content per delta ([#9265](https://github.com/earendil-works/pi/issues/9265))
 - Fixed the login dialog opening sign-in URLs that are not web URLs, and printing control characters from sign-in, device-code, and info URLs, which could end a terminal hyperlink and send escape sequences to the terminal
 
+## [0.0.2] - 2026-10-27
+
+### Fixed
+
+- OpenAI-compatible streams: a tool-call chunk with no id and no name under a new index now continues the previous call instead of creating a nameless call. Gateways that stream the tail of a call's arguments that way (seen with a free anonymous gateway) used to produce `Tool  not found` and a 400 when the history was sent back. Covered by `openai-completions-nameless-tool-chunk.test.ts`.
+
+### Changed
+
+- A failed `edit` (text not found) keeps its message and now appends the closest region of the file with line numbers (anchored on the first line of `oldText`, identical line first, else the most similar line; at most 12 lines), so the model can copy the exact text without a separate `read`. Nothing is shown when nothing in the file is close. Covered by `edit-not-found-hint.test.ts`. Effect on real-model success rates is not measured; see `docs/EFFICIENCY.md`.
+
 ## [0.0.1] - 2026-10-27
 
 ### Added

@@ -52,7 +52,7 @@ test("pins published and private dependencies without touching registry aliases,
 			private: true,
 			dependencies: {
 				"@so-agent/coding-agent": "^1.0.0",
-				"@so-agent/ai": "npm:@so-agent/ai@1.0.0",
+				"legacy-ai": "npm:@so-agent/ai@1.0.0",
 			},
 		});
 		await writeManifest(root, "packages/coding-agent/install-lock", {
@@ -73,7 +73,7 @@ test("pins published and private dependencies without touching registry aliases,
 		}
 		const evalsManifest = await readManifest(root, "packages/evals");
 		assert.equal(evalsManifest.dependencies["@so-agent/coding-agent"], "2.0.0");
-		assert.equal(evalsManifest.dependencies["@so-agent/ai"], "npm:@so-agent/ai@1.0.0");
+		assert.equal(evalsManifest.dependencies["legacy-ai"], "npm:@so-agent/ai@1.0.0");
 		const generatedManifest = await readManifest(root, "packages/coding-agent/install-lock");
 		assert.equal(generatedManifest.dependencies["@so-agent/coding-agent"], "^1.0.0");
 

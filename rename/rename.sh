@@ -6,6 +6,7 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="${1:-$(dirname "$here")}"
 node "$here/rename.mjs" --root "$root"
+git -C "$root" add -A
 for p in "$here"/patches/*.patch; do
 	[ -e "$p" ] || continue
 	git -C "$root" apply --3way "$p"

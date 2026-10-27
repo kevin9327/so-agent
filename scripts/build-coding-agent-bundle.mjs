@@ -244,14 +244,15 @@ if (dirname(configOutput) !== dirname(bedrockLoaderOutput)) {
 
 const metafiles = [mainResult.metafile, lazyResult.metafile, codemodeWorkerResult.metafile];
 validateExternalImports(metafiles);
-// `so --version` prints the package version without evaluating the application module graph (about 8x faster).
 const cliLauncher = `#!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { createRequire, enableCompileCache } from "node:module";
 
+// \`so --version\` alone prints the package version without evaluating the application module graph.
+// Anything else, and any run with SO_PACKAGE_DIR set (which relocates package.json), takes the normal path.
 const args = process.argv.slice(2);
 let version;
-if (args.length === 1 && (args[0] === "--version" || args[0] === "-v")) {
+if (args.length === 1 && (args[0] === "--version" || args[0] === "-v") && !process.env.SO_PACKAGE_DIR) {
 	try {
 		version = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;
 	} catch {}

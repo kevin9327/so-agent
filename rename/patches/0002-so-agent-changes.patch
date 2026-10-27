@@ -1,3 +1,66 @@
+diff --git a/.github/ISSUE_TEMPLATE/bug.yml b/.github/ISSUE_TEMPLATE/bug.yml
+index 4e5a2c6..3d5f63a 100644
+--- a/.github/ISSUE_TEMPLATE/bug.yml
++++ b/.github/ISSUE_TEMPLATE/bug.yml
+@@ -5,9 +5,9 @@ body:
+   - type: markdown
+     attributes:
+       value: |
+-        **Before you start:** Read [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md).
++        **Before you start:** Read [CONTRIBUTING.md](https://github.com/kevin9327/so-agent/blob/main/CONTRIBUTING.md).
+ 
+-        New issues from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. Issues that do not meet the quality bar in [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md) will not be reopened or receive a reply.
++        A reproduction or a measured before/after makes an issue far easier to act on; see [CONTRIBUTING.md](https://github.com/kevin9327/so-agent/blob/main/CONTRIBUTING.md).
+ 
+         Keep this short. If it doesn't fit on one screen, it's too long. Write in your own voice.
+ 
+diff --git a/.github/ISSUE_TEMPLATE/config.yml b/.github/ISSUE_TEMPLATE/config.yml
+index 66b6798..2457a71 100644
+--- a/.github/ISSUE_TEMPLATE/config.yml
++++ b/.github/ISSUE_TEMPLATE/config.yml
+@@ -1,5 +1,5 @@
+ blank_issues_enabled: false
+ contact_links:
+-  - name: Questions
+-    url: https://discord.com/invite/3cU7Bz4UPx
+-    about: Ask questions on Discord instead of opening an issue
++  - name: Questions and ideas
++    url: https://github.com/kevin9327/so-agent/discussions
++    about: Ask questions or share what you built with so in Discussions instead of opening an issue
+diff --git a/.github/ISSUE_TEMPLATE/contribution.yml b/.github/ISSUE_TEMPLATE/contribution.yml
+index 1a36a1a..99e41d5 100644
+--- a/.github/ISSUE_TEMPLATE/contribution.yml
++++ b/.github/ISSUE_TEMPLATE/contribution.yml
+@@ -1,13 +1,13 @@
+ name: Contribution Proposal
+-description: Propose a change or feature (required for new contributors before submitting a PR)
++description: Propose a change or feature (optional but recommended before a large PR)
+ labels: []
+ body:
+   - type: markdown
+     attributes:
+       value: |
+-        **Before you start:** Read [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md).
++        **Before you start:** Read [CONTRIBUTING.md](https://github.com/kevin9327/so-agent/blob/main/CONTRIBUTING.md).
+ 
+-        New issues from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. Issues that do not meet the quality bar in [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md) will not be reopened or receive a reply.
++        A reproduction or a measured before/after makes an issue far easier to act on; see [CONTRIBUTING.md](https://github.com/kevin9327/so-agent/blob/main/CONTRIBUTING.md).
+ 
+         Keep this short. If it doesn't fit on one screen, it's too long. Write in your own voice.
+ 
+diff --git a/.github/ISSUE_TEMPLATE/package-report.yml b/.github/ISSUE_TEMPLATE/package-report.yml
+index e68c680..b060d70 100644
+--- a/.github/ISSUE_TEMPLATE/package-report.yml
++++ b/.github/ISSUE_TEMPLATE/package-report.yml
+@@ -7,7 +7,7 @@ body:
+       value: |
+         Use this form to report a package listed on pi.dev. For So core bugs, use the bug report template instead.
+ 
+-        New issues from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. Issues that do not meet the quality bar in [CONTRIBUTING.md](https://github.com/earendil-works/pi/blob/main/CONTRIBUTING.md) will not be reopened or receive a reply.
++        A reproduction or a measured before/after makes an issue far easier to act on; see [CONTRIBUTING.md](https://github.com/kevin9327/so-agent/blob/main/CONTRIBUTING.md).
+ 
+         Keep this short. If it doesn't fit on one screen, it's too long. Write in your own voice.
+ 
 diff --git a/.github/workflows/DISABLED.md b/.github/workflows/DISABLED.md
 new file mode 100644
 index 0000000..5055110
@@ -47,30 +110,319 @@ index 0000000..58f58fa
 +so agent is an independent derivative. It is not affiliated with or endorsed by
 +the Pi authors, and upstream maintainers do not support it.
 diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
-index 9aa2389..858c82f 100644
+index 9aa2389..78f6e91 100644
 --- a/CONTRIBUTING.md
 +++ b/CONTRIBUTING.md
-@@ -1,5 +1,7 @@
- # Contributing to so
+@@ -1,102 +1,38 @@
+-# Contributing to so
++# Contributing to so agent
  
-+> so agent is a fork of Pi ([ATTRIBUTION.md](ATTRIBUTION.md)). This guide is upstream's, with names changed. The contribution gate and Discord link are inherited and belong to the upstream project until the fork's owner adapts them; the gate workflows are disabled (see [.github/workflows/DISABLED.md](.github/workflows/DISABLED.md)).
-+
- This guide exists to save both sides time.
+-This guide exists to save both sides time.
++so agent is a fork of [Pi](https://github.com/earendil-works/pi) (see [ATTRIBUTION.md](ATTRIBUTION.md)). Issues and pull requests are welcome; there is no contribution gate on this fork.
  
- ## Philosophy
+-## Philosophy
++## What helps most
+ 
+-First things first: **so's core is minimal**.
++- **Bug reports with a reproduction.** Use the issue template. Run `so -ne` first to rule out an extension.
++- **Real-model results.** Run `bench/eval` against a model you have and post the table (see [bench/eval/README.md](bench/eval/README.md)). More models and more runs are worth more than opinions.
++- **Lossless improvements**: a fix or speedup that removes nothing, has a test, and comes with a before/after number (`bench/run.mjs`, `bench/eval`). See how the existing ones are written up in [docs/EFFICIENCY.md](docs/EFFICIENCY.md) and the [changelog](packages/coding-agent/CHANGELOG.md).
++- **Docs and examples.**
+ 
+-If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
++## Ground rules
+ 
+-So's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.
++1. **Understand your code.** You must be able to explain what a change does. AI-assisted code is fine; unreviewed generated code is not.
++2. **The core stays minimal.** Features that fit an extension should be an extension (see [packages/coding-agent/docs/extensions.md](packages/coding-agent/docs/extensions.md)).
++3. **Do not remove behavior or model guidance** to win a benchmark. Changes to the system prompt or tool descriptions need an eval showing no regression.
++4. **Keep the fork reproducible.** The rename from upstream is `rename/rename.sh` (codemod plus `rename/patches`). After a change, `rename/regenerate-patches.sh` rebuilds the patches; do not edit the patch files by hand.
++5. **Credit upstream.** Do not remove the license, [ATTRIBUTION.md](ATTRIBUTION.md) or upstream's changelog history.
+ 
+-## The One Rule
+-
+-**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
+-
+-Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
+-
+-If you use an agent, run it from the `so` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
+-
+-## Contribution Gate
+-
+-All issues and PRs from new contributors are auto-closed by default.
+-
+-Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx
+-
+-Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.
+-
+-Approval happens through maintainer replies on issues:
+-
+-- `lgtmi`: your future issues will not be auto-closed
+-- `lgtm`: your future issues and PRs will not be auto-closed
+-
+-The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.
+-
+-## Quality Bar For Issues
+-
+-If you open an issue, you must use one of the two GitHub issue templates.
+-
+-If you open an issue, keep it short, concrete, and worth reading.
+-
+-- Keep it concise. If it does not fit on one screen, it is too long.
+-- Write in your own voice (do not use an LLM to generate text, if you must, follow up with a clearly AI labeled comment).
+-- State the bug or request clearly.
+-- Explain why it matters.
+-- If you want to implement the change yourself, say so.
+-
+-If the issue is real and written well, a maintainer may reopen it or reply with `lgtmi` or `lgtm` in the command position described above.
+-
+-## Blocking
+-
+-If you ignore this document twice, or if you spam the tracker with agent-generated issues, your GitHub account will be permanently blocked.
+-
+-If you send a large volume of issues through automation, your GitHub account will be permanently blocked. No taksies backsies.
+-
+-## Before Submitting a PR
+-
+-Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.
+-
+-Before submitting a PR:
++## Before you open a pull request
+ 
+ ```bash
+-npm run check
+-./test.sh
++npm ci --ignore-scripts
++npm run check        # lint, format, type check, entry-graph budgets, install-lock check
++./test.sh            # tests (LLM-dependent tests are skipped without API keys; needs `fd` on PATH)
+ ```
+ 
+-Both must pass.
+-
+-Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
+-
+-If you are adding a new provider to `packages/ai`, see `AGENTS.md` for required tests.
+-
+-## Questions?
+-
+-Ask on [Discord](https://discord.com/invite/nKXTsAcmbT).
+-
+-## FAQ
+-
+-### Why are new issues and PRs auto-closed?
+-
+-so receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
+-
+-### Why are weekend issues lower priority?
+-
+-We triage the tracker during working hours. That means more issues can accumulate over the weekend. Anything submitted Friday through Sunday may be missed or given lower priority in the Monday review queue. If a problem is urgent, ask on Discord and include the short version, a repro, and the relevant logs.
+-
+-### Why do some issues get no reply?
+-
+-A reply is maintenance work too. Low-signal issues, unclear reports, duplicates, and issues that do not follow this guide may be closed without discussion. This keeps time available for reproducible bugs, thoughtful requests, and contributors who have done the work to make their report actionable.
+-
+-### Why not let AI triage everything?
++Known failures that also fail on upstream's baseline in this environment: `auth-storage` "keeps a coalesced reload alive" (filesystem timestamp resolution) and the six `packages/env` suites that need the Rust daemon build.
+ 
+-AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.
++Add a `CHANGELOG.md` entry under the next version in `packages/coding-agent/CHANGELOG.md` for user-visible changes. Do not bump versions in a pull request; the maintainer does that when releasing ([docs/VERSIONING.md](docs/VERSIONING.md)).
+ 
+-### Is this hostile to contributors?
++## Security
+ 
+-No. It is a guardrail against burnout and tracker spam. Short, concrete, reproducible issues are welcome. Thoughtful contributions are welcome. Automated slop, entitlement, and large volumes of low-effort reports are not.
++Report vulnerabilities as described in [SECURITY.md](SECURITY.md), not in public issues.
+ 
+-## Where can I learn about plans?
++## Upstream
+ 
+-Earendil uses RFCs to discuss larger changes.  Not all of them are public, but
+-quite a few are.  They can be found at [rfc.earendil.com](https://rfc.earendil.com/keyword/pi/).
++Project rules for agents and humans are in [AGENTS.md](AGENTS.md). Upstream's own contributing guide is kept in [docs/UPSTREAM-CONTRIBUTING.md](docs/UPSTREAM-CONTRIBUTING.md).
 diff --git a/README.md b/README.md
-index e8b60f1..dd9ad48 100644
+index e8b60f1..b34eec3 100644
 --- a/README.md
 +++ b/README.md
-@@ -8,6 +8,8 @@
-   <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square" /></a>
+@@ -1,73 +1,74 @@
+ <p align="center">
+-  <a href="https://pi.dev">
+-    <img alt="so logo" src="https://pi.dev/logo-auto.svg" width="128">
+-  </a>
++  <img alt="so agent: a small, extensible coding agent for your terminal" src="assets/banner.svg" width="720">
+ </p>
++
+ <p align="center">
+-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
+-  <a href="https://www.npmjs.com/package/@so-agent/coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@so-agent/coding-agent?style=flat-square" /></a>
++  <a href="https://github.com/kevin9327/so-agent/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/kevin9327/so-agent/actions/workflows/ci.yml/badge.svg" /></a>
++  <a href="https://github.com/kevin9327/so-agent/releases"><img alt="release" src="https://img.shields.io/github/v/release/kevin9327/so-agent?style=flat-square&include_prereleases" /></a>
++  <a href="LICENSE"><img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" /></a>
++  <img alt="node >= 22.19" src="https://img.shields.io/badge/node-%3E%3D22.19-339933?style=flat-square&logo=node.js&logoColor=white" />
++  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
  </p>
  
-+> **so agent is a fork of [Pi](https://github.com/earendil-works/pi)** (MIT, by Mario Zechner and contributors); see [ATTRIBUTION.md](ATTRIBUTION.md) and [docs/EFFICIENCY.md](docs/EFFICIENCY.md). The installer URLs, badges, logo and screenshots below are still upstream's: the installers (`pi.dev/install.sh`) install **Pi, not so**, and the `@so-agent/*` packages are not published to npm yet. Until they are, build from source (see [Development](#development) and `./so-test.sh`). Everything else in this README is upstream's text with the names changed.
-+
- > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
+-> New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
+-
+-# So
+-
+-So is a minimal, extensible agent harness that you can make your own.
+-
+-Adapt So to your workflows, not the other way around. Customize So with [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), and [themes](packages/coding-agent/docs/themes.md). Bundle them as [So packages](packages/coding-agent/docs/packages.md) and share via npm or git.
+-
+-So ships with powerful defaults but skips features like sub-agents and plan mode. Ask So to build what you want, or install a package that does it your way.
+-
+-Use So [interactively](packages/coding-agent/docs/usage.md), automate it in [print or JSON mode](packages/coding-agent/docs/cli.md), control it over [RPC](packages/coding-agent/docs/rpc.md), or build apps with the [So TypeScript SDK](packages/coding-agent/docs/sdk.md). See [OpenClaw](https://github.com/OpenClaw/OpenClaw) for a real-world integration.
++**so agent** is a terminal coding agent: a minimal harness with `read`, `write`, `edit` and `bash` tools that you extend with TypeScript extensions, skills, prompt templates, themes and packages instead of waiting for features. It is a **fork of [Pi](https://github.com/earendil-works/pi)** (MIT, by Mario Zechner and contributors; [ATTRIBUTION.md](ATTRIBUTION.md)), renamed, kept compatible with Pi's extension API, and tuned conservatively. Early (0.0.x), built from source for now.
  
- # So
+-## Getting started
++A real run (so 0.0.2, local Qwen3-4B model, [full transcript and how it was recorded](docs/demo.md)):
+ 
+-Install the command-line interface:
++```text
++You: Change the default server port from 3000 to 8080 in config.js and update the README so it states the new default. Change nothing else.
+ 
+-```bash
+-curl -fsSL https://pi.dev/install.sh | sh
+-```
+-
+-On Windows:
++  read   config.js
++  read   README.md
++  edit   config.js     Successfully replaced 1 block(s) in config.js.
++  edit   README.md     Successfully replaced 1 block(s) in README.md.
+ 
+-```shell
+-powershell -c "irm https://pi.dev/install.ps1 | iex"
++so: I've updated both files as requested: the default port in config.js is now 8080 and the README states it.
+ ```
+ 
+-The installer pins all dependencies and updates So with `so update`. Alternatively, install directly with npm, which does not pin transitive dependencies:
++## Why so agent
+ 
+-```bash
+-npm install -g --ignore-scripts @so-agent/coding-agent
+-```
++so is the same agent as Pi 1.4.0 with its behavior kept (nothing removed), plus a short list of changes that are measured or tested. The numbers are in [docs/EFFICIENCY.md](docs/EFFICIENCY.md); they are small on purpose, because most of an agent's time is the model, not the harness.
+ 
+-So requires Node.js 22.19 or newer. The macOS, Linux, and Windows installers can install it if needed. So does not require dependency lifecycle scripts for a normal npm installation.
++| | Pi 1.4.0 | so 0.0.3 | How measured |
++|---|---|---|---|
++| `so --version` | 171.5 ms | **23.5 ms** | median of 31 runs (`bench/run.mjs`); `node -e 0` alone is 20.7 ms |
++| Peak memory, one print-mode run | 122 MiB | **117 MiB** | same harness |
++| Time to first provider request | 234 ms | 235 ms (same) | same harness, mock provider |
++| System prompt, tool descriptions | upstream | upstream wording | unchanged apart from the name |
++| Prompt cache prefix across turns | stable | stable | `promptPrefixBreak: null` |
+ 
+-Start So in the directory where you want it to work:
++What else is different:
+ 
+-```bash
+-cd /path/to/project
+-so
+-```
++- **Pi extensions keep working.** `@earendil-works/pi-*` and `@mariozechner/pi-*` imports still resolve, next to the new `@so-agent/*` names.
++- **Fork-safe network defaults.** Update check points at this package's npm entry, install reporting and the installer hint have no upstream endpoint, and the remote model catalog can be pointed elsewhere or off (`SO_CATALOG_URL`). Every variable is in [docs/UPSTREAM-ENDPOINTS.md](docs/UPSTREAM-ENDPOINTS.md).
++- **Small fixes found by running it** (see [CHANGELOG](packages/coding-agent/CHANGELOG.md)): streams that send a tool call's arguments under a new index no longer create a nameless call; a failed `edit` shows the closest lines of the file; the output-limit error tells the model how to retry.
++- **A reproducible rename** from upstream: `rename/rename.sh` regenerates this tree from a Pi checkout, so upstream updates can be merged.
++- **A real-model eval harness** for comparing builds on the same tasks with any OpenAI-compatible endpoint ([bench/eval](bench/eval/README.md)). The first small eval, on a local 4B model, found no difference between so and Pi beyond noise; the sample is tiny and it is documented as such.
+ 
+-For a built-in AI provider, run `/login` inside So to connect a subscription or API key. Then give So a task.
++What so is **not**: it is not faster in the work that matters (model latency), it has no new features over Pi yet, and it is not affiliated with the Pi authors. If you only want the original, use [Pi](https://github.com/earendil-works/pi).
+ 
+-See the [documentation](https://pi.dev/docs/latest) for full setup and usage instructions, or [visit pi.dev](https://pi.dev) for demos.
++## Quick start (from source)
+ 
+-## Run with Nix
++so is not on npm yet. Requires Node.js 22.19 or newer.
+ 
+ ```bash
+-nix run github:earendil-works/pi/stable
++git clone https://github.com/kevin9327/so-agent && cd so-agent
++npm ci --ignore-scripts
++npm run build                     # builds all packages (refreshes model data from the network)
++
++# run it from any project directory
++cd /path/to/your/project
++node /path/to/so-agent/packages/coding-agent/dist/bundle/cli.js
++# optional: alias so="node /path/to/so-agent/packages/coding-agent/dist/bundle/cli.js"
+ ```
+ 
+-`stable` points at the latest release. Install it with `nix profile add github:earendil-works/pi/stable` and update with `nix profile upgrade so`. Use a release tag such as `github:earendil-works/pi/v1.0.0` to pin a version, or `github:earendil-works/pi` for unreleased changes on `main`. Nix builds So from source.
++Inside so, run `/login` to connect a subscription or API key, or export a provider key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`, then give it a task. A local model works too: add an OpenAI-compatible server to `~/.so/agent/models.json` (see [docs/models.md](packages/coding-agent/docs/models.md)). To run from TypeScript sources without building, use `./so-test.sh`.
+ 
+-Supports ARM64 and x86-64 on Linux and macOS. Use `nix build .` or `nix run .` to build or run your checkout.
++`npm install -g @so-agent/coding-agent` will work once the packages are published; until then that command fails.
+ 
+-Nix builds are offline, so the bundled model data comes from a pi.dev model catalog revision pinned in `nix/model-catalog.json`. At runtime, So still overlays newer catalog data from pi.dev as usual. The Nix workflow replaces the pin on `main` when it no longer matches the checkout, for example after a provider is added or gains a new model type. To refresh it by hand:
++## What you can do with it
+ 
+-```bash
+-npm run update:model-catalog-pin
+-```
++Customize so with [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), and [themes](packages/coding-agent/docs/themes.md). Bundle them as [packages](packages/coding-agent/docs/packages.md) and share via npm or git. Use so [interactively](packages/coding-agent/docs/usage.md), automate it in [print or JSON mode](packages/coding-agent/docs/cli.md), control it over [RPC](packages/coding-agent/docs/rpc.md), or build apps with the [TypeScript SDK](packages/coding-agent/docs/sdk.md). It skips sub-agents and plan mode on purpose: ask so to build what you want, or install a package.
+ 
+ ## Packages
+ 
+@@ -83,7 +84,7 @@ This monorepo contains the So CLI and its supporting libraries.
+ | **[@so-agent/coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
+ | **[@so-agent/tui](packages/tui)** | Terminal UI library with differential rendering |
+ 
+-For Slack/chat automation and workflows see [earendil-works/so-chat](https://github.com/earendil-works/pi-chat).
++For Slack/chat automation and workflows see upstream's [pi-chat](https://github.com/earendil-works/pi-chat) (a Pi project, not tested with so).
+ 
+ ## Permissions & Containerization
+ 
+@@ -97,7 +98,7 @@ If you need stronger boundaries, containerize or sandbox So. See [packages/codin
+ 
+ ## Contributing
+ 
+-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Longer term plans for So can also be found in [RFCs](https://rfc.earendil.com/keyword/pi/).
++Issues and PRs are welcome (no contribution gate on this fork). See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Upstream's longer-term plans for Pi are in its [RFCs](https://rfc.earendil.com/keyword/pi/).
+ 
+ ## Development
+ 
+@@ -173,34 +174,19 @@ We treat npm dependency changes as reviewed code changes.
+ - `.npmrc` sets `save-exact=true` and `min-release-age=2` to avoid same-day dependency releases during npm resolution.
+ - `package-lock.json` is the dependency ground truth. Pre-commit blocks accidental lockfile commits unless `SO_ALLOW_LOCKFILE_CHANGE=1` is set.
+ - `npm run check` verifies pinned direct deps, native TypeScript import compatibility, and the generated coding-agent install lock.
+-- The pi.dev installer installs from `packages/coding-agent/install-lock/`, generated from the root lockfile, to pin transitive deps. The npm package does not pin transitive deps.
++- The upstream (Pi) installer installs from `packages/coding-agent/install-lock/`, generated from the root lockfile, to pin transitive deps. The npm package does not pin transitive deps.
+ - Local release smoke tests and npm publication use the same tarball packer; npm publishes the validated tarballs rather than repacking workspace directories.
+ - Local release installs, documented npm installs, and `so update --self` use `--ignore-scripts` where supported.
+ - CI installs with `npm ci --ignore-scripts`, and a scheduled GitHub workflow runs `npm audit --omit=dev` plus `npm audit signatures --omit=dev`.
+ - Install lock generation has an explicit allowlist for dependency lifecycle scripts; new lifecycle-script deps fail checks until reviewed.
+ 
+-## Share your OSS coding agent sessions
+-
+-If you use So or other coding agents for open source work, please share your sessions.
+-
+-Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks.
+-
+-For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
++## Launch notes, comparison, history
+ 
+-To publish sessions, use [`badlogic/so-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `so-share-hf`.
+-
+-You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `so-agent` sessions.
+-
+-I regularly publish my own `so-agent` work sessions here:
+-
+-- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
++- [docs/EFFICIENCY.md](docs/EFFICIENCY.md): every change from the first pass, what was kept, restored or replaced, and measured numbers
++- [docs/VERSIONING.md](docs/VERSIONING.md), [CHANGELOG](packages/coding-agent/CHANGELOG.md), [releases](https://github.com/kevin9327/so-agent/releases)
++- [docs/UPSTREAM-ENDPOINTS.md](docs/UPSTREAM-ENDPOINTS.md), [docs/INSTALL-REPORT.md](docs/INSTALL-REPORT.md)
++- [docs/UPSTREAM-README-SECTIONS.md](docs/UPSTREAM-README-SECTIONS.md): sections of upstream's README that do not apply here
+ 
+ ## License
+ 
+-MIT
+-
+-<p align="center">
+-  <a href="https://pi.dev">pi.dev</a> domain graciously donated by
+-  <br /><br />
+-  <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
+-</p>
++MIT. The original license and copyright notice (Mario Zechner) are kept; see [LICENSE](LICENSE) and [ATTRIBUTION.md](ATTRIBUTION.md).
 diff --git a/SECURITY.md b/SECURITY.md
 index d393c7f..64bfa0d 100644
 --- a/SECURITY.md
@@ -100,6 +452,38 @@ index d393c7f..64bfa0d 100644
  
  ## Out Of Scope
  
+diff --git a/assets/banner.svg b/assets/banner.svg
+new file mode 100644
+index 0000000..95ccbdd
+--- /dev/null
++++ b/assets/banner.svg
+@@ -0,0 +1,13 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" width="900" height="260" role="img" aria-label="so agent: a terminal coding agent">
++  <title>so agent: a terminal coding agent</title>
++  <rect width="900" height="260" rx="24" fill="#0b1020"/>
++  <g transform="translate(48 66) scale(1.2)">
++    <rect width="128" height="128" rx="28" fill="#111a33"/>
++    <polyline points="22,46 42,64 22,82" fill="none" stroke="#5eead4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
++    <path d="M82 52 C78 45 56 45 56 56 C56 67 82 62 82 73 C82 84 60 84 53 76" fill="none" stroke="#f8fafc" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
++    <circle cx="104" cy="64" r="12" fill="none" stroke="#f8fafc" stroke-width="9"/>
++  </g>
++  <text x="236" y="128" fill="#f8fafc" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="64" font-weight="700">so agent</text>
++  <text x="238" y="172" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="20">a small, extensible coding agent for your terminal</text>
++  <text x="238" y="208" fill="#5eead4" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="20">Pi-compatible · MIT · TypeScript</text>
++</svg>
+diff --git a/assets/logo.svg b/assets/logo.svg
+new file mode 100644
+index 0000000..0fcf7b0
+--- /dev/null
++++ b/assets/logo.svg
+@@ -0,0 +1,7 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="so agent logo">
++  <title>so agent</title>
++  <rect width="128" height="128" rx="28" fill="#0b1020"/>
++  <polyline points="22,46 42,64 22,82" fill="none" stroke="#5eead4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
++  <path d="M82 52 C78 45 56 45 56 56 C56 67 82 62 82 73 C82 84 60 84 53 76" fill="none" stroke="#f8fafc" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
++  <circle cx="104" cy="64" r="12" fill="none" stroke="#f8fafc" stroke-width="9"/>
++</svg>
 diff --git a/bench/README.md b/bench/README.md
 new file mode 100644
 index 0000000..a5be37a
@@ -156,10 +540,10 @@ index 0000000..6824405
 +});
 diff --git a/bench/eval/README.md b/bench/eval/README.md
 new file mode 100644
-index 0000000..d087422
+index 0000000..ac9e74b
 --- /dev/null
 +++ b/bench/eval/README.md
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,46 @@
 +# Prompt / behavior evaluation against a real model
 +
 +`bench/run.mjs` measures cost with a mock provider. This directory measures **behavior** with a real one: the same fixed
@@ -200,6 +584,12 @@ index 0000000..d087422
 +  the same amount to both builds.
 +- Results of a run are kept next to the results JSON; `docs/EFFICIENCY.md` records the one that was done for this repo and
 +  its caveats.
++
++## Summaries, transcripts, results
++
++- `node bench/eval/summarize.mjs bench/eval/results/*.json` merges result files into a per-task pass table.
++- `--transcripts <dir>` on `run-eval.mjs` saves each run's JSON event stream; `node bench/eval/transcript-to-md.mjs <file.jsonl> "<prompt>"` renders one as Markdown (see `docs/demo.md`).
++- Committed results live in `bench/eval/results/`.
 diff --git a/bench/eval/repair-stream.mjs b/bench/eval/repair-stream.mjs
 new file mode 100644
 index 0000000..7fe609f
@@ -243,45 +633,11 @@ index 0000000..7fe609f
 +		return lines.map(fixLine).join("\n") + (final || lines.length ? "\n" : "");
 +	};
 +}
-diff --git a/bench/eval/results-local-qwen3-4b.json b/bench/eval/results-local-qwen3-4b.json
-new file mode 100644
-index 0000000..54a067a
---- /dev/null
-+++ b/bench/eval/results-local-qwen3-4b.json
-@@ -0,0 +1,27 @@
-+{
-+  "baseUrl": "http://127.0.0.1:8081/v1",
-+  "model": "qwen3-4b-instruct-2507",
-+  "runs": 3,
-+  "results": [
-+    {
-+      "build": "upstream",
-+      "task": "fix-off-by-one",
-+      "success": false,
-+      "exitCode": 0,
-+      "turns": 7,
-+      "toolCalls": 7,
-+      "toolErrors": 1,
-+      "inputTokens": 2417,
-+      "outputTokens": 1432,
-+      "cacheReadTokens": 13188,
-+      "wallMs": 160404,
-+      "firstTurnInputTokens": 1435,
-+      "errors": [],
-+      "stderrTail": "",
-+      "run": 0,
-+      "attempts": 1,
-+      "invalid": false
-+    }
-+  ],
-+  "retried": []
-+}
-\ No newline at end of file
-diff --git a/bench/eval/results-pollinations-gpt-oss-20b.json b/bench/eval/results-pollinations-gpt-oss-20b.json
+diff --git a/bench/eval/results/pollinations-gpt-oss-20b-inconclusive.json b/bench/eval/results/pollinations-gpt-oss-20b-inconclusive.json
 new file mode 100644
 index 0000000..b901f71
 --- /dev/null
-+++ b/bench/eval/results-pollinations-gpt-oss-20b.json
++++ b/bench/eval/results/pollinations-gpt-oss-20b-inconclusive.json
 @@ -0,0 +1,1301 @@
 +{
 +  "baseUrl": "http://127.0.0.1:8787/v1",
@@ -1585,6 +1941,2092 @@ index 0000000..b901f71
 +  ]
 +}
 \ No newline at end of file
+diff --git a/bench/eval/results/qwen3-4b-A.json b/bench/eval/results/qwen3-4b-A.json
+new file mode 100644
+index 0000000..a2681ca
+--- /dev/null
++++ b/bench/eval/results/qwen3-4b-A.json
+@@ -0,0 +1,1377 @@
++{
++  "baseUrl": "http://127.0.0.1:8081/v1",
++  "model": "qwen3-4b-instruct-2507",
++  "runs": 3,
++  "results": [
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "success": true,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 3,
++      "toolErrors": 0,
++      "inputTokens": 1736,
++      "outputTokens": 427,
++      "cacheReadTokens": 4762,
++      "wallMs": 49254,
++      "firstTurnInputTokens": 1434,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 7,
++      "toolErrors": 4,
++      "inputTokens": 2671,
++      "outputTokens": 1457,
++      "cacheReadTokens": 5984,
++      "wallMs": 155064,
++      "firstTurnInputTokens": 1441,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 5,
++      "toolCalls": 16,
++      "toolErrors": 13,
++      "inputTokens": 2071,
++      "outputTokens": 1297,
++      "cacheReadTokens": 9573,
++      "wallMs": 133372,
++      "firstTurnInputTokens": 870,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 5,
++      "toolCalls": 15,
++      "toolErrors": 12,
++      "inputTokens": 2137,
++      "outputTokens": 1341,
++      "cacheReadTokens": 9625,
++      "wallMs": 141884,
++      "firstTurnInputTokens": 870,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 871,
++      "outputTokens": 81,
++      "cacheReadTokens": 2082,
++      "wallMs": 11891,
++      "firstTurnInputTokens": 846,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 1467,
++      "outputTokens": 81,
++      "cacheReadTokens": 1520,
++      "wallMs": 14867,
++      "firstTurnInputTokens": 1442,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 886,
++      "outputTokens": 103,
++      "cacheReadTokens": 2151,
++      "wallMs": 13946,
++      "firstTurnInputTokens": 867,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 886,
++      "outputTokens": 123,
++      "cacheReadTokens": 2113,
++      "wallMs": 14833,
++      "firstTurnInputTokens": 867,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 1006,
++      "outputTokens": 244,
++      "cacheReadTokens": 2066,
++      "wallMs": 28926,
++      "firstTurnInputTokens": 869,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 1004,
++      "outputTokens": 215,
++      "cacheReadTokens": 2102,
++      "wallMs": 22314,
++      "firstTurnInputTokens": 867,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 944,
++      "outputTokens": 197,
++      "cacheReadTokens": 3771,
++      "wallMs": 21596,
++      "firstTurnInputTokens": 851,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "change-default-port",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 944,
++      "outputTokens": 237,
++      "cacheReadTokens": 3717,
++      "wallMs": 24525,
++      "firstTurnInputTokens": 851,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "edit-package-json",
++      "success": false,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 992,
++      "outputTokens": 157,
++      "cacheReadTokens": 3603,
++      "wallMs": 19677,
++      "firstTurnInputTokens": 855,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "edit-package-json",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 3,
++      "toolErrors": 0,
++      "inputTokens": 1033,
++      "outputTokens": 237,
++      "cacheReadTokens": 3705,
++      "wallMs": 25326,
++      "firstTurnInputTokens": 854,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 5,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 848,
++      "outputTokens": 20,
++      "cacheReadTokens": 608,
++      "wallMs": 166147,
++      "firstTurnInputTokens": 848,
++      "errors": [
++        "terminated",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14366,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14326,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14482,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14309,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14301,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14289,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14306,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14280,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14293,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14351,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14311,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14275,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "change-default-port",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14323,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "edit-package-json",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14294,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "edit-package-json",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14284,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14276,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14280,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14303,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14299,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14307,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14321,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14273,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14377,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14324,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14289,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14322,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14313,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 0,
++      "toolErrors": 0,
++      "inputTokens": 0,
++      "outputTokens": 0,
++      "cacheReadTokens": 0,
++      "wallMs": 14298,
++      "firstTurnInputTokens": 0,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "stderrTail": "",
++      "run": 2,
++      "attempts": 1,
++      "invalid": true
++    }
++  ],
++  "retried": [
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "run": 0,
++      "attempt": 1,
++      "errors": [
++        "terminated",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 5,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "run": 0,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "change-default-port",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "edit-package-json",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "edit-package-json",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "run": 2,
++      "attempt": 1,
++      "errors": [
++        "Connection error.",
++        "Connection error.",
++        "Connection error.",
++        "Connection error."
++      ],
++      "turns": 4,
++      "success": false
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/bench/eval/results/qwen3-4b-B.json b/bench/eval/results/qwen3-4b-B.json
+new file mode 100644
+index 0000000..cfb5779
+--- /dev/null
++++ b/bench/eval/results/qwen3-4b-B.json
+@@ -0,0 +1,695 @@
++{
++  "baseUrl": "http://127.0.0.1:8081/v1",
++  "model": "qwen3-4b-instruct-2507",
++  "runs": 2,
++  "summary": {
++    "upstream": {
++      "runs": 14,
++      "invalid": 2,
++      "providerErrorsRetried": 2,
++      "passed": 7,
++      "avgTurns": 2.857142857142857,
++      "avgToolCalls": 3.2857142857142856,
++      "avgInputTokens": 1171,
++      "avgOutputTokens": 411,
++      "avgWallS": 46,
++      "firstTurnInputTokens": 1434
++    },
++    "so": {
++      "runs": 14,
++      "invalid": 2,
++      "providerErrorsRetried": 2,
++      "passed": 8,
++      "avgTurns": 4.785714285714286,
++      "avgToolCalls": 6.071428571428571,
++      "avgInputTokens": 1449,
++      "avgOutputTokens": 612,
++      "avgWallS": 86.4,
++      "firstTurnInputTokens": 1442
++    }
++  },
++  "results": [
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 2143,
++      "outputTokens": 988,
++      "cacheReadTokens": 5480,
++      "wallMs": 131202,
++      "firstTurnInputTokens": 1434,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "success": false,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 3,
++      "toolErrors": 0,
++      "inputTokens": 1753,
++      "outputTokens": 595,
++      "cacheReadTokens": 3326,
++      "wallMs": 62644,
++      "firstTurnInputTokens": 1442,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 5,
++      "toolCalls": 13,
++      "toolErrors": 10,
++      "inputTokens": 1994,
++      "outputTokens": 1294,
++      "cacheReadTokens": 9435,
++      "wallMs": 130115,
++      "firstTurnInputTokens": 869,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 4,
++      "toolErrors": 1,
++      "inputTokens": 1718,
++      "outputTokens": 1419,
++      "cacheReadTokens": 4753,
++      "wallMs": 135459,
++      "firstTurnInputTokens": 1449,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 871,
++      "outputTokens": 81,
++      "cacheReadTokens": 2082,
++      "wallMs": 13678,
++      "firstTurnInputTokens": 846,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 894,
++      "outputTokens": 99,
++      "cacheReadTokens": 2125,
++      "wallMs": 17465,
++      "firstTurnInputTokens": 845,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 888,
++      "outputTokens": 84,
++      "cacheReadTokens": 2151,
++      "wallMs": 14342,
++      "firstTurnInputTokens": 869,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 886,
++      "outputTokens": 103,
++      "cacheReadTokens": 2113,
++      "wallMs": 13585,
++      "firstTurnInputTokens": 867,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 1006,
++      "outputTokens": 231,
++      "cacheReadTokens": 2066,
++      "wallMs": 23820,
++      "firstTurnInputTokens": 869,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 889,
++      "outputTokens": 176,
++      "cacheReadTokens": 2200,
++      "wallMs": 19801,
++      "firstTurnInputTokens": 869,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 944,
++      "outputTokens": 226,
++      "cacheReadTokens": 3774,
++      "wallMs": 25288,
++      "firstTurnInputTokens": 851,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "change-default-port",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 944,
++      "outputTokens": 234,
++      "cacheReadTokens": 3717,
++      "wallMs": 24444,
++      "firstTurnInputTokens": 851,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "edit-package-json",
++      "success": false,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 991,
++      "outputTokens": 158,
++      "cacheReadTokens": 3601,
++      "wallMs": 20236,
++      "firstTurnInputTokens": 854,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "edit-package-json",
++      "success": false,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 939,
++      "outputTokens": 155,
++      "cacheReadTokens": 3707,
++      "wallMs": 21263,
++      "firstTurnInputTokens": 855,
++      "errors": [],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 848,
++      "outputTokens": 20,
++      "cacheReadTokens": 608,
++      "wallMs": 7410,
++      "firstTurnInputTokens": 848,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32220 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32220,\"n_ctx\":20480}"
++      ],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 849,
++      "outputTokens": 20,
++      "cacheReadTokens": 590,
++      "wallMs": 7103,
++      "firstTurnInputTokens": 849,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32203 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32203,\"n_ctx\":20480}"
++      ],
++      "stderrTail": "",
++      "run": 0,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "fix-off-by-one",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 3,
++      "toolErrors": 0,
++      "inputTokens": 1102,
++      "outputTokens": 486,
++      "cacheReadTokens": 3834,
++      "wallMs": 45045,
++      "firstTurnInputTokens": 845,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "fix-off-by-one",
++      "success": true,
++      "exitCode": 0,
++      "turns": 4,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 1151,
++      "outputTokens": 547,
++      "cacheReadTokens": 5833,
++      "wallMs": 52107,
++      "firstTurnInputTokens": 844,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 31,
++      "toolCalls": 44,
++      "toolErrors": 18,
++      "inputTokens": 6094,
++      "outputTokens": 4529,
++      "cacheReadTokens": 153112,
++      "wallMs": 762792,
++      "firstTurnInputTokens": 870,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "add-function",
++      "success": false,
++      "exitCode": 0,
++      "turns": 5,
++      "toolCalls": 15,
++      "toolErrors": 12,
++      "inputTokens": 2144,
++      "outputTokens": 1307,
++      "cacheReadTokens": 9663,
++      "wallMs": 134229,
++      "firstTurnInputTokens": 870,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 869,
++      "outputTokens": 81,
++      "cacheReadTokens": 2080,
++      "wallMs": 11495,
++      "firstTurnInputTokens": 844,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "count-todos",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 869,
++      "outputTokens": 81,
++      "cacheReadTokens": 2116,
++      "wallMs": 11651,
++      "firstTurnInputTokens": 844,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "create-config",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 889,
++      "outputTokens": 84,
++      "cacheReadTokens": 2152,
++      "wallMs": 11692,
++      "firstTurnInputTokens": 870,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-config",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 887,
++      "outputTokens": 84,
++      "cacheReadTokens": 2114,
++      "wallMs": 12023,
++      "firstTurnInputTokens": 868,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "create-fizzbuzz",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 889,
++      "outputTokens": 179,
++      "cacheReadTokens": 2165,
++      "wallMs": 34070,
++      "firstTurnInputTokens": 869,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "create-fizzbuzz",
++      "success": true,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 1005,
++      "outputTokens": 227,
++      "cacheReadTokens": 2103,
++      "wallMs": 24894,
++      "firstTurnInputTokens": 868,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "change-default-port",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 944,
++      "outputTokens": 232,
++      "cacheReadTokens": 3774,
++      "wallMs": 29617,
++      "firstTurnInputTokens": 851,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "change-default-port",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 4,
++      "toolErrors": 0,
++      "inputTokens": 944,
++      "outputTokens": 237,
++      "cacheReadTokens": 3720,
++      "wallMs": 25311,
++      "firstTurnInputTokens": 851,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "upstream",
++      "task": "edit-package-json",
++      "success": false,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 2,
++      "toolErrors": 0,
++      "inputTokens": 997,
++      "outputTokens": 159,
++      "cacheReadTokens": 3598,
++      "wallMs": 19247,
++      "firstTurnInputTokens": 856,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "edit-package-json",
++      "success": true,
++      "exitCode": 0,
++      "turns": 3,
++      "toolCalls": 3,
++      "toolErrors": 0,
++      "inputTokens": 1035,
++      "outputTokens": 237,
++      "cacheReadTokens": 3709,
++      "wallMs": 25970,
++      "firstTurnInputTokens": 856,
++      "errors": [],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": false
++    },
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 848,
++      "outputTokens": 20,
++      "cacheReadTokens": 608,
++      "wallMs": 7285,
++      "firstTurnInputTokens": 848,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32220 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32220,\"n_ctx\":20480}"
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "success": false,
++      "exitCode": 0,
++      "turns": 2,
++      "toolCalls": 1,
++      "toolErrors": 0,
++      "inputTokens": 850,
++      "outputTokens": 20,
++      "cacheReadTokens": 590,
++      "wallMs": 7384,
++      "firstTurnInputTokens": 850,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32204 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32204,\"n_ctx\":20480}"
++      ],
++      "stderrTail": "",
++      "run": 1,
++      "attempts": 1,
++      "invalid": true
++    }
++  ],
++  "retried": [
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "run": 0,
++      "attempt": 1,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32220 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32220,\"n_ctx\":20480}"
++      ],
++      "turns": 2,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "run": 0,
++      "attempt": 1,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32203 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32203,\"n_ctx\":20480}"
++      ],
++      "turns": 2,
++      "success": false
++    },
++    {
++      "build": "so",
++      "task": "count-errors-large-log",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32220 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32220,\"n_ctx\":20480}"
++      ],
++      "turns": 2,
++      "success": false
++    },
++    {
++      "build": "upstream",
++      "task": "count-errors-large-log",
++      "run": 1,
++      "attempt": 1,
++      "errors": [
++        "400: {\"code\":400,\"message\":\"request (32204 tokens) exceeds the available context size (20480 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":32204,\"n_ctx\":20480}"
++      ],
++      "turns": 2,
++      "success": false
++    }
++  ]
++}
+\ No newline at end of file
 diff --git a/bench/eval/run-eval.mjs b/bench/eval/run-eval.mjs
 new file mode 100644
 index 0000000..f2d91ed
@@ -1745,6 +4187,42 @@ index 0000000..f2d91ed
 +}
 +console.log(JSON.stringify(summary, null, 2));
 +writeFileSync(out, JSON.stringify({ baseUrl, model, runs, summary, results, retried }, null, 2));
+diff --git a/bench/eval/summarize.mjs b/bench/eval/summarize.mjs
+new file mode 100644
+index 0000000..cede0d0
+--- /dev/null
++++ b/bench/eval/summarize.mjs
+@@ -0,0 +1,30 @@
++#!/usr/bin/env node
++// Merge one or more run-eval result files and print a per-task table (passes / valid runs per build) plus totals.
++// Runs whose provider answered with an error are listed as invalid and left out of the pass counts.
++//   node bench/eval/summarize.mjs results-a.json results-b.json
++import { readFileSync } from "node:fs";
++
++const files = process.argv.slice(2);
++if (files.length === 0) throw new Error("usage: summarize.mjs <results.json>...");
++const results = files.flatMap((f) => JSON.parse(readFileSync(f, "utf8")).results ?? []);
++const builds = [...new Set(results.map((r) => r.build))];
++const taskIds = [...new Set(results.map((r) => r.task))];
++const cell = (b, t) => {
++	const rs = results.filter((r) => r.build === b && r.task === t);
++	const valid = rs.filter((r) => !r.invalid);
++	return { pass: valid.filter((r) => r.success).length, valid: valid.length, invalid: rs.length - valid.length };
++};
++const rows = taskIds.map((t) => [t, ...builds.map((b) => {
++	const c = cell(b, t);
++	return `${c.pass}/${c.valid}${c.invalid ? ` (+${c.invalid} invalid)` : ""}`;
++})]);
++const total = (b) => {
++	const valid = results.filter((r) => r.build === b && !r.invalid);
++	const sum = (k) => valid.reduce((a, r) => a + r[k], 0);
++	return { pass: valid.filter((r) => r.success).length, valid: valid.length, turns: sum("turns"), tools: sum("toolCalls"), input: sum("inputTokens"), output: sum("outputTokens"), wallS: Math.round(sum("wallMs") / 1000) };
++};
++const lines = [["task", ...builds], ...rows, ["TOTAL pass/valid", ...builds.map((b) => `${total(b).pass}/${total(b).valid}`)]];
++const width = lines[0].map((_, i) => Math.max(...lines.map((l) => String(l[i]).length)));
++for (const l of lines) console.log(l.map((c, i) => String(c).padEnd(width[i])).join("  "));
++console.log("");
++for (const b of builds) console.log(b, JSON.stringify(total(b)));
 diff --git a/bench/eval/tasks.mjs b/bench/eval/tasks.mjs
 new file mode 100644
 index 0000000..d8e49f2
@@ -1978,6 +4456,45 @@ index 0000000..a2005b9
 +	stats.failed++;
 +	res.writeHead(502).end("rate limit retries exhausted");
 +}).listen(port, "127.0.0.1", () => console.error(`[proxy] 127.0.0.1:${port} -> ${upstream}, one call per ${minInterval} ms`));
+diff --git a/bench/eval/transcript-to-md.mjs b/bench/eval/transcript-to-md.mjs
+new file mode 100644
+index 0000000..099ecbe
+--- /dev/null
++++ b/bench/eval/transcript-to-md.mjs
+@@ -0,0 +1,33 @@
++#!/usr/bin/env node
++// Render a --mode json transcript (see run-eval.mjs --transcripts) as readable markdown.
++//   node bench/eval/transcript-to-md.mjs transcript.jsonl "task prompt" > demo.md
++import { readFileSync } from "node:fs";
++
++const [file, prompt] = process.argv.slice(2);
++if (!file) throw new Error("usage: transcript-to-md.mjs <transcript.jsonl> [prompt]");
++const events = readFileSync(file, "utf8").split("\n").flatMap((l) => {
++	try {
++		return [JSON.parse(l)];
++	} catch {
++		return [];
++	}
++});
++const out = [];
++if (prompt) out.push(`**You:** ${prompt}`, "");
++const text = (content) => content.filter((b) => b.type === "text").map((b) => b.text).join("").trim();
++for (const e of events) {
++	if (e.type === "message_end" && e.message?.role === "assistant") {
++		const t = text(e.message.content);
++		if (t) out.push(`**so:** ${t}`, "");
++	}
++	if (e.type === "tool_execution_start") {
++		const args = e.args ?? {};
++		const summary = e.toolName === "bash" ? args.command : e.toolName === "write" ? `${args.path} (${String(args.content ?? "").length} chars)` : e.toolName === "edit" ? args.path : (args.path ?? JSON.stringify(args));
++		out.push(`\`${e.toolName}\` ${e.toolName === "bash" ? "`" + summary + "`" : summary}`, "");
++	}
++	if (e.type === "tool_execution_end") {
++		const t = text(e.result?.content ?? []);
++		out.push(`> ${e.isError ? "error: " : ""}${t.split("\n").slice(0, 6).join("\n> ").slice(0, 600)}`, "");
++	}
++}
++process.stdout.write(`${out.join("\n").trim()}\n`);
 diff --git a/bench/interactive.mjs b/bench/interactive.mjs
 new file mode 100644
 index 0000000..4afd66f
@@ -2256,10 +4773,10 @@ index 0000000..f234b25
 +}
 diff --git a/docs/EFFICIENCY.md b/docs/EFFICIENCY.md
 new file mode 100644
-index 0000000..6a88de4
+index 0000000..13027b1
 --- /dev/null
 +++ b/docs/EFFICIENCY.md
-@@ -0,0 +1,99 @@
+@@ -0,0 +1,121 @@
 +# Efficiency work and fork changes
 +
 +This is the honest account of what the fork changed beyond renaming, what was tried and reverted, and what was measured.
@@ -2299,6 +4816,28 @@ index 0000000..6a88de4
 +- Deferring highlight.js language registration (12 ms of CPU in the profile): no measurable change in interactive
 +  start (357/350 vs 358/363 ms), so it was not kept.
 +- Lazy interactive-mode import in the interactive path: neutral.
++
++## Real-model eval (so 0.0.2 vs the upstream baseline)
++
++Local Qwen3-4B-Instruct-2507 (Q4_K_M) through llama.cpp, same prompts and tasks for both builds, 3 runs per task, `--max-tokens 1024`. Raw results are in `bench/eval/results/`, merged with `bench/eval/summarize.mjs`.
++
++| Task | Upstream | so |
++|---|---|---|
++| fix-off-by-one | 2/3 | 1/3 |
++| add-function | 0/3 | 0/3 |
++| count-todos | 0/3 | 0/3 |
++| create-config | 3/3 | 3/3 |
++| create-fizzbuzz | 3/3 | 3/3 |
++| change-default-port | 3/3 | 3/3 |
++| edit-package-json | 0/3 | 2/3 |
++| count-errors-large-log | 0 valid | 0 valid |
++| **Total** | 11/21 | 12/21 |
++
++Turns: so 88, upstream 61. Wall time: so 1596 s, upstream 935 s. Both are most likely sampling noise (the two builds send the same prompt apart from the name) but this was not verified with more runs.
++
++Caveats: n is tiny; a 4B model is weak and sampling is stochastic; some runs were invalid (a llama.cpp OOM kill) and are excluded; the large-log task exceeds the 20k context used, so it has no valid run; `--max-tokens 1024` truncates the model's many parallel tool calls identically for both builds. Treat this as a regression check (so is not worse by a margin visible at this n), not as an improvement claim. A hosted-model run with more tasks and runs is the next useful measurement.
++
++An earlier attempt through a free anonymous gateway produced the inconclusive file `bench/eval/results/pollinations-gpt-oss-20b-inconclusive.json`; that gateway sent tool-call arguments under a wrong index, which led to the 0.0.2 client fix, and returned frequent 5xx errors.
 +
 +## Kept changes (all lossless)
 +
@@ -2418,6 +4957,118 @@ index 0000000..93857fe
 +A receiving endpoint has to be provided by the project owner. Until then so agent sends nothing. Related variables are
 +in `packages/coding-agent/docs/environment-variables.md`; the other upstream services so can call are in
 +`docs/UPSTREAM-ENDPOINTS.md`.
+diff --git a/docs/UPSTREAM-CONTRIBUTING.md b/docs/UPSTREAM-CONTRIBUTING.md
+new file mode 100644
+index 0000000..e43ac1d
+--- /dev/null
++++ b/docs/UPSTREAM-CONTRIBUTING.md
+@@ -0,0 +1,106 @@
++# Upstream contributing guide (Pi), kept for reference
++
++This is the upstream project's guide with names changed. so agent's own guide is [CONTRIBUTING.md](../CONTRIBUTING.md); the contribution gate, Discord link and `lgtm` commands below do not apply to this fork.
++
++> so agent is a fork of Pi ([ATTRIBUTION.md](ATTRIBUTION.md)). This guide is upstream's, with names changed. The contribution gate and Discord link are inherited and belong to the upstream project until the fork's owner adapts them; the gate workflows are disabled (see [.github/workflows/DISABLED.md](.github/workflows/DISABLED.md)).
++
++This guide exists to save both sides time.
++
++## Philosophy
++
++First things first: **so's core is minimal**.
++
++If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
++
++So's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.
++
++## The One Rule
++
++**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
++
++Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
++
++If you use an agent, run it from the `so` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
++
++## Contribution Gate
++
++All issues and PRs from new contributors are auto-closed by default.
++
++Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx
++
++Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.
++
++Approval happens through maintainer replies on issues:
++
++- `lgtmi`: your future issues will not be auto-closed
++- `lgtm`: your future issues and PRs will not be auto-closed
++
++The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.
++
++## Quality Bar For Issues
++
++If you open an issue, you must use one of the two GitHub issue templates.
++
++If you open an issue, keep it short, concrete, and worth reading.
++
++- Keep it concise. If it does not fit on one screen, it is too long.
++- Write in your own voice (do not use an LLM to generate text, if you must, follow up with a clearly AI labeled comment).
++- State the bug or request clearly.
++- Explain why it matters.
++- If you want to implement the change yourself, say so.
++
++If the issue is real and written well, a maintainer may reopen it or reply with `lgtmi` or `lgtm` in the command position described above.
++
++## Blocking
++
++If you ignore this document twice, or if you spam the tracker with agent-generated issues, your GitHub account will be permanently blocked.
++
++If you send a large volume of issues through automation, your GitHub account will be permanently blocked. No taksies backsies.
++
++## Before Submitting a PR
++
++Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.
++
++Before submitting a PR:
++
++```bash
++npm run check
++./test.sh
++```
++
++Both must pass.
++
++Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
++
++If you are adding a new provider to `packages/ai`, see `AGENTS.md` for required tests.
++
++## Questions?
++
++Ask on [Discord](https://discord.com/invite/nKXTsAcmbT).
++
++## FAQ
++
++### Why are new issues and PRs auto-closed?
++
++so receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
++
++### Why are weekend issues lower priority?
++
++We triage the tracker during working hours. That means more issues can accumulate over the weekend. Anything submitted Friday through Sunday may be missed or given lower priority in the Monday review queue. If a problem is urgent, ask on Discord and include the short version, a repro, and the relevant logs.
++
++### Why do some issues get no reply?
++
++A reply is maintenance work too. Low-signal issues, unclear reports, duplicates, and issues that do not follow this guide may be closed without discussion. This keeps time available for reproducible bugs, thoughtful requests, and contributors who have done the work to make their report actionable.
++
++### Why not let AI triage everything?
++
++AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.
++
++### Is this hostile to contributors?
++
++No. It is a guardrail against burnout and tracker spam. Short, concrete, reproducible issues are welcome. Thoughtful contributions are welcome. Automated slop, entitlement, and large volumes of low-effort reports are not.
++
++## Where can I learn about plans?
++
++Earendil uses RFCs to discuss larger changes.  Not all of them are public, but
++quite a few are.  They can be found at [rfc.earendil.com](https://rfc.earendil.com/keyword/pi/).
 diff --git a/docs/UPSTREAM-ENDPOINTS.md b/docs/UPSTREAM-ENDPOINTS.md
 new file mode 100644
 index 0000000..fbe5292
@@ -2445,6 +5096,44 @@ index 0000000..fbe5292
 +
 +`scripts/model-catalog-protocol.ts` is the wire protocol shared with the upstream server and keeps the upstream names
 +(`pi-version`, `pi/<version>`).
+diff --git a/docs/UPSTREAM-README-SECTIONS.md b/docs/UPSTREAM-README-SECTIONS.md
+new file mode 100644
+index 0000000..8b487ab
+--- /dev/null
++++ b/docs/UPSTREAM-README-SECTIONS.md
+@@ -0,0 +1,32 @@
++# Sections of the upstream Pi README that do not apply to so agent
++
++These sections were removed from `README.md` because they speak for the upstream Pi project or describe its
++services. They are kept here verbatim (names changed by the rename codemod) so nothing is lost. "I" in the text is
++Mario Zechner, Pi's author, not the maintainers of so agent.
++
++## Run with Nix (upstream)
++
++`nix run github:earendil-works/pi/stable` in the upstream README runs **Pi**. so agent has not tested its flake; the Nix
++build files are inherited (see `nix/` and `flake.nix`).
++
++## Share your OSS coding agent sessions
++
++If you use So or other coding agents for open source work, please share your sessions.
++
++Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks.
++
++For the full explanation, see [this post on X](https://x.com/badlogicgames/status/2037811643774652911).
++
++To publish sessions, use [`badlogic/so-share-hf`](https://github.com/badlogic/pi-share-hf). Read its README.md for setup instructions. All you need is a Hugging Face account, the Hugging Face CLI, and `so-share-hf`.
++
++You can also watch [this video](https://x.com/badlogicgames/status/2041151967695634619), where I show how I publish my `so-agent` sessions.
++
++I regularly publish my own `so-agent` work sessions here:
++
++- [badlogicgames/pi-mono on Hugging Face](https://huggingface.co/datasets/badlogicgames/pi-mono)
++
++
++
++## Footer (upstream)
++
++pi.dev domain graciously donated by exe.dev.
 diff --git a/docs/VERSIONING.md b/docs/VERSIONING.md
 new file mode 100644
 index 0000000..430273b
@@ -2474,6 +5163,64 @@ index 0000000..430273b
 +Releasing: bump with `npm run version:patch|minor|major` (upstream's script, which also runs `sync-versions`), add a
 +`## [x.y.z]` entry above `[1.4.0]` in the changelog (required: the startup "what's new" and the install report only fire when the changelog has an entry newer than the last version seen), regenerate the install lock
 +(`node scripts/generate-coding-agent-install-lock.mjs`).
+diff --git a/docs/demo.md b/docs/demo.md
+new file mode 100644
+index 0000000..8ebc6a9
+--- /dev/null
++++ b/docs/demo.md
+@@ -0,0 +1,52 @@
++# A recorded session
++
++Two real runs of so 0.0.2 against a **local Qwen3-4B-Instruct (Q4) model served by llama.cpp** on an 8-vCPU CPU-only box, no cloud model involved. They come from the eval harness in `bench/eval` (task files and checks are in `bench/eval/tasks.mjs`); the transcripts were rendered with `bench/eval/transcript-to-md.mjs`. Nothing was edited except line wrapping. A 4B model is weak; this shows the tool loop, not what a frontier model does with so. In the same eval so and the upstream baseline passed about the same share of tasks (12 of 21 vs 11 of 21 valid runs) (see `docs/EFFICIENCY.md`).
++
++## Two files changed (22 s)
++
++**You:** Change the default server port from 3000 to 8080 in config.js and update the README so it states the new default. Change nothing else.
++
++`read` config.js
++
++`read` README.md
++
++> export const config = {
++>   host: "localhost",
++>   port: 3000,
++> };
++
++> # App
++> 
++> The server listens on port 3000 by default.
++
++`edit` config.js
++
++`edit` README.md
++
++> Successfully replaced 1 block(s) in config.js.
++
++> Successfully replaced 1 block(s) in README.md.
++
++**so:** I've updated both files as requested:
++
++1. Changed the default port in `config.js` from 3000 to 8080
++2. Updated the README to reflect the new default port
++
++Both changes are complete and accurate. The server now listens on port 8080 by default, as stated in the README.
++
++## Create a file from a spec (22 s)
++
++**You:** Create fizzbuzz.js (ES module) exporting fizzbuzz(n): returns 'FizzBuzz' for multiples of 15, 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, otherwise the number as a string.
++
++`write` fizzbuzz.js (191 chars)
++
++> Successfully wrote to fizzbuzz.js
++
++**so:** Created `fizzbuzz.js` as an ES module that exports the `fizzbuzz(n)` function, which returns 'FizzBuzz' for multiples of 15, 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, and the number as a string otherwise.
++
++## Record your own
++
++```bash
++node bench/eval/run-eval.mjs --build so=$PWD/packages/coding-agent/dist/bundle/cli.js:SO --base-url http://127.0.0.1:8081/v1 --model <model> --tasks create-fizzbuzz --transcripts out/
++node bench/eval/transcript-to-md.mjs out/so-create-fizzbuzz-r0-a1.jsonl "<prompt>"
++```
 diff --git a/package-lock.json b/package-lock.json
 index 9fa0552..d80f622 100644
 --- a/package-lock.json

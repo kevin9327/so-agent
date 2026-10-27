@@ -1,87 +1,99 @@
-# Efficiency work
+# Efficiency work and fork changes
 
-Baseline: upstream Pi at commit `6c384aa` (1.4.0), built with the same Node and run on the same machine as so agent.
-All numbers come from `bench/run.mjs` (see [bench/README.md](../bench/README.md)) against a local mock provider
-unless stated otherwise. Machine: 8 vCPU Linux box, Node v22.23.4, warm disk cache, compile cache enabled.
-`node -e 0` takes 19 ms here, which is the floor for any Node CLI.
+This is the honest account of what the fork changed beyond renaming, what was tried and reverted, and what was measured.
+The first pass of this work traded capability for speed (a shorter system prompt, shorter tool descriptions, network
+features switched off, files deleted). That was the wrong trade and most of it was reverted. The rule now: nothing that
+removes functionality, model guidance, docs or user-facing behavior stays unless it is purely the rename or fixes a
+fork-specific problem (the fix is then described below).
+
+Reproduce every number with `bench/` (see `bench/README.md`). Upstream baseline: Pi 1.4.0 at `6c384aa`, built unchanged.
+Machine: 8 vCPU Linux box, Node 22.23.4, mock OpenAI-compatible provider on localhost, medians of 31 cold runs after one
+warm-up, two interleaved rounds.
 
 ## Results
 
-| Metric | Upstream Pi | so agent | Change |
+| Metric | Upstream Pi 1.4.0 | so agent | Reading |
 |---|---|---|---|
-| `--version` wall time (median of 40) | 167 ms | 24 ms | -86% (7x) |
-| Fixed prompt prefix per model turn, o200k tokens (system prompt + 4 tool schemas) | 1205 | 974 | -19% |
-| System prompt characters | 2682 | 1890 | -30% |
-| Tool schema characters | 2841 | 2509 | -12% |
-| npm tarball (`npm pack`) packed / unpacked | 7.70 MB / 23.7 MB | 4.16 MB / 15.8 MB | -46% / -34% |
-| Process start to first provider request (median of 41, two rounds) | 236 / 231 ms | 227 / 228 ms | about -3% (near noise) |
-| Print-mode run, 3 turns (median of 41, two rounds) | 319 / 313 ms | 306 / 306 ms | about -3% |
-| Peak RSS, print mode | 122 MiB | 117 MiB | -4% |
-| Bundle size (`dist/bundle`) | 9.0 MiB | 9.0 MiB | none |
+| `--version` | 171.5 ms | 23.5 ms | Floor: `node -e 0` is 20.7 ms. The launcher answers without loading the application. |
+| Print mode, process start to first provider request | 234 / 238 ms | 235 / 238 ms | No change. Startup is about 150 ms of module evaluation and compile, 34 ms of `main()`, and 20 ms of Node itself. |
+| Print mode, whole 3-turn run | 315 / 319 ms | 315 / 318 ms | No change. |
+| Print mode, CPU time (user + system) | 396 / 401 ms | 393 / 400 ms | No change. |
+| Print mode, peak RSS | 122 MiB | 117 MiB | -5 MiB (-4%): the interactive UI module graph is no longer evaluated in print and RPC runs. |
+| Interactive TUI, first byte / screen settled | 219 / 357 ms and 212 / 350 ms | 219 / 358 ms and 224 / 363 ms | No change. |
+| System prompt, tool schemas, tool descriptions | 2682 chars, 2841 chars | same text, with the names changed (2655 chars) | Not touched. |
+| Request prefix stability across turns | n/a | stable | Every request starts with the previous request's tools, system prompt and messages byte for byte (`promptPrefixBreak: null`), so provider prompt caches work. Upstream's request has the same property. |
+| npm tarball | 7.70 MB packed, 23.7 MB unpacked | 7.71 MB, 23.7 MB | Unchanged (the first pass shrank it by dropping sourcemaps and images; reverted). |
 
-The prompt measurement includes a few characters of path length difference (the upstream checkout path is
-longer); it is under 30 characters. Tokens were counted with `gpt-tokenizer` (o200k_base) on the real request bodies.
+What limits these numbers. Wall time and CPU are dominated by evaluating and compiling the bundled module graph at start
+(the compile cache already saves about 58 ms; the cpu profile shows the time spread flat over the model catalog, the
+schema library, undici, the TUI and markdown libraries, with no single module above about 25 ms). Lazy mode loading
+therefore moves work around without removing it: print mode skips the interactive graph, which shows up as memory, not
+time. The only large win is the one that skips the application entirely (`--version`).
 
-## What each change does, and what limits the number
+The honest conclusion: upstream was already tuned (lazy chunks, compile cache, graph budgets enforced by
+`npm run check`, section-patch system prompts, truncated tool output with notes, provider cache markers). The lossless
+headroom that remains at startup is single-digit milliseconds per item. I measured and dropped these:
 
-### 1. Condensed fixed prompt (-231 tokens on every turn)
+- Deferring highlight.js language registration (12 ms of CPU in the profile): no measurable change in interactive
+  start (357/350 vs 358/363 ms), so it was not kept.
+- Lazy interactive-mode import in the interactive path: neutral.
 
-The prefix is resent on every turn, so every token saved is saved on every model call (provider prompt caching
-makes repeated prefix tokens cheaper, not free, and the first call and every cache miss pay full price).
+## Kept changes (all lossless)
 
-- The `<docs>` section listed a file for each of 13 topics in prose, about 1250 characters, although the model reads
-  it only when asked about the harness itself. It is now three lines that name the same files by pattern
-  (`docs/<topic>.md`) and keep the three behavioral rules: resolve paths against the docs root, read completely,
-  follow cross-references.
-- The edit tool stated the "match the original file, do not overlap, merge nearby changes" rule up to six times: in
-  four system rules, the tool description and two parameter descriptions. It now states it in the tool
-  description and parameter descriptions (where the model sees it next to the schema) and in two short rules.
+| Change | Where | Evidence |
+|---|---|---|
+| `so --version` / `-v` answers from the launcher | `scripts/build-coding-agent-bundle.mjs` | 171.5 -> 23.5 ms. Only when it is the sole argument and `SO_PACKAGE_DIR` is not set; everything else takes the normal path. `scripts/cli-launcher.test.mjs` checks the output equals the full path's output and that other invocations load the runtime. |
+| Run modes imported on demand | `packages/coding-agent/src/main.ts` | RSS 122 -> 117 MiB. `scripts/cli-launcher.test.mjs` runs a real print-mode turn against the mock provider with a module resolution hook and asserts the `interactive-mode` chunk is never loaded. |
+| Benchmarks | `bench/` | `run.mjs` (start, CPU, RSS, per-turn payload, prompt-prefix stability), `interactive.mjs` (TUI start in a pty), `mock-server.mjs`. |
+| Catalog protocol pin | `remote-catalog-provider.ts` | so sends `pi-version=1.4.0` itself (`CATALOG_PROTOCOL_VERSION`). The server picks the revision a client can read from that parameter and only redirects clients that announce `pi/<version>`; so announces `so/<version>`, so without the pin it would get whatever revision is newest. Test: `model-catalog-protocol.test.ts`. |
 
-What limits it: the remaining 974 tokens are the tool schemas (547) and the rules that change behavior. The
-read, bash and write descriptions and the four rule bullets are already short; cutting more removes information, not
-repetition. Risk: this is a prompt change. I could not run a model-quality evaluation here, so edit accuracy on real
-models is unverified. `test/system-prompt.test.ts` pins a size budget and the single statement of the edit rule.
+## Audit of the first pass: keep, restore, or replace
 
-### 2. `so --version` skips the application (-143 ms)
+| Earlier change | Verdict | What it is now, and why |
+|---|---|---|
+| Codemod renames (content, paths, env, scopes) | **Keep** | Pure rename. |
+| Codemod deleted 12 items: issue templates, `APPROVED_CONTRIBUTORS`, 8 workflows, `scripts/issues/` | **Restore** (workflows: **replace**) | Everything is back. The 8 governance/publishing workflows are renamed to `*.yml.disabled` (`.github/workflows/DISABLED.md`): they use `github.repository`, so in a fork they would auto-close issues against upstream's contributor list, check upstream's staff team, and publish to upstream's infrastructure. Re-enable one by renaming it back after adapting it. `scripts/rename-codemod.test.mjs` pins this. |
+| Codemod deduplicated the `@earendil-works/pi-*` and `@mariozechner/pi-*` import aliases | **Restore** | Pi extensions import those names. The loader, virtual modules, resource loader, coding-agent vitest config and the theme's old global key keep them as keys next to `@so-agent/*`, so existing Pi extensions load unchanged. Test: `scripts/rename-codemod.test.mjs`; upstream's own `11156-*-virtual-module` test still passes. |
+| Removed the announcement component and `/dementedelves` | **Restore** | Back, with its text made accurate ("Pi, the project so agent is based on, has joined Earendil"); the blog link is unchanged. |
+| Condensed system prompt (2682 -> 1890 chars) | **Restore** | Prompt quality was never evaluated on real models. Back to upstream's wording. |
+| Condensed tool descriptions (edit tool) | **Restore** | Same. |
+| Prompt size-budget test, boundaries-test fixture bump | **Drop** | They only existed for the shorter prompt. |
+| Update feed off unless `SO_UPDATE_URL` | **Replace** | On by default again, as upstream. The upstream feed would offer, and `so update --self` would install, Pi (its answer carries Pi's package name). The default feed is now the npm registry entry of the installed package, which stays silent (404) until the package is published. `SO_UPDATE_URL` restores the upstream-style feed; `SO_SKIP_VERSION_CHECK` / `SO_OFFLINE` turn it off. Tests: `version-check.test.ts`. |
+| Remote model catalog off unless `SO_CATALOG_URL` | **Restore** | On by default (`https://pi.dev`), as upstream, plus `SO_CATALOG_URL` to change the host and `SO_CATALOG_URL=off` to disable. Tests: `network-defaults.test.ts`, `model-catalog-protocol.test.ts`. |
+| Install ping removed | **Replace** | Code, setting (`enableInstallTelemetry`, `SO_TELEMETRY`) and docs are back. The endpoint is `SO_INSTALL_REPORT_URL` with no default: the upstream counter would count so installs as Pi installs. Open question for you. Test: `network-defaults.test.ts`. |
+| Post-update installer hint removed | **Replace** | Hint is back, printed only when `SO_INSTALLER_URL` / `SO_INSTALLER_PS1_URL` name an so installer (upstream's installer installs Pi). |
+| "Could not determine latest version" message | **Keep (improved)** | Names the URL it looked at and `SO_UPDATE_URL`. |
+| `--version` launcher fast path | **Keep** | See above; added the `SO_PACKAGE_DIR` guard and equivalence tests. |
+| Lazy mode imports in `main.ts` | **Keep** | See above; added the real print-mode test. |
+| Sourcemaps and `docs/images` left out of the npm tarball | **Restore** | The bundle is minified; without maps `--enable-source-maps` stack traces are useless. Tarball back to upstream's contents. |
+| README, CONTRIBUTING, coding-agent README, quickstart rewritten | **Restore** | Upstream text with the names changed, plus a short fork notice at the top of README, CONTRIBUTING and the coding-agent README (the installer URLs in them install Pi, not so, and the npm packages are not published). Pictures still show Pi's logo: replace later. |
+| SECURITY.md contact | **Keep** | Upstream's security mailbox would receive reports about the fork. It is kept as a pointer for issues in inherited code. |
+| CHANGELOG fork notice | **Keep** | Additive. |
+| `APP_TITLE` and the easter-egg logo changed from the pi symbol to "so" | **Keep** | Branding. |
+| `SO_ATTRIBUTION.url` (OpenRouter `HTTP-Referer`) | **Keep** | Credits the so repository (placeholder `kevin9327/so-agent`) instead of Pi's site. |
+| `repository.url` in 11 `package.json` files | **Keep** | Points at the placeholder so-agent repository instead of upstream. |
+| Biome import/line-wrap fixes, `install-lock` duplicate-key cleanup, `legacy-ai` test key | **Keep** | Mechanical consequences of the rename (`rename/patches/0001`). |
+| Test edits made for the removed behavior | **Replace** | Reverted to upstream's tests where the behavior is restored; new tests added for every kept or replaced change. |
+| `docs/UPSTREAM-ENDPOINTS.md` | **Rewrite** | Lists each upstream URL and what so does with it. |
 
-The bundle launcher now prints the version from `package.json` when `--version` or `-v` is the only argument and
-falls back to the normal path otherwise. Before, it evaluated the whole 12 MB module graph first. What limits it: 19 ms
-Node boot plus a small `package.json` read. Covered by `scripts/cli-launcher.test.mjs`, which checks that the
-runtime is not loaded for `--version` and is loaded for everything else.
+## Tests
 
-### 3. Modes load on demand (-5 MiB RSS, a few ms)
+Full `./test.sh` with `fd` on PATH and Node 22.23.4, compared with the unmodified upstream checkout:
 
-`main.ts` imported the interactive UI, print mode and RPC mode statically. Each is now imported when its mode runs,
-so print and RPC runs do not evaluate `interactive-mode.ts`. The gain is small because the TUI library and the
-built-in tool renderers are still needed in every mode.
+| | Upstream Pi 1.4.0 | so agent |
+|---|---|---|
+| coding-agent (vitest) | 2766 passed, 1 failed, 50 skipped | 2774 passed, 1 failed, 50 skipped |
+| root scripts (`node:test`) | 49 passed | 56 passed (new: codemod, launcher, print-mode laziness) |
+| everything else (agent, ai, tui, codemode, mcp, chord, durable, evals, telemetry) | passes | passes |
+| failures | `auth-storage.test.ts` "keeps a coalesced reload alive...", and six `packages/env` suites that need the Rust daemon (`npm run build:daemon`) | the same seven, and only those |
 
-What limits startup (profile of the upstream bundle, 195 ms with profiler overhead): about 19 ms Node boot, about
-150 ms evaluating the module graph (ESM compilation 21 ms, TUI/highlight/markdown top level 27 ms, core and model
-data 11 ms, GC 10 ms, the rest spread over many modules), and 34 ms in `main()` (28 ms to create the session runtime).
-The compile cache already saves 58 ms (226 ms without it). Removing more needs a different structure (a V8 startup
-snapshot or splitting the TUI out of non-interactive runs), which I did not attempt.
+The `auth-storage` failure is environmental: the cache key for `auth.json` is `dev:ino:size:mtimeNs:ctimeNs`, and on
+ext4 the timestamps move in 4 ms ticks, so two writes of the same size in one tick look identical. It does not fail on
+filesystems with nanosecond timestamps. Left as is: a fix would change upstream's caching semantics, which other tests
+depend on.
 
-### 4. Smaller npm tarball (-3.5 MB packed, -7.9 MB unpacked)
+## Unverified
 
-`files` now excludes `dist/**/*.map` (5.5 MB of sourcemaps for the unbundled build) and `docs/images` (2.9 MB of
-documentation screenshots). Docs, examples, the changelog, schemas and runtime assets still ship.
-`scripts/package-contents.test.mjs` pins this. What limits it: the 9 MB bundle (about 3 MB is generated model data and
-provider SDKs) and the unbundled `dist/` that SDK users import.
-
-## Not changed
-
-- Bundle size and startup of the TUI path: see above.
-- Tool output limits (2000 lines / 50 KB) and compaction: changing them changes behavior, not just cost.
-- Provider cache hints: untouched. Verifying them needs live provider calls.
-- Upstream network calls at startup (update check, remote model catalog, install ping) are now off by default. That
-  was a decoupling decision, not a measured gain: they run in the background, so they did not delay the first request.
-
-## Reproduce
-
-```bash
-git clone --depth 1 https://github.com/earendil-works/pi /tmp/pi-baseline   # read-only
-(cd /tmp/pi-baseline && npm ci --ignore-scripts && npm run build)
-npm ci --ignore-scripts && npm run build
-node bench/run.mjs --cli /tmp/pi-baseline/packages/coding-agent/dist/bundle/cli.js --prefix PI --runs 41 --label upstream
-node bench/run.mjs --cli "$PWD/packages/coding-agent/dist/bundle/cli.js" --prefix SO --runs 41 --label so
-```
+- Performance on a real provider and network (all numbers use a localhost mock). Startup numbers are from one machine.
+- Whether `https://pi.dev` keeps serving so's `so/<version>` user agent; the pin was checked against the live server once.
+- The npm registry default for updates has not run against a published `@so-agent/coding-agent` (the package does not exist yet).

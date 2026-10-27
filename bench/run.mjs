@@ -7,7 +7,10 @@ import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { startMockServer } from "./mock-server.mjs";
+
+const cpuPreload = fileURLToPath(new URL("./cpu-preload.mjs", import.meta.url));
 
 const arg = (n, d) => {
 	const i = process.argv.indexOf(`--${n}`);
@@ -62,10 +65,12 @@ async function once() {
 		[`${prefix}_OFFLINE`]: "1",
 		[`${prefix}_SKIP_VERSION_CHECK`]: "1",
 		[`${prefix}_TELEMETRY`]: "0",
+		BENCH_CPU_FILE: join(home, "cpu.txt"),
 		...JSON.parse(process.env.BENCH_EXTRA_ENV ?? "{}"),
 	};
+	writeFileSync(env.BENCH_CPU_FILE, "");
 	const t0 = performance.now();
-	const child = spawn(process.execPath, [...(process.env.BENCH_NODE_ARGS ?? "").split(" ").filter(Boolean), cli, "-p", "--provider", "mock", "--model", "m", "--no-session", "--no-extensions", "run the commands", "--mode", "text"], { cwd: project, env, stdio: ["ignore", "pipe", "pipe"] });
+	const child = spawn(process.execPath, ["--import", cpuPreload, ...(process.env.BENCH_NODE_ARGS ?? "").split(" ").filter(Boolean), cli, "-p", "--provider", "mock", "--model", "m", "--no-session", "--no-extensions", "run the commands", "--mode", "text"], { cwd: project, env, stdio: ["ignore", "pipe", "pipe"] });
 	let peak = 0;
 	const poll = setInterval(() => (peak = Math.max(peak, readRss(child.pid))), 20);
 	let firstReq;
@@ -86,7 +91,8 @@ async function once() {
 	const total = performance.now() - t0;
 	srv.server.close();
 	const reqs = readFileSync(logFile, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
-	return { code, out, firstReq, total, peak, reqs };
+	const cpu = readFileSync(env.BENCH_CPU_FILE, "utf8").split("\n").filter(Boolean).map(Number).reduce((a, b) => a + b, 0);
+	return { code, out, firstReq, total, peak, reqs, cpu };
 }
 
 server.close();
@@ -111,14 +117,30 @@ const turn = (r) => {
 		messageChars: JSON.stringify(b.messages.filter((m) => m.role !== "system" && m.role !== "developer")).length,
 	};
 };
+// Prompt-cache friendliness: every request must start with the previous request's tools, system prompt and messages,
+// byte for byte, so providers can reuse the cached prefix. Reports the first turn that breaks the prefix, or null.
+function firstPrefixBreak(reqs) {
+	for (let i = 1; i < reqs.length; i++) {
+		const prev = reqs[i - 1].body;
+		const cur = reqs[i].body;
+		const strip = (b) => JSON.stringify({ ...b, messages: undefined, stream_options: undefined });
+		if (strip(prev) !== strip(cur)) return { turn: i + 1, why: "request parameters or tools changed" };
+		for (let m = 0; m < prev.messages.length; m++) {
+			if (JSON.stringify(prev.messages[m]) !== JSON.stringify(cur.messages[m])) return { turn: i + 1, why: `message ${m} changed` };
+		}
+	}
+	return null;
+}
 if (process.env.BENCH_SHOW_OUTPUT) console.error(ok[0].out);
 const summary = {
 	label,
 	runs: ok.length,
 	firstRequestMs: { median: Math.round(median(ok.map((r) => r.firstReq))), min: Math.round(Math.min(...ok.map((r) => r.firstReq))) },
 	totalMs: { median: Math.round(median(ok.map((r) => r.total))) },
+	cpuMs: { median: Math.round(median(ok.map((r) => r.cpu))) },
 	peakRssMiB: Math.round(median(ok.map((r) => r.peak))),
 	turns: first.map(turn),
+	promptPrefixBreak: firstPrefixBreak(first),
 };
 console.log(JSON.stringify(summary, null, 2));
 const jf = arg("json");

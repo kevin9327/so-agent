@@ -16,7 +16,10 @@ node bench/run.mjs --cli /path/to/other/checkout/packages/coding-agent/dist/bund
 - `firstRequestMs`: process spawn to the first byte of the first provider request. This is startup cost as a user
   would feel it before the model is even asked.
 - `totalMs`: whole print-mode run with three model turns (a `bash` call, a `read` call, then a text answer).
+- `cpuMs`: user + system CPU time of the CLI process (less noisy than wall time).
 - `peakRssMiB`: peak resident set size of the CLI process (`VmHWM`).
+- `promptPrefixBreak`: `null` when every request starts with the previous request's tools, system prompt and messages
+  byte for byte (what provider prompt caches need), otherwise the first turn that breaks it.
 - `turns[]`: for every model request, the request body size, system prompt characters, tool schema characters,
   tool count, and message characters.
 
@@ -25,3 +28,9 @@ tokenized with any tokenizer to turn characters into tokens.
 
 Other knobs: `BENCH_EXTRA_ENV='{"SO_TIMING":"1"}'`, `BENCH_NODE_ARGS="--cpu-prof --cpu-prof-dir=/tmp/prof"`,
 `BENCH_SHOW_OUTPUT=1`.
+
+`interactive.mjs` times the TUI start in a pseudo terminal (first output byte, and the moment the screen stops changing):
+
+```bash
+node bench/interactive.mjs --cli "$PWD/packages/coding-agent/dist/bundle/cli.js" --prefix SO --runs 15
+```

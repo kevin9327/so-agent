@@ -12,9 +12,9 @@
 import { mkdtemp, readdir, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BACKGROUND_CONTEXT as context } from "@earendil-works/chord/context";
-import { createModels } from "@earendil-works/pi-ai/models";
-import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@earendil-works/pi-ai/providers/faux";
+import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+import { createModels } from "@so-agent/ai/models";
+import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
 import { Type } from "typebox";
 import {
 	type Conversation,
@@ -36,7 +36,7 @@ type Scenario = {
 	depth: 1 | 2;
 	bytes: number;
 	gapMs: number;
-	/** Whether nested calls stream their running output to `pi.live`. */
+	/** Whether nested calls stream their running output to `so.live`. */
 	progress: boolean;
 	runs: number;
 };
@@ -92,7 +92,7 @@ function noWrites(): Written {
 }
 
 async function runScenario(scenario: Scenario): Promise<{ perRun: Run[]; closedBytes: number }> {
-	const directory = await mkdtemp(join(tmpdir(), "pi-durable-nested-bench-"));
+	const directory = await mkdtemp(join(tmpdir(), "so-durable-nested-bench-"));
 	try {
 		const faux = fauxProvider();
 		const models = createModels();

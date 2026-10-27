@@ -4,7 +4,7 @@ import { stream as streamAnthropic } from "../src/api/anthropic-messages.ts";
 import { stream as streamMistral } from "../src/api/mistral-conversations.ts";
 import { stream as streamOpenAICompletions } from "../src/api/openai-completions.ts";
 import { processResponsesStream } from "../src/api/openai-responses-shared.ts";
-import { stream as streamPiMessages } from "../src/api/pi-messages.ts";
+import { stream as streamSoMessages } from "../src/api/so-messages.ts";
 import { fauxAssistantMessage, fauxProvider, fauxToolCall } from "../src/providers/faux.ts";
 import type { AssistantMessage, AssistantMessageEvent, Model, TranscriptContext } from "../src/types.ts";
 import { AssistantMessageEventStream } from "../src/utils/event-stream.ts";
@@ -120,7 +120,7 @@ function* chatEvents(deltas: readonly string[], withIdEveryChunk: boolean): Gene
 	yield "data: [DONE]\n\n";
 }
 
-function* piMessagesEvents(deltas: readonly string[], args: object): Generator<string> {
+function* soMessagesEvents(deltas: readonly string[], args: object): Generator<string> {
 	yield sse({ type: "start" });
 	yield sse({ type: "toolcall_start", contentIndex: 0, id: "call_1", toolName: "write" });
 	for (const delta of deltas) yield sse({ type: "toolcall_delta", contentIndex: 0, delta });
@@ -288,19 +288,19 @@ const PATHS: readonly Path[] = [
 			),
 	},
 	{
-		name: "pi-messages",
+		name: "so-messages",
 		stream: (deltas, args) =>
-			streamPiMessages(
+			streamSoMessages(
 				{
 					...baseModel,
 					id: "auto",
 					name: "a",
-					api: "pi-messages",
+					api: "so-messages",
 					provider: "radius",
 					baseUrl: "https://example.test/v1",
 				},
 				context,
-				{ apiKey: "test", fetch: sseFetch(() => piMessagesEvents(deltas, args)) },
+				{ apiKey: "test", fetch: sseFetch(() => soMessagesEvents(deltas, args)) },
 			),
 	},
 	{

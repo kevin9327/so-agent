@@ -1,7 +1,7 @@
-import { type AssistantMessage, fauxAssistantMessage, fauxText, Type } from "@earendil-works/pi-ai";
-import { CodemodeSandbox } from "@earendil-works/pi-codemode";
-import { CODEMODE_SOURCE_GRAMMAR } from "@earendil-works/pi-codemode/source";
-import { defineTool, MemoryStorage, type ToolRegistration } from "@earendil-works/pi-durable";
+import { type AssistantMessage, fauxAssistantMessage, fauxText, Type } from "@so-agent/ai";
+import { CodemodeSandbox } from "@so-agent/codemode";
+import { CODEMODE_SOURCE_GRAMMAR } from "@so-agent/codemode/source";
+import { defineTool, MemoryStorage, type ToolRegistration } from "@so-agent/durable";
 import { describe, expect, it } from "vitest";
 import { createCodemodeExtension } from "../src/codemode/codemode.ts";
 import { type CodemodeNamespace, codemodeDescription, codemodeSection } from "../src/codemode/describe.ts";
@@ -79,7 +79,7 @@ describe("code mode description and section", () => {
 		setup.faux.setResponses([fauxAssistantMessage([fauxText("hi")]) as AssistantMessage]);
 		const { harness, root } = await openChat(new MemoryStorage(), setup);
 		await (await root.submit({ type: "input", content: "go" }, context)).wait(context);
-		const system = (await allEntries(root)).find((entry) => entry.kind === "pi.system")!;
+		const system = (await allEntries(root)).find((entry) => entry.kind === "so.system")!;
 		const sections = (system.model![0] as { sections?: Record<string, string> }).sections!;
 		expect(sections.codemode).toContain("### `read`");
 		expect(sections.codemode).toContain("### `mcp__github__list_issues`");
@@ -87,7 +87,7 @@ describe("code mode description and section", () => {
 		expect(sections.codemode).not.toContain("mcp__github__get_issue");
 		// The code mode tool itself is not callable from scripts.
 		expect(sections.codemode).not.toContain("### `codemode`");
-		// The tool declaration carries the script grammar; pi-ai applies it only for models that support it.
+		// The tool declaration carries the script grammar; so-ai applies it only for models that support it.
 		const tools = (system.model![0] as { toolsAdded?: { name: string; constrainedSampling?: unknown }[] })
 			.toolsAdded!;
 		expect(tools.find((candidate) => candidate.name === "codemode")?.constrainedSampling).toEqual({

@@ -1,14 +1,14 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import type { Context } from "@earendil-works/chord";
+import type { Context } from "@so-agent/chord";
 import {
 	type CommitPublication,
 	defineDoc,
 	MemoryStorage,
 	type Seq,
 	type StorageWrite,
-} from "@earendil-works/pi-durable";
+} from "@so-agent/durable";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { FileError, Result } from "../src/env/index.ts";
 import { NodeExecutionEnv } from "../src/env/node.ts";
@@ -316,7 +316,7 @@ describe("publication at adoption", () => {
 			scope: "session",
 			initial: () => ({ count: 0 }),
 		});
-		const directory = await mkdtemp(join(tmpdir(), "pi-durable-adoption-"));
+		const directory = await mkdtemp(join(tmpdir(), "so-durable-adoption-"));
 		const env = new RenameLog({ cwd: directory });
 		const session = new SessionImpl(await JsonlStorage.open(directory, env, context));
 		const count = () =>

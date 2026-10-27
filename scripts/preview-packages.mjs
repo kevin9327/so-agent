@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Preview builds of pi's packages on pkg.earendil.com, served by the earendil-works/pkg worker.
+// Preview builds of so's packages on pkg.earendil.com, served by the earendil-works/pkg worker.
 // Used by .github/workflows/ci.yml (pack) and .github/workflows/preview-packages.yml (publish, delete-ref).
 //
 //   pack        Point internal dependencies at this commit's builds, then `npm pack` every public package.
@@ -17,7 +17,7 @@ import { getPublicWorkspacePackages } from "./release-packages.mjs";
 const BASE_URL = "https://pkg.earendil.com";
 const FULL_SHA = /^[0-9a-f]{40}$/;
 // Its daemon binaries are cross-compiled only by the release workflow; previews would ship without them.
-const EXCLUDED = new Set(["@earendil-works/pi-env"]);
+const EXCLUDED = new Set(["@so-agent/env"]);
 
 class UsageError extends Error {}
 

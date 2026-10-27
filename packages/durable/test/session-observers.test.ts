@@ -1,8 +1,8 @@
 // Tests for `Session.observeDoc()`, the synchronous observer of one document address that watches are built on.
 import { setFlagsFromString } from "node:v8";
 import { runInNewContext } from "node:vm";
-import type { WatchChange } from "@earendil-works/chord";
-import { withAbortSignal } from "@earendil-works/chord/context";
+import type { WatchChange } from "@so-agent/chord";
+import { withAbortSignal } from "@so-agent/chord/context";
 import {
 	type ConversationId,
 	defineDoc,
@@ -10,7 +10,7 @@ import {
 	type Observation,
 	type Observer,
 	type ReportInfo,
-} from "@earendil-works/pi-durable";
+} from "@so-agent/durable";
 import { describe, expect, it } from "vitest";
 import { SessionImpl } from "../src/session/session.ts";
 import { ControlledStorage, context, createConversation, flush } from "./session-support.ts";

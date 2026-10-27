@@ -9,7 +9,7 @@ import {
 	DefaultResourceLoader,
 	getAgentDir,
 	SessionManager,
-} from "@earendil-works/pi-coding-agent";
+} from "@so-agent/coding-agent";
 
 const cwd = process.cwd();
 const agentDir = getAgentDir();
@@ -20,7 +20,7 @@ const loader1 = new DefaultResourceLoader({
 	agentDir,
 	systemPromptOverride: () => `You are a helpful assistant that speaks like a pirate.
 Always end responses with "Arrr!"`,
-	// Needed to avoid DefaultResourceLoader appending APPEND_SYSTEM.md from ~/.pi/agent or <cwd>/.pi.
+	// Needed to avoid DefaultResourceLoader appending APPEND_SYSTEM.md from ~/.so/agent or <cwd>/.so.
 	appendSystemPromptOverride: () => [],
 });
 await loader1.reload();

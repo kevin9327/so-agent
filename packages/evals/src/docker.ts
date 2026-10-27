@@ -36,7 +36,7 @@ function requireSuccess(command: string, args: readonly string[]): void {
 }
 
 export function buildImages(): BuiltImages {
-	const prefix = `pi-evals-${createHash("sha256").update(repositoryRoot).digest("hex").slice(0, 12)}`;
+	const prefix = `so-evals-${createHash("sha256").update(repositoryRoot).digest("hex").slice(0, 12)}`;
 	const images = {
 		without_docs: { name: `${prefix}-without-docs:local`, id: "" },
 		with_docs: { name: `${prefix}-with-docs:local`, id: "" },
@@ -66,7 +66,7 @@ function environment(name: string, value: string): string[] {
 
 export function requireEvalAuthFile(provider: string): string {
 	const path = join(
-		process.env.PI_CODING_AGENT_DIR ? resolve(process.env.PI_CODING_AGENT_DIR) : join(homedir(), ".pi", "agent"),
+		process.env.SO_CODING_AGENT_DIR ? resolve(process.env.SO_CODING_AGENT_DIR) : join(homedir(), ".so", "agent"),
 		"auth.json",
 	);
 	if (!existsSync(path) || !statSync(path).isFile())
@@ -105,20 +105,20 @@ function dockerArgs(
 		"/repo/node_modules/.vite-temp:rw,exec,mode=1777",
 		"--mount",
 		`type=bind,source=${outputDirectory},target=/artifacts`,
-		...environment("PI_EVAL_ARTIFACT_DIR", "/artifacts"),
-		...environment("PI_EVAL_RUNS_PER_VARIANT", String(context.runsPerVariant)),
-		...environment("PI_EVAL_SANDBOX_UID", "65532"),
-		...environment("PI_EVAL_SANDBOX_GID", "65532"),
-		...environment("PI_PROVIDER", context.provider),
-		...environment("PI_MODEL", context.model),
+		...environment("SO_EVAL_ARTIFACT_DIR", "/artifacts"),
+		...environment("SO_EVAL_RUNS_PER_VARIANT", String(context.runsPerVariant)),
+		...environment("SO_EVAL_SANDBOX_UID", "65532"),
+		...environment("SO_EVAL_SANDBOX_GID", "65532"),
+		...environment("SO_PROVIDER", context.provider),
+		...environment("SO_MODEL", context.model),
 	];
 	if (typeof process.getuid === "function" && typeof process.getgid === "function") {
 		args.push(
-			...environment("PI_EVAL_ARTIFACT_UID", String(process.getuid())),
-			...environment("PI_EVAL_ARTIFACT_GID", String(process.getgid())),
+			...environment("SO_EVAL_ARTIFACT_UID", String(process.getuid())),
+			...environment("SO_EVAL_ARTIFACT_GID", String(process.getgid())),
 		);
 	}
-	args.push("--mount", `type=bind,source=${context.authPath},target=/run/pi-eval-secrets/auth.json,readonly`);
+	args.push("--mount", `type=bind,source=${context.authPath},target=/run/so-eval-secrets/auth.json,readonly`);
 	args.push(context.images[variant].name, ...entrypointArgs);
 	return args;
 }

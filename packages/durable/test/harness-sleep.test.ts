@@ -9,7 +9,7 @@ import {
 	type Storage,
 	type TaskId,
 	type Wake,
-} from "@earendil-works/pi-durable";
+} from "@so-agent/durable";
 import { afterEach, describe, expect, it } from "vitest";
 import { openNodeSqliteStorage } from "../src/storage/sqlite/node.ts";
 import { context, flush } from "./session-support.ts";
@@ -23,7 +23,7 @@ afterEach(async () => {
 });
 
 async function sqlitePath(): Promise<string> {
-	const directory = await mkdtemp(join(tmpdir(), "pi-durable-sleep-"));
+	const directory = await mkdtemp(join(tmpdir(), "so-durable-sleep-"));
 	directories.add(directory);
 	return join(directory, "session.sqlite");
 }

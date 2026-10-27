@@ -1,8 +1,8 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { JsonValue } from "@earendil-works/chord";
-import { withAbortSignal } from "@earendil-works/chord/context";
+import type { JsonValue } from "@so-agent/chord";
+import { withAbortSignal } from "@so-agent/chord/context";
 import {
 	type AssistantMessage,
 	fauxAssistantMessage,
@@ -11,7 +11,7 @@ import {
 	type ToolResultMessage,
 	Type,
 	type Usage,
-} from "@earendil-works/pi-ai";
+} from "@so-agent/ai";
 import {
 	type AgentEvent,
 	AssistantEntry,
@@ -31,7 +31,7 @@ import {
 	type ToolTaskResult,
 	UsageDoc,
 	watchEvents,
-} from "@earendil-works/pi-durable";
+} from "@so-agent/durable";
 import { afterEach, describe, expect, it } from "vitest";
 import { openNodeSqliteStorage } from "../src/storage/sqlite/node.ts";
 import { allEntries, type ChatSetup, chatSetup, openChat } from "./chat-support.ts";
@@ -123,7 +123,7 @@ describe("nested tool calls", () => {
 		};
 		const { harness, root } = await openChat(storage, setup);
 		await (await root.submit({ type: "input", content: "go" }, context)).wait(context);
-		const nested = written.filter((write) => write.kind.startsWith("pi.tool."));
+		const nested = written.filter((write) => write.kind.startsWith("so.tool."));
 		expect(nested).toEqual([
 			{ kind: NestedCallDoc.definition.kind, key: "1" },
 			{ kind: NestedCallDoc.definition.kind, key: "named" },
@@ -429,7 +429,7 @@ describe("nested tool calls", () => {
 		await harness.close(context);
 	});
 
-	it("reports nested calls in pi.live.nestedTools and as tool events with their parent", async () => {
+	it("reports nested calls in so.live.nestedTools and as tool events with their parent", async () => {
 		const setup = chatSetup();
 		const release = deferred();
 		const running = deferred();
@@ -566,7 +566,7 @@ describe("nested tool calls", () => {
 	});
 
 	it("reattaches a replay-safe caller to the nested calls it made before a restart", async () => {
-		const directory = await mkdtemp(join(tmpdir(), "pi-durable-nested-"));
+		const directory = await mkdtemp(join(tmpdir(), "so-durable-nested-"));
 		directories.add(directory);
 		const path = join(directory, "session.sqlite");
 		const setup = chatSetup();
@@ -668,7 +668,7 @@ describe("nested tool calls", () => {
 	});
 
 	it("aborts left-running nested calls of a caller interrupted while it cleaned them up", async () => {
-		const directory = await mkdtemp(join(tmpdir(), "pi-durable-nested-"));
+		const directory = await mkdtemp(join(tmpdir(), "so-durable-nested-"));
 		directories.add(directory);
 		const path = join(directory, "session.sqlite");
 		const setup = chatSetup();
@@ -1279,7 +1279,7 @@ describe("tool task version 1 records", () => {
 	 * `{ assistant, callId }` input at version 1, with `checkpoint`. Returns the storage path and the task ID.
 	 */
 	async function storeVersion1(setup: ChatSetup, checkpoint: JsonValue): Promise<{ path: string; id: TaskId }> {
-		const directory = await mkdtemp(join(tmpdir(), "pi-durable-tool-v1-"));
+		const directory = await mkdtemp(join(tmpdir(), "so-durable-tool-v1-"));
 		directories.add(directory);
 		const path = join(directory, "session.sqlite");
 		// No submission, so the Harness never starts scheduling and the task stays pending.

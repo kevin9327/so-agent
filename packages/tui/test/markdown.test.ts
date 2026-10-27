@@ -839,8 +839,8 @@ after`,
 \[
 A=
 \begin{pmatrix}
-\pi & 0\\
-0 & \frac{1}{\pi}
+\so & 0\\
+0 & \frac{1}{\so}
 \end{pmatrix}.
 \]`,
 				0,

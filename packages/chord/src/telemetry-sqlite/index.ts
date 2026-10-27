@@ -11,7 +11,7 @@ import {
 	type TelemetryPropagation,
 	type TelemetrySpan,
 	type TelemetryStore,
-} from "@earendil-works/pi-telemetry";
+} from "@so-agent/telemetry";
 import { applySqliteMigrations, type SqliteDatabase, type SqliteValue } from "../sqlite/index.ts";
 import { findMetrics, findTraces, getTrace } from "./store.ts";
 
@@ -49,8 +49,8 @@ type Metric = {
 	max: number;
 };
 const identities = new WeakMap<TelemetryContext, Identity>();
-const carrierKey = "pi-sqlite-span";
-const traceKey = "pi-sqlite-trace";
+const carrierKey = "so-sqlite-span";
+const traceKey = "so-sqlite-trace";
 const intervalMs = 10_000;
 
 function copyAttributes(attributes?: SpanAttributes): SpanAttributes {

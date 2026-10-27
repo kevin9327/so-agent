@@ -1,15 +1,15 @@
 import { setFlagsFromString } from "node:v8";
 import { runInNewContext } from "node:vm";
-import type { Context, WatchChange, WatchEnd } from "@earendil-works/chord";
+import type { Context, WatchChange, WatchEnd } from "@so-agent/chord";
 import {
 	BACKGROUND_CONTEXT,
 	createContextKey,
 	withAbortSignal,
 	withCancel,
 	withContextValue,
-} from "@earendil-works/chord/context";
-import { applyImmutable } from "@earendil-works/chord/delta";
-import { type DocumentWatch, defineDoc, defineDocFamily, MemoryStorage } from "@earendil-works/pi-durable";
+} from "@so-agent/chord/context";
+import { applyImmutable } from "@so-agent/chord/delta";
+import { type DocumentWatch, defineDoc, defineDocFamily, MemoryStorage } from "@so-agent/durable";
 import { describe, expect, it } from "vitest";
 import { SessionImpl } from "../src/session/session.ts";
 import { context, createConversation, documentChanges, flush, openTestSession } from "./session-support.ts";

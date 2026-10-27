@@ -14,7 +14,7 @@ const sha = "a".repeat(40);
 const newerSha = "b".repeat(40);
 
 function temporaryDirectory(t) {
-	const directory = mkdtempSync(join(tmpdir(), "pi-preview-packages-test-"));
+	const directory = mkdtempSync(join(tmpdir(), "so-preview-packages-test-"));
 	t.after(() => rmSync(directory, { recursive: true, force: true }));
 	return directory;
 }
@@ -68,7 +68,7 @@ test("pack points internal dependencies at the commit's builds and restores pack
 	writePackage(repo, "a", { name: "@scope/a", version: "1.0.0", dependencies: { "@scope/b": "1.0.0", other: "2.0.0" } });
 	writePackage(repo, "b", { name: "@scope/b", version: "1.0.0" });
 	writePackage(repo, "internal", { name: "@scope/internal", version: "1.0.0", private: true });
-	writePackage(repo, "env", { name: "@earendil-works/pi-env", version: "1.0.0" });
+	writePackage(repo, "env", { name: "@so-agent/env", version: "1.0.0" });
 	const original = readFileSync(join(repo, "packages/a/package.json"), "utf8");
 
 	const out = join(repo, "out");

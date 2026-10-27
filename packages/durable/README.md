@@ -1,10 +1,10 @@
-# @earendil-works/pi-durable
+# @so-agent/durable
 
 > **Experimental.** The API changes without notice between releases.
 
 A durable agent harness. Conversations, model turns, tool calls, and your own state are committed to storage before anything is shown. If the process dies mid-turn, reopening the storage picks the work up where it stopped.
 
-Built on [`@earendil-works/pi-ai`](../ai/README.md) for model access and `@earendil-works/chord` for document state.
+Built on [`@so-agent/ai`](../ai/README.md) for model access and `@so-agent/chord` for document state.
 
 ## Table of Contents
 
@@ -40,16 +40,16 @@ Built on [`@earendil-works/pi-ai`](../ai/README.md) for model access and `@earen
 ## Installation
 
 ```bash
-npm install @earendil-works/pi-durable @earendil-works/pi-ai @earendil-works/chord
+npm install @so-agent/durable @so-agent/ai @so-agent/chord
 ```
 
 ## Quick Start
 
 ```typescript
-import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
-import { createModels } from "@earendil-works/pi-ai/models";
-import { openaiProvider } from "@earendil-works/pi-ai/providers/openai";
-import { AssistantEntry, createRegistry, Harness, MemoryStorage } from "@earendil-works/pi-durable";
+import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+import { createModels } from "@so-agent/ai/models";
+import { openaiProvider } from "@so-agent/ai/providers/openai";
+import { AssistantEntry, createRegistry, Harness, MemoryStorage } from "@so-agent/durable";
 
 const context = BACKGROUND_CONTEXT;
 
@@ -77,39 +77,39 @@ What happened:
 
 Every async call takes a Chord `Context`, which carries cancellation and its current `TelemetrySpan`. `BACKGROUND_CONTEXT` never cancels and uses a NOOP span. The Harness owns the root adapter; adapters are never stored in a `Context`. Cancelling a wait only cancels that wait, never the work.
 
-`HarnessOptions.identity` sets how model requests identify the app to providers (a pi-ai `ClientIdentity`), merged over `DEFAULT_HARNESS_IDENTITY` (`{ attribution: PI_ATTRIBUTION }`: OpenRouter, NVIDIA NIM, and OpenCode attribution headers name pi). It applies to generation, compaction, hooks, and tools, over the identity the host's `Models` was created with. Pass your app's attribution, for example `{ attribution: { name: "my-app", url: "https://my-app.example" } }`, or `{ attribution: null }` to send none.
+`HarnessOptions.identity` sets how model requests identify the app to providers (a so-ai `ClientIdentity`), merged over `DEFAULT_HARNESS_IDENTITY` (`{ attribution: SO_ATTRIBUTION }`: OpenRouter, NVIDIA NIM, and OpenCode attribution headers name so). It applies to generation, compaction, hooks, and tools, over the identity the host's `Models` was created with. Pass your app's attribution, for example `{ attribution: { name: "my-app", url: "https://my-app.example" } }`, or `{ attribution: null }` to send none.
 
-`HarnessOptions.telemetry` accepts a host-owned `TelemetryContext` from `@earendil-works/pi-telemetry`, with optional `propagation` and `metrics` capabilities; omitted, it is a no-op. `DURABLE_TELEMETRY_SCHEMA`, exported from the package root, documents its typed spans, events, and metrics. Attributes contain IDs and control metadata, never messages, arguments, or results; IDs point to the transcript.
+`HarnessOptions.telemetry` accepts a host-owned `TelemetryContext` from `@so-agent/telemetry`, with optional `propagation` and `metrics` capabilities; omitted, it is a no-op. `DURABLE_TELEMETRY_SCHEMA`, exported from the package root, documents its typed spans, events, and metrics. Attributes contain IDs and control metadata, never messages, arguments, or results; IDs point to the transcript.
 
-- `pi.durable.submit` covers the public submit call and its commit. Each input starts a new root trace with a link to its caller's current span; a write is a child of its caller. Duplicate `requestId` preserves the original submission and carrier. Internal admissions, such as compaction writes, emit events on their phase span without a submit span.
-- `pi.durable.phase` covers one run or abort phase of every task, including its decision commit, never the next phase, a durable wait, or a restart. Its attributes identify the task, phase, attempt when present, `resumed`, and outcome. Tool phases also identify the tool and call. Nested tasks and background compactions inherit the creating phase; model requests receive that phase context. Hooks add no spans.
+- `so.durable.submit` covers the public submit call and its commit. Each input starts a new root trace with a link to its caller's current span; a write is a child of its caller. Duplicate `requestId` preserves the original submission and carrier. Internal admissions, such as compaction writes, emit events on their phase span without a submit span.
+- `so.durable.phase` covers one run or abort phase of every task, including its decision commit, never the next phase, a durable wait, or a restart. Its attributes identify the task, phase, attempt when present, `resumed`, and outcome. Tool phases also identify the tool and call. Nested tasks and background compactions inherit the creating phase; model requests receive that phase context. Hooks add no spans.
 - Failed phase outcomes set error status with a fixed category (`task_faulted`, `task_failed`, or `task_orphaned`) and the outcome's diagnostic message, truncated to 500 characters (the reason for an orphaned task). Diagnostics can contain caller content; no error detail or exception name is recorded. An `aborted` outcome keeps status `ok`, including interruption by close or cancellation.
-- Every `onReport` report also emits a `pi.durable.report` event on its current span. Without a span, the NOOP span drops the event; no root report span is created. Only `type`, optional fixed `reason`, `extension`, and `task.id` are recorded; no error payload is included. `pi.durable.reports` counts all reports by `type` only, including those without a span. Clock failures report without a phase context. The `onReport` callback is unchanged.
-- Committed entries and settled submissions emit `pi.durable.entry` and `pi.durable.submission`. Committed running phase changes emit `pi.durable.checkpoint`; a nested call answered from its stored result emits `pi.durable.replay`.
+- Every `onReport` report also emits a `so.durable.report` event on its current span. Without a span, the NOOP span drops the event; no root report span is created. Only `type`, optional fixed `reason`, `extension`, and `task.id` are recorded; no error payload is included. `so.durable.reports` counts all reports by `type` only, including those without a span. Clock failures report without a phase context. The `onReport` callback is unchanged.
+- Committed entries and settled submissions emit `so.durable.entry` and `so.durable.submission`. Committed running phase changes emit `so.durable.checkpoint`; a nested call answered from its stored result emits `so.durable.replay`.
 - Propagation stores optional opaque `trace` carriers in submission and task JSON without a storage migration. Phase spans extract their task's stored carrier, or start at the adapter root when absent or unknown. `TaskOptions.trace` inherits the creator's carrier when absent, accepts an explicit carrier override, or uses `"root"` to start at the adapter root without storing a carrier. A run started for several queued inputs takes the first input's trace; its first invocation's phase spans link to the other inputs through immutable task `links`. A steer stays in the running trace and its submit span links to that run's stored carrier. A reopened task's first invocation has `resumed: true` in the same trace.
-- Metrics record `pi.durable.phase.duration` (milliseconds; task, phase, outcome) and `pi.durable.tasks.active` (live tasks; task name), without record IDs. Closing the Harness releases its active counts.
+- Metrics record `so.durable.phase.duration` (milliseconds; task, phase, outcome) and `so.durable.tasks.active` (live tasks; task name), without record IDs. Closing the Harness releases its active counts.
 
 ## Concepts
 
 - **Harness**: one open storage plus the machinery that runs agents on it. All changes go through one line of atomic commits, and nothing is shown before its commit is stored.
 - **Conversation**: a transcript. `root()` creates the root conversation on first use; you can create more and fork them. A `Conversation` handle holds no state; compare handles by `id`.
-- **Entry**: one immutable transcript record, such as a user message (`pi.user`), a model response (`pi.assistant`), a tool result (`pi.tool-result`), a system prompt change (`pi.system`), a reset (`pi.reset`), or your own kind. The model sees the entries from the newest reset onward.
+- **Entry**: one immutable transcript record, such as a user message (`so.user`), a model response (`so.assistant`), a tool result (`so.tool-result`), a system prompt change (`so.system`), a reset (`so.reset`), or your own kind. The model sees the entries from the newest reset onward.
 - **Commit**: an atomic write. `conversation.commit((tx) => ...)` can append entries, edit documents, and create tasks together; either all of it is stored or none of it.
-- **Document**: typed JSON state stored next to the transcript and changed in commits. Built-in ones hold each conversation's agent choices (`pi.agent`), provider-facing session identity (`pi.provider`), running generation and tools (`pi.live`), queued submissions (`pi.inbox`), and spend (`pi.usage`).
-- **Task**: a durable state machine that saves a checkpoint at every step, so a restarted process continues from the last one. Every task has an owner: its conversation, or another task. The Harness runs answers as built-in tasks: `pi.generation` calls the model and owns the `pi.tool` tasks of its tool calls, waits for them, and hands the run to the next generation.
+- **Document**: typed JSON state stored next to the transcript and changed in commits. Built-in ones hold each conversation's agent choices (`so.agent`), provider-facing session identity (`so.provider`), running generation and tools (`so.live`), queued submissions (`so.inbox`), and spend (`so.usage`).
+- **Task**: a durable state machine that saves a checkpoint at every step, so a restarted process continues from the last one. Every task has an owner: its conversation, or another task. The Harness runs answers as built-in tasks: `so.generation` calls the model and owns the `so.tool` tasks of its tool calls, waits for them, and hands the run to the next generation.
 - **Submission**: something you hand to a conversation, either user input or an entry to write, which you can wait for.
 - **Turn and run**: a turn is one model response and its tool calls; a run is the turns from an input to its final answer. A conversation is busy while a run is going.
 - **Extension**: a named bundle of tools, system prompt sections, hooks, wrappers, and tasks.
 - **Registry**: the extensions this process installed. It can change while the Harness runs; new work uses the new state.
-- **Agent**: what a conversation runs with: model, thinking level, selected extensions, tools, instructions, and working directory. Stored per conversation as names in `pi.agent`, resolved against the registry at each use.
+- **Agent**: what a conversation runs with: model, thinking level, selected extensions, tools, instructions, and working directory. Stored per conversation as names in `so.agent`, resolved against the registry at each use.
 
 One answered input, as entries and tasks:
 
 ```text
-submit(input) → pi.user
-  pi.generation → pi.system (only if the prompt or tools changed), pi.assistant (tool calls)
-    pi.tool × n → pi.tool-result × n   (owned by the generation, which waits for them)
-  pi.generation → pi.assistant (answer) → submission done
+submit(input) → so.user
+  so.generation → so.system (only if the prompt or tools changed), so.assistant (tool calls)
+    so.tool × n → so.tool-result × n   (owned by the generation, which waits for them)
+  so.generation → so.assistant (answer) → submission done
 ```
 
 ## Persist and Resume
@@ -117,14 +117,14 @@ submit(input) → pi.user
 Use SQLite or JSONL storage to keep conversations across restarts:
 
 ```typescript
-import { openNodeSqliteStorage } from "@earendil-works/pi-durable/storage/sqlite/node";
+import { openNodeSqliteStorage } from "@so-agent/durable/storage/sqlite/node";
 
 const harness = await Harness.open(await openNodeSqliteStorage("./session.sqlite"), { models, registry }, context);
 const root = await harness.root(context); // the same root as last time
 harness.resume(); // continue any run the last process left unfinished
 ```
 
-Work interrupted by a crash or close stays pending. `resume()` starts the task scheduler; submitting or waiting starts it too. A process that only shows a session another one drives opens it with `readOnly: true`: open recovers nothing, and every write, `resume()`, and every call that would run tasks rejects with `ReadOnlySession`. Each conversation has its own persisted UUIDv7 in `pi.provider`, forwarded to pi-ai as `sessionId` for provider prompt-cache and session affinity. It survives reopen, retries, reset, compaction, and model changes; a child or fork receives a fresh identity. A legacy conversation receives and persists one before its first generation or compaction request.
+Work interrupted by a crash or close stays pending. `resume()` starts the task scheduler; submitting or waiting starts it too. A process that only shows a session another one drives opens it with `readOnly: true`: open recovers nothing, and every write, `resume()`, and every call that would run tasks rejects with `ReadOnlySession`. Each conversation has its own persisted UUIDv7 in `so.provider`, forwarded to so-ai as `sessionId` for provider prompt-cache and session affinity. It survives reopen, retries, reset, compaction, and model changes; a child or fork receives a fresh identity. A legacy conversation receives and persists one before its first generation or compaction request.
 
 A retried submission with the same `requestId` returns the existing submission instead of submitting twice:
 
@@ -226,8 +226,8 @@ The default `setTimer` declines the timers that only free memory in Workers, so 
 Code the Harness runs, other than its built-in tasks, comes in named extensions installed in a registry your process owns:
 
 ```typescript
-import { createRegistry, defineExtension, defineTool, hook, section, ToolTask } from "@earendil-works/pi-durable";
-import { CodingTools } from "@earendil-works/pi-durable/tools";
+import { createRegistry, defineExtension, defineTool, hook, section, ToolTask } from "@so-agent/durable";
+import { CodingTools } from "@so-agent/durable/tools";
 
 const Coding = defineExtension({
 	name: "coding",
@@ -244,13 +244,13 @@ An extension may bring `tools`, `sections`, `hooks`, `wraps` (decorators of a to
 
 ## Tools
 
-`@earendil-works/pi-durable/tools` provides `read`, `write`, `edit`, and `bash`, and the `CodingTools` extension with all four. They touch files and processes only through the call's environment (see [Environment](#environment)).
+`@so-agent/durable/tools` provides `read`, `write`, `edit`, and `bash`, and the `CodingTools` extension with all four. They touch files and processes only through the call's environment (see [Environment](#environment)).
 
 `read` returns an image file as one image block, which programs calling it get as an `ImageContent`. Limits are the model's `inputLimits.images.resize`, by default 2000x2000 pixels and 4.5 MB of base64. Without an image processor it sends PNG, JPEG, GIF, and WebP files within them (dimensions read from the file's header) as they are, without decoding them, and refuses larger ones and other formats. With one, it decodes every image, turns it upright by its EXIF orientation, converts BMP to PNG, and shrinks it to fit. The Photon-based processor runs on WebAssembly and is only loaded when you import it:
 
 ```typescript
-import { createNodePhotonImages } from "@earendil-works/pi-durable/images/node"; // or /images/cloudflare, or createPhotonImages(wasm) from /images
-import { createCodingTools } from "@earendil-works/pi-durable/tools";
+import { createNodePhotonImages } from "@so-agent/durable/images/node"; // or /images/cloudflare, or createPhotonImages(wasm) from /images
+import { createCodingTools } from "@so-agent/durable/tools";
 
 registry.install(createCodingTools({ images: await createNodePhotonImages() }));
 ```
@@ -260,7 +260,7 @@ A model without image input sees a placeholder instead of the image, and `read` 
 Define your own tool with a TypeBox schema. `defineTool()` types `args` from `parameters`, which the Harness validates before `execute()`. `api.output()` streams running output, which becomes the result when `execute()` returns no `output`:
 
 ```typescript
-import { Type } from "@earendil-works/pi-ai";
+import { Type } from "@so-agent/ai";
 
 const count = defineTool({
 	name: "count",
@@ -324,7 +324,7 @@ const testsPass = defineTool({
 
 - The caller gets the nested call's `taskId`, `structuredOutput`, `details`, `diagnostics`, `usage`, and `isError`, not the `output` meant for the model. A blocked, invalid, failed, or aborted nested call returns an `isError` result. `executeTool()` itself rejects once `execute()` has returned, when the caller is aborted, or when the Harness closes; cancelling its `context` stops only the wait.
 - Hooks see a nested call's `call.parent`, so a guard can treat calls from scripts differently.
-- While the caller runs, its nested calls show in `docs["pi.live"].nestedTools`, with the arguments they run with and a `summary` (error, duration, usage) once done, and as tool events with `parentToolCallId` and `parentTaskId`. `progress: false` keeps a nested call's running output out of `pi.live`. Before the caller settles, nested calls it left running are aborted, also those an earlier attempt made. The caller's result message does not list its nested calls; their task records keep them.
+- While the caller runs, its nested calls show in `docs["so.live"].nestedTools`, with the arguments they run with and a `summary` (error, duration, usage) once done, and as tool events with `parentToolCallId` and `parentTaskId`. `progress: false` keeps a nested call's running output out of `so.live`. Before the caller settles, nested calls it left running are aborted, also those an earlier attempt made. The caller's result message does not list its nested calls; their task records keep them.
 - Each nested call has a key, its position among the caller's nested calls unless the caller passes `{ key }`. A replay-safe caller that reruns after a crash and calls in the same order, or passes the same keys, gets the nested calls it already made back, finished or still running, instead of starting them again. A nested call the crash interrupted before its result was committed follows its own `replay` policy, so a replay-safe tool with external effects still needs its own idempotency. A caller that is not replay-safe never reruns, so after a restart its unfinished nested calls are abandoned, with everything they own, before they run again.
 - A nested call's `usage` is counted under its own tool; passing it on in the caller's result counts it twice.
 - Nested results are not kept: they live in the caller's task documents (`NestedCallDoc`, one per nested call, keyed by its key, holding `{ taskId, result? }`) only until the caller settles. The nested call's task record keeps only a small receipt. A stored result is exactly what `executeTool()` returns, without the model's `output`, so an image or a `bash` tail is stored once.
@@ -346,7 +346,7 @@ await root.configure({ modelTools: { remove: [bash] } }, context);
 
 `conversation.agent()` resolves both lists: `tools`, offered to the model, and `callable`, which nested calls resolve among. `tools` still decides what is enabled at all; `modelTools` cannot add to it.
 
-A `deferred: true` tool is not offered to the model until it is loaded, though other tools can call it any time. The `tool_search` tool from `@earendil-works/pi-durable/tool-search` (`createToolSearchExtension()`) lets the model search the deferred tools and loads the matches with `control.addTools`, which records them in `modelTools`; loaded tools stay offered on that branch, also after a compaction, and the `codemode` section leaves deferred tools out. Use it for large tool sets, such as an MCP server's.
+A `deferred: true` tool is not offered to the model until it is loaded, though other tools can call it any time. The `tool_search` tool from `@so-agent/durable/tool-search` (`createToolSearchExtension()`) lets the model search the deferred tools and loads the matches with `control.addTools`, which records them in `modelTools`; loaded tools stay offered on that branch, also after a compaction, and the `codemode` section leaves deferred tools out. Use it for large tool sets, such as an MCP server's.
 
 ### Tasks a restart abandons
 
@@ -354,11 +354,11 @@ A task that its creator awaits only in memory, and that the creator never resume
 
 ## Code Mode
 
-`@earendil-works/pi-durable/codemode` adds a `codemode` tool: the model writes JavaScript that calls the conversation's tools as `await tools.<name>(args)`, in a QuickJS sandbox (`@earendil-works/pi-codemode`). Each call is a nested tool call, and only the script's output reaches the model. The script survives a restart: it resumes where it was, without running its finished calls again.
+`@so-agent/durable/codemode` adds a `codemode` tool: the model writes JavaScript that calls the conversation's tools as `await tools.<name>(args)`, in a QuickJS sandbox (`@so-agent/codemode`). Each call is a nested tool call, and only the script's output reaches the model. The script survives a restart: it resumes where it was, without running its finished calls again.
 
 ```typescript
-import { CodemodeSandbox } from "@earendil-works/pi-codemode";
-import { createCodemodeExtension } from "@earendil-works/pi-durable/codemode";
+import { CodemodeSandbox } from "@so-agent/codemode";
+import { createCodemodeExtension } from "@so-agent/durable/codemode";
 
 registry.install(createCodemodeExtension({ sandbox: new CodemodeSandbox({ memoryLimitBytes: 256 * 1024 * 1024 }) }));
 ```
@@ -379,7 +379,7 @@ A conversation's `instructions` render last, as the section `instructions`. Sect
 
 ## Per-Conversation Agent
 
-Each conversation stores what it runs with in its `pi.agent` document. `configure()` changes it in one commit; unset fields follow the host:
+Each conversation stores what it runs with in its `so.agent` document. `configure()` changes it in one commit; unset fields follow the host:
 
 ```typescript
 await root.configure(
@@ -429,7 +429,7 @@ const harness = await Harness.open(storage, {
 `env` builds the execution environment for each tool call, section rendering, and `runtime.env()`. It receives the conversation's ID, its agent `cwd`, and committed reads, so one function serves a directory per conversation or a container per conversation:
 
 ```typescript
-import { NodeExecutionEnv } from "@earendil-works/pi-durable/env/node";
+import { NodeExecutionEnv } from "@so-agent/durable/env/node";
 
 const harness = await Harness.open(storage, {
 	models,
@@ -451,9 +451,9 @@ await env.exec(["git", "status", "--porcelain=v2", "-z"], {
 }, context);
 ```
 
-Abort the context to stop one call; `cleanup()` is for shutting the environment down. A custom environment can check itself with `registerEnvConformance()` from `@earendil-works/pi-durable/testing`, like storage below.
+Abort the context to stop one call; `cleanup()` is for shutting the environment down. A custom environment can check itself with `registerEnvConformance()` from `@so-agent/durable/testing`, like storage below.
 
-Some environments also implement the optional `listFiles()`: the files and directories below a directory at any depth, as `fd` lists them, skipping what git ignores and stopping at bounds with `truncated`. `NodeExecutionEnv` does not; pi-env's `RemoteExecutionEnv` and `LocalExecutionEnv` do. Callers fall back to their own walk when the method is missing or fails with `not_supported`:
+Some environments also implement the optional `listFiles()`: the files and directories below a directory at any depth, as `fd` lists them, skipping what git ignores and stopping at bounds with `truncated`. `NodeExecutionEnv` does not; so-env's `RemoteExecutionEnv` and `LocalExecutionEnv` do. Callers fall back to their own walk when the method is missing or fails with `not_supported`:
 
 ```typescript
 const listing = await env.listFiles?.(".", { exclude: ["node_modules"], maxEntries: 50_000 }, context);
@@ -480,25 +480,25 @@ const watch = await root.watch(context);
 render(watch.value); // the state at attachment
 watch.start(async ({ value, ops }) => {
 	// value.entries: the active transcript
-	// value.docs["pi.live"]: the running generation (streamed partial, retry, deferred) and tool calls (output, details)
-	// value.docs["pi.inbox"], value.docs["pi.usage"], value.docs["pi.agent"], value.docs["pi.provider"]
+	// value.docs["so.live"]: the running generation (streamed partial, retry, deferred) and tool calls (output, details)
+	// value.docs["so.inbox"], value.docs["so.usage"], value.docs["so.agent"], value.docs["so.provider"]
 	render(value);
 	await send(ops); // for example to a remote client that applies them
 });
 // later: await watch.stop();
 ```
 
-Watches are Chord's `WatchHandle` (exported by `@earendil-works/chord`; Durable re-exports it). The listener gets one change per call, `{ value, ops, retired }`, and the newest commit's context. A watch ends once, and `closed` (or `stop()`) gives the reason: `stopped`, `cancelled` (its acquisition context was cancelled), `ended` (the Harness closed, or a task document's task ended), `listener_error`, or `failed` (the Harness failed). An ended watch keeps its last value and no longer references the Harness.
+Watches are Chord's `WatchHandle` (exported by `@so-agent/chord`; Durable re-exports it). The listener gets one change per call, `{ value, ops, retired }`, and the newest commit's context. A watch ends once, and `closed` (or `stop()`) gives the reason: `stopped`, `cancelled` (its acquisition context was cancelled), `ended` (the Harness closed, or a task document's task ended), `listener_error`, or `failed` (the Harness failed). An ended watch keeps its last value and no longer references the Harness.
 
 Adapters that must change in the same step as Durable's memory, such as a Chord source over a view, attach a synchronous observer instead of a watch: `harness.observeConversation(id, observer, context)`, `harness.observeTaskGraph(observer, context)`, and `harness.observeDoc(token, ...scope, observer, context)` return the current `value` and `detach()`, and call `observer.advance(change, context)` with every later change, unfolded, as memory adopts it: inside the storage's commit for a stored commit, at once for a deferred one (before it is stored). A document observer gets one call per change at its address, so a commit that retires and recreates the document gives two; the task graph also advances without a commit when a registry change alters a task's `blocked` reason. A change can arrive before the `observeXXX()` promise resolves; its ops apply from the observation's `value`. `observer.end(failure)` comes once, when the Harness closes or fails, or, for a task document, right after the retirement of the commit that ends its task. `advance` only records the change: no awaits, no Harness calls, no throws, and quick, since every commit waits for it. One that throws is reported, detached, and ended with the error. Watches are built on these observers.
 
 Commits that land while a callback runs are delivered together in the next callback: the newest view and the operations of all of them, folded (appends to one string join, sets of one field keep the last). Past 10,000 pending operations the callback gets one root replacement `[["r", view]]` holding the whole newest view instead. A client that joins late or reconnects starts from the current view; nothing is replayed.
 
-Partial answers and tool output are committed at most every 100 ms by default, and watches see each commit at once. Storage gets them later and together, as deferred commits (see [Your Own State](#your-own-state)): with the next commit that reads `pi.live`, such as the end of the answer or of a tool, and at the latest after `settings.progress.persistWithinMs` (default 1,000 ms). A crash loses at most about that window of an answer or of tool output; a stream that crashes in its first second may leave no aborted entry, and that attempt's usage is not recorded. `settings.progress` changes the intervals; a host whose storage is remote can commit less often, for example `{ partialIntervalMs: 500, outputIntervalMs: 500 }`.
+Partial answers and tool output are committed at most every 100 ms by default, and watches see each commit at once. Storage gets them later and together, as deferred commits (see [Your Own State](#your-own-state)): with the next commit that reads `so.live`, such as the end of the answer or of a tool, and at the latest after `settings.progress.persistWithinMs` (default 1,000 ms). A crash loses at most about that window of an answer or of tool output; a stream that crashes in its first second may leave no aborted entry, and that attempt's usage is not recorded. `settings.progress` changes the intervals; a host whose storage is remote can commit less often, for example `{ partialIntervalMs: 500, outputIntervalMs: 500 }`.
 
 ## Busy Conversations
 
-A conversation is busy while a run is working on an input. Submitting to a busy conversation queues the submission in the conversation's inbox, `docs["pi.inbox"]` in the view:
+A conversation is busy while a run is working on an input. Submitting to a busy conversation queues the submission in the conversation's inbox, `docs["so.inbox"]` in the view:
 
 ```typescript
 await root.submit({ type: "input", content: "Also run the tests" }, context); // follow-up (default)
@@ -515,7 +515,7 @@ await root.submit({ type: "write", entry: { kind: "app.note", data: "user opened
 
 If a run fails, queued items stay in the inbox until the next input or queued write places them, oldest first.
 
-An input is placed as a `pi.user` entry. To show it as something else, give it an `entry` with your kind and data; the model still sees `content` as the user message:
+An input is placed as a `so.user` entry. To show it as something else, give it an `entry` with your kind and data; the model still sees `content` as the user message:
 
 ```typescript
 await root.submit(
@@ -529,7 +529,7 @@ await root.submit(
 // placed as { kind: "chat.mention", data: { author: "ann", ... }, model: [{ role: "user", content: "ann: can you check the build?" }] }
 ```
 
-It behaves like any other input: it starts a run, steers, follows up, or rejects, and is answered. While queued, its inbox item carries the entry. The kind must not start with `pi.`.
+It behaves like any other input: it starts a run, steers, follows up, or rejects, and is answered. While queued, its inbox item carries the entry. The kind must not start with `so.`.
 
 ## Reset and Handoff
 
@@ -546,7 +546,7 @@ A tool can return `control: { handoff: "..." }` to write the same reset with its
 
 ## Compaction
 
-Compaction shrinks what the model sees: it summarizes older entries and appends a `pi.compaction` entry that holds the summary and heads the first entry it keeps. Older entries stay in storage.
+Compaction shrinks what the model sees: it summarizes older entries and appends a `so.compaction` entry that holds the summary and heads the first entry it keeps. Older entries stay in storage.
 
 ```typescript
 const id = await root.compact("Keep the failing test names", context); // manual, with optional instructions
@@ -578,18 +578,18 @@ settings: {
 
 The fixed token counts rarely suit a 32k and a 1M context window alike; `modelOverrides` lets one harness serve both. The conversation's current model picks the entry, at the threshold check, after a context overflow, and when a compaction selects what to summarize.
 
-When a provider rejects a request because the context is too long, generation compacts and retries once. A summary that would cut before the start of the current context settles as `stale` when it is placed, so when several are in flight, the furthest cut stays in effect. Summarization spend counts in `pi.usage`. A `beforeCompact` hook on `CompactionTask` can decline or supply its own summary.
+When a provider rejects a request because the context is too long, generation compacts and retries once. A summary that would cut before the start of the current context settles as `stale` when it is placed, so when several are in flight, the furthest cut stays in effect. Summarization spend counts in `so.usage`. A `beforeCompact` hook on `CompactionTask` can decline or supply its own summary.
 
 When a compaction that a generation waits for at the blocking threshold fails, the generation fails too, without sending a request: its inputs settle `unanswered` with `model_error` and detail `Compaction failed: <error>`. One that finds nothing to compact or is declined lets the request go ahead.
 
-Running compactions are listed in `docs["pi.live"].compactions` with their reason, attempt, and retry backoff. The newest failure stays in `docs["pi.live"].compactionFailure` (task, reason, error) until a compaction produces a summary. The agent events add `compaction_start` and `compaction_end` (with `error` when the compaction failed), and `compactions` and `compactionFailure` fields in the snapshot.
+Running compactions are listed in `docs["so.live"].compactions` with their reason, attempt, and retry backoff. The newest failure stays in `docs["so.live"].compactionFailure` (task, reason, error) until a compaction produces a summary. The agent events add `compaction_start` and `compaction_end` (with `error` when the compaction failed), and `compactions` and `compactionFailure` fields in the snapshot.
 
 ## Agent Events (Experimental)
 
 For consumers that want coding-agent style events (`message_start`, `message_update`, `tool_execution_start`, ...) instead of structural state:
 
 ```typescript
-import { watchEvents } from "@earendil-works/pi-durable";
+import { watchEvents } from "@so-agent/durable";
 
 const stream = await watchEvents(harness, root.id, context);
 initialize(stream.snapshot); // entries, run, in-flight generation, tools, compactions, inbox, agent, usage
@@ -605,7 +605,7 @@ Events are derived from commits, one batch per commit, and apply on top of the s
 Hooks let extensions observe or adjust the built-in tasks, in the conversations that select them:
 
 ```typescript
-import { GenerationTask, hook, ToolTask } from "@earendil-works/pi-durable";
+import { GenerationTask, hook, ToolTask } from "@so-agent/durable";
 
 const Guard = defineExtension({
 	name: "guard",
@@ -725,7 +725,7 @@ A task appears with the commit that creates it and leaves with the commit that m
 Documents are typed JSON objects committed together with entries. Define one, and edit it in a commit:
 
 ```typescript
-import { defineDoc } from "@earendil-works/pi-durable";
+import { defineDoc } from "@so-agent/durable";
 
 const Todos = defineDoc<{ items: string[] }>({
 	kind: "app.todos",
@@ -761,7 +761,7 @@ Watches and the view see it at once. Storage gets it with the next commit that r
 
 ## Usage and Cost
 
-Each conversation keeps token and cost totals in `docs["pi.usage"]`: per `provider/model` for model responses, and per tool name for tool results that report usage. Failed and aborted attempts count too. For the whole Session:
+Each conversation keeps token and cost totals in `docs["so.usage"]`: per `provider/model` for model responses, and per tool name for tool results that report usage. Failed and aborted attempts count too. For the whole Session:
 
 ```typescript
 const usage = await harness.usage(context); // { models: { "openai/gpt-6-sol": Usage }, tools: {...} }
@@ -772,33 +772,33 @@ const usage = await harness.usage(context); // { models: { "openai/gpt-6-sol": U
 | Backend | Import | Notes |
 |---|---|---|
 | Memory | `MemoryStorage` from the package root | Nothing is persisted. |
-| IndexedDB | `IndexedDbStorage.open(name)` from `@earendil-works/pi-durable/storage/indexeddb` | Browser-only storage in one IndexedDB database. |
-| SQLite | `openNodeSqliteStorage(file)` from `@earendil-works/pi-durable/storage/sqlite/node` | One database file. WAL mode with `synchronous = NORMAL`: commits survive process crashes; the newest may be lost on power or host failure. |
-| JSONL | `openNodeJsonlStorage(directory, context)` from `@earendil-works/pi-durable/storage/jsonl/node` | Append-only files in one directory. Pass `{ fsync: true }` to flush before each commit marker. Keeps the whole history in memory too, so memory grows with it; use SQLite for long-running agents. |
-| Cloudflare Durable Object | `openDurableObjectSqliteStorage(ctx.storage)` from `@earendil-works/pi-durable/storage/sqlite/cloudflare` | The SQLite storage of one SQLite-backed Durable Object; commits are its storage transactions. |
+| IndexedDB | `IndexedDbStorage.open(name)` from `@so-agent/durable/storage/indexeddb` | Browser-only storage in one IndexedDB database. |
+| SQLite | `openNodeSqliteStorage(file)` from `@so-agent/durable/storage/sqlite/node` | One database file. WAL mode with `synchronous = NORMAL`: commits survive process crashes; the newest may be lost on power or host failure. |
+| JSONL | `openNodeJsonlStorage(directory, context)` from `@so-agent/durable/storage/jsonl/node` | Append-only files in one directory. Pass `{ fsync: true }` to flush before each commit marker. Keeps the whole history in memory too, so memory grows with it; use SQLite for long-running agents. |
+| Cloudflare Durable Object | `openDurableObjectSqliteStorage(ctx.storage)` from `@so-agent/durable/storage/sqlite/cloudflare` | The SQLite storage of one SQLite-backed Durable Object; commits are its storage transactions. |
 
 In a browser, open IndexedDB storage with `await IndexedDbStorage.open(name)`. One owner must hold the database at a
 time; use a [Web Lock](https://developer.mozilla.org/docs/Web/API/Web_Locks_API) around its lifetime rather than opening
 it in competing tabs or workers. Call `await navigator.storage.persist()` when durable retention matters.
 
-SQLite storage can namespace its tables and indexes when sharing a database: pass `{ prefix: "pi_" }` to
+SQLite storage can namespace its tables and indexes when sharing a database: pass `{ prefix: "so_" }` to
 `SqliteStorage.open(database, options)`, `openNodeSqliteStorage(path, options)`, or
 `openDurableObjectSqliteStorage(ctx.storage, options)`. Storage renders the prefixed names into its SQL, so adapters
 need no support. A prefix must be a SQLite identifier and cannot begin with `sqlite_`; a host may reserve more, such
 as `_cf_` in Durable Objects. Changing the prefix does not migrate existing data.
 
-Multiple Pi storages opened through the Cloudflare adapter with the same storage object automatically share an
-operation queue. To share the database with host tables, create an adapter and use it for both Pi and all host queries;
-direct storage calls bypass the queue and may be rolled back with a Pi transaction:
+Multiple So storages opened through the Cloudflare adapter with the same storage object automatically share an
+operation queue. To share the database with host tables, create an adapter and use it for both So and all host queries;
+direct storage calls bypass the queue and may be rolled back with a So transaction:
 
 ```typescript
 const database = new DurableObjectSqliteDatabase(ctx.storage);
-const piStorage = await SqliteStorage.open(database, { prefix: "pi_" });
+const soStorage = await SqliteStorage.open(database, { prefix: "so_" });
 await database.exec("CREATE TABLE IF NOT EXISTS host_notes (text TEXT)");
 await database.run("INSERT INTO host_notes (text) VALUES (?)", text);
 ```
 
-One process owns a storage at a time; there is no cross-process locking. The portable SQLite and JSONL cores (`/storage/sqlite`, `/storage/jsonl`) run without Node APIs, for example on Bun or in Cloudflare Durable Objects, given an asynchronous `SqliteDatabase` facade or a `FileSystem` from `@earendil-works/pi-durable/env`.
+One process owns a storage at a time; there is no cross-process locking. The portable SQLite and JSONL cores (`/storage/sqlite`, `/storage/jsonl`) run without Node APIs, for example on Bun or in Cloudflare Durable Objects, given an asynchronous `SqliteDatabase` facade or a `FileSystem` from `@so-agent/durable/env`.
 
 SQLite adapters implement promise-based `exec`, `run`, `get`, `all`, `transaction`, and `close`. `run`, `get`, and `all` take SQL text plus positional bindings; adapters may cache prepared statements by SQL text. A transaction callback receives a transaction handle; all work in the transaction must use it, and the handle expires when the callback settles. Adapters must queue unrelated operations and other transactions until the transaction finishes, so calling `database` itself inside the callback never settles:
 
@@ -812,7 +812,7 @@ await database.transaction(async (transaction) => {
 A custom backend's `commit(writes, adopt, context)` calls `adopt(seq)` once the batch is durable, synchronously and before its next commit starts, and then resolves with `seq`; a commit that fails before the batch is durable never calls it. `adopt` is the Session's in-memory adoption and publication of the batch, so memory and every view never show a partial log: inside it the Session's own observers run (views, task graph, scheduler, waits), and `subscribeCommits()` listeners, watch listeners and the code the commit wakes follow in microtasks, so at the backend's next `await` if it still works after `adopt` (as JSONL reclaims sidecars), before its `commit` resolves. `adopt` calls no Storage method and never throws; once it ran, the commit is published even if the backend then rejects, and the Session then fails. Custom backends can run the shared conformance suite, which checks this too, with any Vitest- or Jest-compatible runner:
 
 ```typescript
-import { registerStorageConformance } from "@earendil-works/pi-durable/testing";
+import { registerStorageConformance } from "@so-agent/durable/testing";
 import { describe, expect, it } from "vitest";
 
 registerStorageConformance({ describe, expect, it }, "My Storage", async (use) => {
@@ -825,7 +825,7 @@ registerStorageConformance({ describe, expect, it }, "My Storage", async (use) =
 });
 ```
 
-The package root loads TypeBox, because the tool task validates arguments with pi-ai's `validateToolArguments()`. That costs about 23 MB of peak RSS unbundled, about 4 MB in a tree-shaken bundle.
+The package root loads TypeBox, because the tool task validates arguments with so-ai's `validateToolArguments()`. That costs about 23 MB of peak RSS unbundled, about 4 MB in a tree-shaken bundle.
 
 ## Errors
 

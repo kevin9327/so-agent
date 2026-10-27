@@ -8,10 +8,10 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BACKGROUND_CONTEXT as context } from "@earendil-works/chord/context";
-import { createModels } from "@earendil-works/pi-ai/models";
-import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@earendil-works/pi-ai/providers/faux";
-import { CodemodeSandbox } from "@earendil-works/pi-codemode";
+import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+import { createModels } from "@so-agent/ai/models";
+import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
+import { CodemodeSandbox } from "@so-agent/codemode";
 import { Type } from "typebox";
 import { createCodemodeTool } from "../src/codemode/codemode.ts";
 import { createRegistry, defineExtension, defineTool, Harness } from "../src/index.ts";
@@ -42,7 +42,7 @@ const plain = defineTool({
 });
 
 async function run(mode: "codemode" | "plain", shape: Shape, n: number): Promise<{ ms: number; commits: number }> {
-	const directory = await mkdtemp(join(tmpdir(), "pi-codemode-bench-"));
+	const directory = await mkdtemp(join(tmpdir(), "so-codemode-bench-"));
 	try {
 		const faux = fauxProvider();
 		const models = createModels();

@@ -8,7 +8,7 @@ export function runClipboardCommand(
 ): Promise<Buffer | undefined> {
 	return new Promise((resolve) => {
 		// Clipboard writers can daemonize. Do not give them output pipes to retain.
-		// Detach on POSIX so the daemon leaves pi's process group and Ctrl+Z suspend
+		// Detach on POSIX so the daemon leaves so's process group and Ctrl+Z suspend
 		// (SIGTSTP to the group) does not stop the clipboard owner (#11179).
 		const child = spawn(command, args, {
 			stdio: ["pipe", options?.input === undefined ? "pipe" : "ignore", "ignore"],

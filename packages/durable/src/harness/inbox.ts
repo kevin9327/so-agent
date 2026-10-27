@@ -1,10 +1,10 @@
-import { copyJson, type Draft, type JsonRepresentation } from "@earendil-works/chord";
+import { copyJson, type Draft, type JsonRepresentation } from "@so-agent/chord";
 import { defineDoc } from "../documents.ts";
 import { UserEntry } from "../entries.ts";
 import type { ConversationId, EntryDraft, EntryId, EntryRecord, JsonObject, SubmissionId, Tx } from "../types.ts";
 import type { InputEntry, QueueMode, Settings, UserInput } from "./types.ts";
 
-/** A queued submission: user input for a run, with the entry it is placed as when not `pi.user`, or an entry write. */
+/** A queued submission: user input for a run, with the entry it is placed as when not `so.user`, or an entry write. */
 export type InboxItem =
 	| {
 			id: SubmissionId;
@@ -19,7 +19,7 @@ export type InboxItem =
 export type InboxState = { items: InboxItem[] };
 
 export const InboxDoc = defineDoc<InboxState>({
-	kind: "pi.inbox",
+	kind: "so.inbox",
 	version: 1,
 	scope: "conversation",
 	history: "latest",
@@ -109,7 +109,7 @@ export async function applyBoundary(
 	return { users: placed, reset };
 }
 
-/** Append the entry an input is placed as: `entry`'s kind and data, or `pi.user`, with the user message of `content`. */
+/** Append the entry an input is placed as: `entry`'s kind and data, or `so.user`, with the user message of `content`. */
 export function appendInput(
 	tx: Tx,
 	conversationId: ConversationId,

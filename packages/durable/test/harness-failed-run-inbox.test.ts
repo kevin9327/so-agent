@@ -1,5 +1,5 @@
-import { type FauxResponseStep, fauxAssistantMessage } from "@earendil-works/pi-ai";
-import { type AfterFailedRun, AssistantEntry, MemoryStorage } from "@earendil-works/pi-durable";
+import { type FauxResponseStep, fauxAssistantMessage } from "@so-agent/ai";
+import { type AfterFailedRun, AssistantEntry, MemoryStorage } from "@so-agent/durable";
 import { describe, expect, it } from "vitest";
 import { chatSetup, openChat, textOf } from "./chat-support.ts";
 import { context } from "./session-support.ts";

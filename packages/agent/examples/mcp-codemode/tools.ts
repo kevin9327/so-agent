@@ -1,6 +1,6 @@
 /**
- * Adapters that give a pi-agent-core `Agent` MCP tools and a codemode tool, using
- * `@earendil-works/pi-mcp` and `@earendil-works/pi-codemode`. See main.ts for how they fit together.
+ * Adapters that give a so-agent-core `Agent` MCP tools and a codemode tool, using
+ * `@so-agent/mcp` and `@so-agent/codemode`. See main.ts for how they fit together.
  */
 
 import {
@@ -9,15 +9,15 @@ import {
 	type AgentToolCallOutcome,
 	type AgentToolResult,
 	runToolCall,
-} from "@earendil-works/pi-agent-core";
-import type { ImageContent, JsonObject, JsonValue, TextContent } from "@earendil-works/pi-ai";
+} from "@so-agent/agent-core";
+import type { ImageContent, JsonObject, JsonValue, TextContent } from "@so-agent/ai";
 import {
 	type CodemodeJsonSchema,
 	CodemodeSandbox,
 	type CodemodeTool,
 	renderDeclarations,
-} from "@earendil-works/pi-codemode";
-import { type McpClient, toLlmContent } from "@earendil-works/pi-mcp";
+} from "@so-agent/codemode";
+import { type McpClient, toLlmContent } from "@so-agent/mcp";
 import { Type } from "typebox";
 
 /** Provider tool names are limited to 64 characters of `[A-Za-z0-9_-]`. */
@@ -154,7 +154,7 @@ export function createCodemodeTool(
 			const sandbox = new CodemodeSandbox({ tools: sandboxTools, timeoutMs: 120_000 });
 			try {
 				const result = await sandbox.execute(params.code, { signal });
-				// Items from text(), console.*, and image(), in order. They have pi-ai's content shapes.
+				// Items from text(), console.*, and image(), in order. They have so-ai's content shapes.
 				const content: (TextContent | ImageContent)[] = [...result.output];
 				if (result.ok && result.value !== undefined) {
 					const value = typeof result.value === "string" ? result.value : JSON.stringify(result.value);

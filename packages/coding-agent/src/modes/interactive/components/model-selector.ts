@@ -1,4 +1,4 @@
-import { type Model, modelsAreEqual } from "@earendil-works/pi-ai";
+import { type Model, modelsAreEqual } from "@so-agent/ai";
 import {
 	Container,
 	type Focusable,
@@ -8,7 +8,7 @@ import {
 	Spacer,
 	Text,
 	type TUI,
-} from "@earendil-works/pi-tui";
+} from "@so-agent/tui";
 import type { ModelRuntime } from "../../../core/model-runtime.ts";
 import { refreshModelCatalogs } from "../model-catalog-refresh.ts";
 import { getDistinctModelName, getModelSelectorSearchText } from "../model-search.ts";

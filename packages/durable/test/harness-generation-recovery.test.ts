@@ -2,8 +2,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { type AssistantMessage, createModels, fauxAssistantMessage, type Message } from "@earendil-works/pi-ai";
-import { AssistantEntry, type Harness, LiveDoc, type TaskId } from "@earendil-works/pi-durable";
+import { type AssistantMessage, createModels, fauxAssistantMessage, type Message } from "@so-agent/ai";
+import { AssistantEntry, type Harness, LiveDoc, type TaskId } from "@so-agent/durable";
 import { afterEach, describe, expect, it } from "vitest";
 import { openNodeSqliteStorage } from "../src/storage/sqlite/node.ts";
 import { allEntries, type ChatSetup, chatSetup, openChat, textOf, unanswered, waitFor } from "./chat-support.ts";
@@ -19,7 +19,7 @@ afterEach(async () => {
 });
 
 async function sqlitePath(): Promise<string> {
-	const directory = await mkdtemp(join(tmpdir(), "pi-durable-generation-"));
+	const directory = await mkdtemp(join(tmpdir(), "so-durable-generation-"));
 	directories.add(directory);
 	return join(directory, "session.sqlite");
 }
@@ -65,9 +65,9 @@ describe("generation recovery", () => {
 		opened.harness.resume();
 		expect((await (await opened.harness.submission(id, context))!.wait(context)).status).toBe("done");
 		expect((await allEntries(opened.root)).map((entry) => entry.kind)).toEqual([
-			"pi.user",
-			"pi.system",
-			"pi.assistant",
+			"so.user",
+			"so.system",
+			"so.assistant",
 		]);
 		await opened.harness.close(context);
 	});
@@ -115,9 +115,9 @@ describe("generation recovery", () => {
 		expect(sent).toEqual([["system", "user"]]);
 		expect(timeouts).toEqual([1234]);
 		expect((await allEntries(opened.root)).map((entry) => entry.kind)).toEqual([
-			"pi.user",
-			"pi.system",
-			"pi.assistant",
+			"so.user",
+			"so.system",
+			"so.assistant",
 		]);
 		await opened.harness.close(context);
 	});
@@ -154,7 +154,7 @@ describe("generation recovery", () => {
 		expect((await (await opened.harness.submission(id, context))!.wait(context)).status).toBe("done");
 		expect(sent).toEqual([["user"]]);
 		const entries = await allEntries(opened.root);
-		expect(entries.map((entry) => entry.kind)).toEqual(["pi.user", "pi.assistant", "pi.assistant"]);
+		expect(entries.map((entry) => entry.kind)).toEqual(["so.user", "so.assistant", "so.assistant"]);
 		const converted = entries[1]!.model![0] as AssistantMessage;
 		expect(converted.stopReason).toBe("aborted");
 		expect(textOf(converted)).toBe(partial);
@@ -202,9 +202,9 @@ describe("generation recovery", () => {
 		opened.harness.resume();
 		expect((await (await opened.harness.submission(id, context))!.wait(context)).status).toBe("done");
 		expect((await allEntries(opened.root)).map((entry) => entry.kind)).toEqual([
-			"pi.user",
-			"pi.assistant",
-			"pi.assistant",
+			"so.user",
+			"so.assistant",
+			"so.assistant",
 		]);
 		await opened.harness.close(context);
 	});

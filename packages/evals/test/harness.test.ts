@@ -1,12 +1,12 @@
 import { homedir } from "node:os";
-import { getDocsPath, getExamplesPath, getReadmePath } from "@earendil-works/pi-coding-agent";
+import { getDocsPath, getExamplesPath, getReadmePath } from "@so-agent/coding-agent";
 import { describe, expect, it, vi } from "vitest";
 import { buildSystemPrompt } from "../../coding-agent/src/core/system-prompt.ts";
 import {
 	applyIsolatedEnvironment,
-	createPiDocumentationEvalHarness,
+	createSoDocumentationEvalHarness,
 	DOCUMENTATION_EVAL_TOOLS,
-	excludePiDocumentation,
+	excludeSoDocumentation,
 	resolveDocumentationVariant,
 	resolveModelSelection,
 	verifySystemPrompt,
@@ -17,19 +17,19 @@ describe("resolveModelSelection", () => {
 		expect(
 			resolveModelSelection(
 				{ provider: "anthropic", id: "claude-opus-4-6" },
-				{ PI_PROVIDER: "openai-codex", PI_MODEL: "gpt-5.6-sol" },
+				{ SO_PROVIDER: "openai-codex", SO_MODEL: "gpt-5.6-sol" },
 			),
 		).toEqual({ provider: "anthropic", id: "claude-opus-4-6" });
 	});
 
 	it("uses trimmed environment defaults", () => {
-		expect(resolveModelSelection(undefined, { PI_PROVIDER: " openai-codex ", PI_MODEL: " gpt-5.6-sol " })).toEqual({
+		expect(resolveModelSelection(undefined, { SO_PROVIDER: " openai-codex ", SO_MODEL: " gpt-5.6-sol " })).toEqual({
 			provider: "openai-codex",
 			id: "gpt-5.6-sol",
 		});
 	});
 
-	it.each([{}, { PI_PROVIDER: "openai-codex" }, { PI_MODEL: "gpt-5.6-sol" }])(
+	it.each([{}, { SO_PROVIDER: "openai-codex" }, { SO_MODEL: "gpt-5.6-sol" }])(
 		"rejects incomplete model selection",
 		(environment) => {
 			expect(() => resolveModelSelection(undefined, environment)).toThrow("Select a harness model explicitly");
@@ -39,21 +39,21 @@ describe("resolveModelSelection", () => {
 
 describe("isolateProcessEnvironment", () => {
 	it("removes runner metadata and restores the process environment", () => {
-		vi.stubEnv("PI_EVAL_VARIANT", "with_docs");
-		vi.stubEnv("PI_EVAL_ARTIFACT_DIR", "/tmp/artifacts");
+		vi.stubEnv("SO_EVAL_VARIANT", "with_docs");
+		vi.stubEnv("SO_EVAL_ARTIFACT_DIR", "/tmp/artifacts");
 		const oldHome = process.env.HOME;
 		try {
 			const restore = applyIsolatedEnvironment("/tmp/eval-home", "/tmp/eval-agent");
 			try {
 				expect(homedir()).toBe("/tmp/eval-home");
-				expect(process.env.PI_CODING_AGENT_DIR).toBe("/tmp/eval-agent");
-				expect(process.env.PI_EVAL_VARIANT).toBeUndefined();
-				expect(process.env.PI_EVAL_ARTIFACT_DIR).toBeUndefined();
+				expect(process.env.SO_CODING_AGENT_DIR).toBe("/tmp/eval-agent");
+				expect(process.env.SO_EVAL_VARIANT).toBeUndefined();
+				expect(process.env.SO_EVAL_ARTIFACT_DIR).toBeUndefined();
 			} finally {
 				restore();
 			}
 			expect(process.env.HOME).toBe(oldHome);
-			expect(process.env.PI_EVAL_VARIANT).toBe("with_docs");
+			expect(process.env.SO_EVAL_VARIANT).toBe("with_docs");
 		} finally {
 			vi.unstubAllEnvs();
 		}
@@ -66,24 +66,24 @@ describe("documentation variant", () => {
 	});
 
 	it.each([undefined, "", "other"])("rejects invalid variant %s", (variant) => {
-		expect(() => resolveDocumentationVariant(variant)).toThrow("PI_EVAL_VARIANT");
+		expect(() => resolveDocumentationVariant(variant)).toThrow("SO_EVAL_VARIANT");
 	});
 
-	it("strips only the documentation routing section from the default Pi prompt", () => {
+	it("strips only the documentation routing section from the default So prompt", () => {
 		const prompt = buildSystemPrompt({
 			cwd: "/workspace",
 			selectedTools: [...DOCUMENTATION_EVAL_TOOLS],
 		});
-		expect(prompt).toContain("\n<docs>\nPi documentation (read only");
+		expect(prompt).toContain("\n<docs>\nSo documentation (read only");
 		expect(prompt).toContain("\n<rules>\n");
 		expect(prompt).toContain("\n<cwd>\n/workspace\n</cwd>");
 		expect(prompt).toContain("docs/models.md");
 
-		const stripped = excludePiDocumentation(prompt);
+		const stripped = excludeSoDocumentation(prompt);
 		expect(stripped).toContain("\n<rules>\n");
 		expect(stripped).toContain("\n<cwd>\n/workspace\n</cwd>");
 		expect(stripped).not.toContain("<docs>");
-		expect(stripped).not.toContain("Pi documentation");
+		expect(stripped).not.toContain("So documentation");
 		expect(stripped).not.toContain("docs/models.md");
 		expect(stripped).not.toContain(getReadmePath());
 		expect(stripped).not.toContain(getDocsPath());
@@ -95,22 +95,22 @@ describe("documentation variant", () => {
 			cwd: "/workspace",
 			selectedTools: [...DOCUMENTATION_EVAL_TOOLS],
 		});
-		const stripped = excludePiDocumentation(prompt);
+		const stripped = excludeSoDocumentation(prompt);
 
-		expect(verifySystemPrompt(stripped, { name: "without_docs", expectedPiDocumentation: false })).toBe(stripped);
-		expect(() => verifySystemPrompt(prompt, { name: "without_docs", expectedPiDocumentation: false })).toThrow(
+		expect(verifySystemPrompt(stripped, { name: "without_docs", expectedSoDocumentation: false })).toBe(stripped);
+		expect(() => verifySystemPrompt(prompt, { name: "without_docs", expectedSoDocumentation: false })).toThrow(
 			"does not match",
 		);
 	});
 
 	it("fails closed when prompt markers are missing", () => {
-		expect(() => excludePiDocumentation("Instructions")).toThrow("no Pi documentation section");
-		expect(() => excludePiDocumentation("\n<docs>\nPi documentation\n</docs>")).toThrow(
+		expect(() => excludeSoDocumentation("Instructions")).toThrow("no So documentation section");
+		expect(() => excludeSoDocumentation("\n<docs>\nSo documentation\n</docs>")).toThrow(
 			"no working-directory section",
 		);
 	});
 
 	it("rejects documentation harnesses outside the container sandbox", () => {
-		expect(() => createPiDocumentationEvalHarness()).toThrow("isolated container sandbox");
+		expect(() => createSoDocumentationEvalHarness()).toThrow("isolated container sandbox");
 	});
 });

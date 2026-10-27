@@ -31,7 +31,7 @@ describe("package commands", () => {
 	let packageDir: string;
 	let originalCwd: string;
 	let originalAgentDir: string | undefined;
-	let originalPiPackageDir: string | undefined;
+	let originalSoPackageDir: string | undefined;
 	let originalPath: string | undefined;
 	let originalExitCode: typeof process.exitCode;
 	let originalExecPath: string;
@@ -53,7 +53,7 @@ describe("package commands", () => {
 		writeFileSync(join(managedRoot, "current-version"), `${VERSION}\n`);
 		writeFileSync(
 			join(managedRoot, "managed-install.json"),
-			`${JSON.stringify({ kind: "pi-managed-install", schemaVersion: 1, layout: "releases-v1" })}\n`,
+			`${JSON.stringify({ kind: "so-managed-install", schemaVersion: 1, layout: "releases-v1" })}\n`,
 		);
 
 		const binDir = join(tempDir, "managed-bin");
@@ -69,14 +69,14 @@ fs.writeFileSync(${JSON.stringify(npmRecordPath)}, JSON.stringify(args));
 if (${npmExitCode} !== 0) process.exit(${npmExitCode});
 const binDir = path.join(process.cwd(), "node_modules", ".bin");
 fs.mkdirSync(binDir, { recursive: true });
-const piPath = path.join(binDir, process.platform === "win32" ? "pi.cmd" : "pi");
+const soPath = path.join(binDir, process.platform === "win32" ? "so.cmd" : "so");
 fs.writeFileSync(
-	piPath,
+	soPath,
 	process.platform === "win32"
 		? "@echo off\\r\\necho ${targetVersion}\\r\\n"
 		: "#!/bin/sh\\nprintf '%s\\n' ${targetVersion}\\n",
 );
-if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
+if (process.platform !== "win32") fs.chmodSync(soPath, 0o755);
 `,
 		);
 		const npmPath = join(binDir, process.platform === "win32" ? "npm.cmd" : "npm");
@@ -88,9 +88,9 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 		);
 		chmodSync(npmPath, 0o755);
 
-		vi.stubEnv("PI_INSTALLER_API_BASE", "https://example.test/api/installer/releases");
-		vi.stubEnv("PI_MANAGED_INSTALL_ROOT", managedRoot);
-		process.env.PI_PACKAGE_DIR = selfPackageDir;
+		vi.stubEnv("SO_INSTALLER_API_BASE", "https://example.test/api/installer/releases");
+		vi.stubEnv("SO_MANAGED_INSTALL_ROOT", managedRoot);
+		process.env.SO_PACKAGE_DIR = selfPackageDir;
 		process.env.PATH = `${binDir}${delimiter}${originalPath ?? ""}`;
 		return { managedRoot, npmRecordPath };
 	}
@@ -136,7 +136,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 	beforeEach(() => {
 		allowNetwork();
-		tempDir = join(tmpdir(), `pi-package-commands-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+		tempDir = join(tmpdir(), `so-package-commands-${Date.now()}-${Math.random().toString(36).slice(2)}`);
 		agentDir = join(tempDir, "agent");
 		projectDir = join(tempDir, "project");
 		packageDir = join(tempDir, "local-package");
@@ -146,7 +146,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 		originalCwd = process.cwd();
 		originalAgentDir = process.env[ENV_AGENT_DIR];
-		originalPiPackageDir = process.env.PI_PACKAGE_DIR;
+		originalSoPackageDir = process.env.SO_PACKAGE_DIR;
 		originalPath = process.env.PATH;
 		originalExitCode = process.exitCode;
 		originalExecPath = process.execPath;
@@ -174,10 +174,10 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 		} else {
 			process.env[ENV_AGENT_DIR] = originalAgentDir;
 		}
-		if (originalPiPackageDir === undefined) {
-			delete process.env.PI_PACKAGE_DIR;
+		if (originalSoPackageDir === undefined) {
+			delete process.env.SO_PACKAGE_DIR;
 		} else {
-			process.env.PI_PACKAGE_DIR = originalPiPackageDir;
+			process.env.SO_PACKAGE_DIR = originalSoPackageDir;
 		}
 		if (originalPath === undefined) {
 			delete process.env.PATH;
@@ -216,8 +216,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("skips untrusted project package settings", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
 		try {
@@ -232,8 +232,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("uses remembered project trust for list", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		new ProjectTrustStore(agentDir).set(projectDir, true);
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
@@ -251,8 +251,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("overrides remembered trust for list with --no-approve", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		new ProjectTrustStore(agentDir).set(projectDir, true);
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
@@ -269,8 +269,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("approves project trust for list with --approve", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
 		try {
@@ -287,9 +287,9 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("uses default project trust for list", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
 		writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ defaultProjectTrust: "always" }));
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
 		try {
@@ -306,16 +306,16 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("uses project_trust extensions for package commands", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
 		try {
 			await expect(
 				main(["list"], {
 					extensionFactories: [
-						(pi) => {
-							pi.on("project_trust", () => ({ trusted: "yes" }));
+						(so) => {
+							so.on("project_trust", () => ({ trusted: "yes" }));
 						},
 					],
 				}),
@@ -332,7 +332,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("does not prompt or ask extensions for project trust during update", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
 		writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ defaultProjectTrust: "always" }));
 		const fakeNpmPath = join(tempDir, "fake-project-npm.cjs");
 		const recordPath = join(tempDir, "project-update.json");
@@ -341,7 +341,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 			`const fs=require("node:fs");fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(process.argv.slice(2)));`,
 		);
 		writeFileSync(
-			join(projectDir, ".pi", "settings.json"),
+			join(projectDir, ".so", "settings.json"),
 			JSON.stringify({ packages: ["npm:fake-package"], npmCommand: [originalExecPath, fakeNpmPath] }),
 		);
 		let projectTrustCalled = false;
@@ -351,8 +351,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 			await expect(
 				main(["update", "--extensions"], {
 					extensionFactories: [
-						(pi) => {
-							pi.on("project_trust", () => {
+						(so) => {
+							so.on("project_trust", () => {
 								projectTrustCalled = true;
 								return { trusted: "yes" };
 							});
@@ -370,7 +370,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("uses saved project trust during update", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
 		const fakeNpmPath = join(tempDir, "fake-trusted-project-npm.cjs");
 		const recordPath = join(tempDir, "trusted-project-update.json");
 		writeFileSync(
@@ -378,7 +378,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 			`const fs=require("node:fs");fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(process.argv.slice(2)));`,
 		);
 		writeFileSync(
-			join(projectDir, ".pi", "settings.json"),
+			join(projectDir, ".so", "settings.json"),
 			JSON.stringify({ packages: ["npm:fake-package"], npmCommand: [originalExecPath, fakeNpmPath] }),
 		);
 		new ProjectTrustStore(agentDir).set(projectDir, true);
@@ -395,9 +395,9 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("lets trust.json override default project trust", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
 		writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ defaultProjectTrust: "always" }));
-		writeFileSync(join(projectDir, ".pi", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
+		writeFileSync(join(projectDir, ".so", "settings.json"), JSON.stringify({ packages: ["npm:@project/pkg"] }));
 		new ProjectTrustStore(agentDir).set(projectDir, false);
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
@@ -414,8 +414,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("blocks local package changes when project is untrusted", async () => {
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
-		writeFileSync(join(projectDir, ".pi", "settings.json"), "{}");
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
+		writeFileSync(join(projectDir, ".so", "settings.json"), "{}");
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 		try {
@@ -432,11 +432,11 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	it("allows local package install to initialize fresh project settings", async () => {
 		await main(["install", "-l", packageDir]);
 
-		const settingsPath = join(projectDir, ".pi", "settings.json");
+		const settingsPath = join(projectDir, ".so", "settings.json");
 		const settings = JSON.parse(readFileSync(settingsPath, "utf-8")) as { packages?: string[] };
 		expect(settings.packages?.length).toBe(1);
 		const stored = settings.packages?.[0] ?? "";
-		expect(realpathSync(join(projectDir, ".pi", stored))).toBe(realpathSync(packageDir));
+		expect(realpathSync(join(projectDir, ".so", stored))).toBe(realpathSync(packageDir));
 		expect(process.exitCode).toBeUndefined();
 	});
 
@@ -449,7 +449,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 			const stdout = logSpy.mock.calls.map(([message]) => String(message)).join("\n");
 			expect(stdout).toContain("Usage:");
-			expect(stdout).toContain("pi install <source> [-l]");
+			expect(stdout).toContain("so install <source> [-l]");
 			expect(errorSpy).not.toHaveBeenCalled();
 			expect(process.exitCode).toBeUndefined();
 		} finally {
@@ -497,9 +497,9 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 	it("cycles project package overrides in config local mode", async () => {
 		const storage = new InMemorySettingsStorage();
-		storage.withLock("global", () => JSON.stringify({ packages: ["npm:pi-tools"] }));
+		storage.withLock("global", () => JSON.stringify({ packages: ["npm:so-tools"] }));
 		const settingsManager = SettingsManager.fromStorage(storage, { projectTrusted: true });
-		const resolvedPaths = extensionPaths(join(tempDir, "pkg"), "npm:pi-tools", "user", ["bar.ts"]);
+		const resolvedPaths = extensionPaths(join(tempDir, "pkg"), "npm:so-tools", "user", ["bar.ts"]);
 		const selector = new ConfigSelectorComponent(
 			{ global: resolvedPaths, project: resolvedPaths },
 			settingsManager,
@@ -514,12 +514,12 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 		selector.getResourceList().handleInput(" ");
 		expect(settingsManager.getProjectSettings().packages).toEqual([
-			{ source: "npm:pi-tools", autoload: false, extensions: ["-extensions/bar.ts"] },
+			{ source: "npm:so-tools", autoload: false, extensions: ["-extensions/bar.ts"] },
 		]);
 
 		selector.getResourceList().handleInput(" ");
 		expect(settingsManager.getProjectSettings().packages).toEqual([
-			{ source: "npm:pi-tools", autoload: false, extensions: ["+extensions/bar.ts"] },
+			{ source: "npm:so-tools", autoload: false, extensions: ["+extensions/bar.ts"] },
 		]);
 
 		selector.getResourceList().handleInput(" ");
@@ -595,7 +595,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 			const stderr = errorSpy.mock.calls.map(([message]) => String(message)).join("\n");
 			expect(stderr).toContain('Unknown option --unknown for "install".');
-			expect(stderr).toContain('Use "pi --help" or "pi install <source> [-l] [--approve|--no-approve]".');
+			expect(stderr).toContain('Use "so --help" or "so install <source> [-l] [--approve|--no-approve]".');
 			expect(process.exitCode).toBe(1);
 		} finally {
 			errorSpy.mockRestore();
@@ -610,7 +610,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 			const stderr = errorSpy.mock.calls.map(([message]) => String(message)).join("\n");
 			expect(stderr).toContain("Missing install source.");
-			expect(stderr).toContain("Usage: pi install <source> [-l]");
+			expect(stderr).toContain("Usage: so install <source> [-l]");
 			expect(stderr).not.toContain("at ");
 			expect(process.exitCode).toBe(1);
 		} finally {
@@ -619,8 +619,8 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	});
 
 	it("allows explicit self-update checks when automatic version checks are disabled", async () => {
-		const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
-		process.env.PI_SKIP_VERSION_CHECK = "1";
+		const previousSkipVersionCheck = process.env.SO_SKIP_VERSION_CHECK;
+		process.env.SO_SKIP_VERSION_CHECK = "1";
 		const fetchMock = vi.fn(async () => Response.json({ version: VERSION }));
 		vi.stubGlobal("fetch", fetchMock);
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
@@ -631,22 +631,22 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 			expect(fetchMock).toHaveBeenCalledOnce();
 			expect(logSpy.mock.calls.map(([message]) => String(message)).join("\n")).toContain(
-				`pi is already up to date (v${VERSION})`,
+				`so is already up to date (v${VERSION})`,
 			);
 			expect(errorSpy).not.toHaveBeenCalled();
 			expect(process.exitCode).toBeUndefined();
 		} finally {
 			if (previousSkipVersionCheck === undefined) {
-				delete process.env.PI_SKIP_VERSION_CHECK;
+				delete process.env.SO_SKIP_VERSION_CHECK;
 			} else {
-				process.env.PI_SKIP_VERSION_CHECK = previousSkipVersionCheck;
+				process.env.SO_SKIP_VERSION_CHECK = previousSkipVersionCheck;
 			}
 		}
 	});
 
 	it("retries a transient self-update version check", async () => {
-		const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
-		delete process.env.PI_SKIP_VERSION_CHECK;
+		const previousSkipVersionCheck = process.env.SO_SKIP_VERSION_CHECK;
+		delete process.env.SO_SKIP_VERSION_CHECK;
 		const fetchMock = vi
 			.fn()
 			.mockRejectedValueOnce(new Error("fetch failed"))
@@ -661,14 +661,14 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 			expect(fetchMock).toHaveBeenCalledTimes(3);
 			expect(errorSpy).not.toHaveBeenCalled();
 		} finally {
-			if (previousSkipVersionCheck === undefined) delete process.env.PI_SKIP_VERSION_CHECK;
-			else process.env.PI_SKIP_VERSION_CHECK = previousSkipVersionCheck;
+			if (previousSkipVersionCheck === undefined) delete process.env.SO_SKIP_VERSION_CHECK;
+			else process.env.SO_SKIP_VERSION_CHECK = previousSkipVersionCheck;
 			logSpy.mockRestore();
 			errorSpy.mockRestore();
 		}
 	});
 
-	it("updates installer-managed Pi through a staged immutable release", async () => {
+	it("updates installer-managed So through a staged immutable release", async () => {
 		const targetVersion = getNewerPatchVersion();
 		const { managedRoot, npmRecordPath } = prepareManagedInstall(targetVersion);
 		const abandonedStage = join(managedRoot, "staging", "update-abandoned");
@@ -691,7 +691,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 			expect.arrayContaining(["ci", "--ignore-scripts"]),
 		);
 		expect(logSpy.mock.calls.map(([message]) => String(message)).join("\n")).toContain(
-			`Updated pi from ${VERSION} to ${targetVersion}`,
+			`Updated so from ${VERSION} to ${targetVersion}`,
 		);
 		expect(errorSpy).not.toHaveBeenCalled();
 		expect(process.exitCode).toBeUndefined();
@@ -702,7 +702,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 		const { managedRoot } = prepareManagedInstall(targetVersion);
 		writeFileSync(
 			join(managedRoot, "managed-install.json"),
-			`\uFEFF${JSON.stringify({ kind: "pi-managed-install", schemaVersion: 1, layout: "releases-v1" })}\r\n`,
+			`\uFEFF${JSON.stringify({ kind: "so-managed-install", schemaVersion: 1, layout: "releases-v1" })}\r\n`,
 		);
 		mockManagedUpdate(targetVersion);
 		vi.spyOn(console, "log").mockImplementation(() => {});
@@ -750,9 +750,9 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 
 		expect(readFileSync(join(managedRoot, "current-version"), "utf8")).toBe(`${VERSION}\n`);
 		expect(existsSync(npmRecordPath)).toBe(false);
-		expect(logSpy.mock.calls.map(([message]) => String(message)).join("\n")).not.toContain("Updated pi from");
+		expect(logSpy.mock.calls.map(([message]) => String(message)).join("\n")).not.toContain("Updated so from");
 		expect(errorSpy.mock.calls.map(([message]) => String(message)).join("\n")).toContain(
-			"Another managed Pi update is already running.",
+			"Another managed So update is already running.",
 		);
 		expect(process.exitCode).toBe(1);
 	});
@@ -769,7 +769,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 		expect(fetchMock).not.toHaveBeenCalled();
 		expect(existsSync(npmRecordPath)).toBe(false);
 		expect(errorSpy.mock.calls.map(([message]) => String(message)).join("\n")).toContain(
-			"Managed pi installations do not support --force",
+			"Managed so installations do not support --force",
 		);
 		expect(process.exitCode).toBe(1);
 	});
@@ -788,7 +788,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 		expect(existsSync(join(managedRoot, "releases", targetVersion))).toBe(false);
 		expect(existsSync(join(managedRoot, "releases", "0.0.1"))).toBe(true);
 		expect(readdirSync(join(managedRoot, "staging"))).toEqual([]);
-		expect(logSpy.mock.calls.map(([message]) => String(message)).join("\n")).not.toContain("Updated pi from");
+		expect(logSpy.mock.calls.map(([message]) => String(message)).join("\n")).not.toContain("Updated so from");
 		expect(errorSpy.mock.calls.map(([message]) => String(message)).join("\n")).toContain("exited with code 23");
 		expect(process.exitCode).toBe(1);
 	});
@@ -796,18 +796,18 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 	it("keeps npm self-updates non-managed when the managed environment is inherited", async () => {
 		const globalPrefix = join(tempDir, "global-prefix");
 		const projectPrefix = join(tempDir, "project-prefix");
-		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@earendil-works", "pi-coding-agent");
+		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@so-agent", "coding-agent");
 		const inheritedManagedRoot = join(tempDir, "inherited-managed-install");
 		mkdirSync(join(inheritedManagedRoot, "releases"), { recursive: true });
 		writeFileSync(
 			join(inheritedManagedRoot, "managed-install.json"),
-			JSON.stringify({ kind: "pi-managed-install", schemaVersion: 1, layout: "releases-v1" }),
+			JSON.stringify({ kind: "so-managed-install", schemaVersion: 1, layout: "releases-v1" }),
 		);
-		vi.stubEnv("PI_MANAGED_INSTALL_ROOT", inheritedManagedRoot);
+		vi.stubEnv("SO_MANAGED_INSTALL_ROOT", inheritedManagedRoot);
 		const fakeNpmPath = join(tempDir, "fake-npm.cjs");
 		const recordPath = join(tempDir, "self-update.json");
 		mkdirSync(selfPackageDir, { recursive: true });
-		mkdirSync(join(projectDir, ".pi"), { recursive: true });
+		mkdirSync(join(projectDir, ".so"), { recursive: true });
 		writeFileSync(
 			fakeNpmPath,
 			`const fs=require("node:fs"),path=require("node:path"),args=process.argv.slice(2),prefix=args[args.indexOf("--prefix")+1];
@@ -820,10 +820,10 @@ else fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(args));
 			JSON.stringify({ npmCommand: [originalExecPath, fakeNpmPath, "--prefix", globalPrefix] }, null, 2),
 		);
 		writeFileSync(
-			join(projectDir, ".pi", "settings.json"),
+			join(projectDir, ".so", "settings.json"),
 			JSON.stringify({ npmCommand: [originalExecPath, fakeNpmPath, "--prefix", projectPrefix] }, null, 2),
 		);
-		process.env.PI_PACKAGE_DIR = selfPackageDir;
+		process.env.SO_PACKAGE_DIR = selfPackageDir;
 		Object.defineProperty(process, "execPath", {
 			value: join(selfPackageDir, "dist", "cli.js"),
 			configurable: true,
@@ -846,7 +846,7 @@ else fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(args));
 			expect(recordedArgs).toContain(`${PACKAGE_NAME}@${VERSION}`);
 			expect(recordedArgs).not.toContain(PACKAGE_NAME);
 			expect(recordedArgs).not.toContain(projectPrefix);
-			expect(stdout).toContain(`Updated pi from ${VERSION} to ${VERSION}`);
+			expect(stdout).toContain(`Updated so from ${VERSION} to ${VERSION}`);
 		} finally {
 			logSpy.mockRestore();
 			errorSpy.mockRestore();
@@ -855,7 +855,7 @@ else fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(args));
 
 	it("uses the current package name when the update check omits packageName", async () => {
 		const globalPrefix = join(tempDir, "global-prefix");
-		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@mariozechner", "pi-coding-agent");
+		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@so-agent", "coding-agent");
 		const fakeNpmPath = join(tempDir, "fake-npm.cjs");
 		const recordPath = join(tempDir, "self-update.json");
 		mkdirSync(selfPackageDir, { recursive: true });
@@ -870,7 +870,7 @@ else fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(args));
 			join(agentDir, "settings.json"),
 			JSON.stringify({ npmCommand: [originalExecPath, fakeNpmPath, "--prefix", globalPrefix] }, null, 2),
 		);
-		process.env.PI_PACKAGE_DIR = selfPackageDir;
+		process.env.SO_PACKAGE_DIR = selfPackageDir;
 		Object.defineProperty(process, "execPath", {
 			value: join(selfPackageDir, "dist", "cli.js"),
 			configurable: true,
@@ -892,7 +892,7 @@ else fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(args));
 			const recordedArgs = JSON.parse(readFileSync(recordPath, "utf-8")) as string[];
 			expect(recordedArgs).toContain(`${PACKAGE_NAME}@${targetVersion}`);
 			expect(recordedArgs).not.toContain(PACKAGE_NAME);
-			expect(stdout).toContain(`Updated pi from ${VERSION} to ${targetVersion}`);
+			expect(stdout).toContain(`Updated so from ${VERSION} to ${targetVersion}`);
 		} finally {
 			logSpy.mockRestore();
 			errorSpy.mockRestore();
@@ -901,7 +901,7 @@ else fs.writeFileSync(${JSON.stringify(recordPath)},JSON.stringify(args));
 
 	it("installs the active package name from the update check during self-update", async () => {
 		const globalPrefix = join(tempDir, "global-prefix");
-		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@mariozechner", "pi-coding-agent");
+		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@so-agent", "coding-agent");
 		const fakeNpmPath = join(tempDir, "fake-npm.cjs");
 		const recordPath = join(tempDir, "self-update.json");
 		mkdirSync(selfPackageDir, { recursive: true });
@@ -920,12 +920,12 @@ else {
 			join(agentDir, "settings.json"),
 			JSON.stringify({ npmCommand: [originalExecPath, fakeNpmPath, "--prefix", globalPrefix] }, null, 2),
 		);
-		process.env.PI_PACKAGE_DIR = selfPackageDir;
+		process.env.SO_PACKAGE_DIR = selfPackageDir;
 		Object.defineProperty(process, "execPath", {
 			value: join(selfPackageDir, "dist", "cli.js"),
 			configurable: true,
 		});
-		const activePackageName = PACKAGE_NAME === "@new-scope/pi" ? "@newer-scope/pi" : "@new-scope/pi";
+		const activePackageName = PACKAGE_NAME === "@new-scope/so" ? "@newer-scope/so" : "@new-scope/so";
 		vi.stubGlobal(
 			"fetch",
 			vi.fn(async () => Response.json({ packageName: activePackageName, version: "0.73.0" })),
@@ -952,7 +952,7 @@ else {
 
 	it("prints a pnpm metadata hint when self-update fails", async () => {
 		const globalRoot = join(tempDir, "pnpm", "global", "v11");
-		const selfPackageDir = join(globalRoot, "node_modules", "@earendil-works", "pi-coding-agent");
+		const selfPackageDir = join(globalRoot, "node_modules", "@so-agent", "coding-agent");
 		const fakeBinDir = join(tempDir, "bin");
 		const fakePnpmPath = join(fakeBinDir, process.platform === "win32" ? "pnpm.cmd" : "pnpm");
 		mkdirSync(selfPackageDir, { recursive: true });
@@ -965,7 +965,7 @@ else {
 		writeFileSync(fakePnpmPath, fakePnpmScript);
 		chmodSync(fakePnpmPath, 0o755);
 		process.env.PATH = `${fakeBinDir}${process.env.PATH ? `${delimiter}${process.env.PATH}` : ""}`;
-		process.env.PI_PACKAGE_DIR = selfPackageDir;
+		process.env.SO_PACKAGE_DIR = selfPackageDir;
 		Object.defineProperty(process, "execPath", {
 			value: join(tempDir, "pnpm", "bin", "node"),
 			configurable: true,
@@ -984,10 +984,10 @@ else {
 			expect(process.exitCode).toBe(1);
 			const stdout = logSpy.mock.calls.map(([message]) => String(message)).join("\n");
 			const stderr = errorSpy.mock.calls.map(([message]) => String(message)).join("\n");
-			expect(stdout).not.toContain("Updated pi");
+			expect(stdout).not.toContain("Updated so");
 			expect(stderr).toContain("exited with code 23");
 			expect(stderr).toContain("If pnpm reports missing package versions");
-			expect(stderr).toContain("Run `pnpm store prune` and retry `pi update --self`.");
+			expect(stderr).toContain("Run `pnpm store prune` and retry `so update --self`.");
 		} finally {
 			logSpy.mockRestore();
 			errorSpy.mockRestore();
@@ -996,7 +996,7 @@ else {
 
 	it("fails self-update when renamed npm package installation fails", async () => {
 		const globalPrefix = join(tempDir, "global-prefix");
-		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@mariozechner", "pi-coding-agent");
+		const selfPackageDir = join(globalPrefix, "lib", "node_modules", "@so-agent", "coding-agent");
 		const fakeNpmPath = join(tempDir, "fake-npm-fail.cjs");
 		const recordPath = join(tempDir, "self-update-fail.json");
 		mkdirSync(selfPackageDir, { recursive: true });
@@ -1017,12 +1017,12 @@ if(args.includes("install")) process.exit(23);
 			join(agentDir, "settings.json"),
 			JSON.stringify({ npmCommand: [originalExecPath, fakeNpmPath, "--prefix", globalPrefix] }, null, 2),
 		);
-		process.env.PI_PACKAGE_DIR = selfPackageDir;
+		process.env.SO_PACKAGE_DIR = selfPackageDir;
 		Object.defineProperty(process, "execPath", {
 			value: join(selfPackageDir, "dist", "cli.js"),
 			configurable: true,
 		});
-		const activePackageName = PACKAGE_NAME === "@new-scope/pi" ? "@newer-scope/pi" : "@new-scope/pi";
+		const activePackageName = PACKAGE_NAME === "@new-scope/so" ? "@newer-scope/so" : "@new-scope/so";
 		vi.stubGlobal(
 			"fetch",
 			vi.fn(async () => Response.json({ packageName: activePackageName, version: "0.73.0" })),
@@ -1037,7 +1037,7 @@ if(args.includes("install")) process.exit(23);
 			expect(process.exitCode).toBe(1);
 			const stdout = logSpy.mock.calls.map(([message]) => String(message)).join("\n");
 			const stderr = errorSpy.mock.calls.map(([message]) => String(message)).join("\n");
-			expect(stdout).not.toContain(`Updated pi`);
+			expect(stdout).not.toContain(`Updated so`);
 			expect(stderr).toContain("exited with code 23");
 			const recordedCalls = JSON.parse(readFileSync(recordPath, "utf-8")) as string[][];
 			expect(recordedCalls).toEqual([
@@ -1052,22 +1052,22 @@ if(args.includes("install")) process.exit(23);
 
 	it("suggests the configured source when update input omits the npm prefix", async () => {
 		const settingsPath = join(agentDir, "settings.json");
-		writeFileSync(settingsPath, JSON.stringify({ packages: ["npm:pi-formatter"] }, null, 2));
+		writeFileSync(settingsPath, JSON.stringify({ packages: ["npm:so-formatter"] }, null, 2));
 
 		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
 		try {
-			await expect(main(["update", "pi-formatter"])).resolves.toBeUndefined();
+			await expect(main(["update", "so-formatter"])).resolves.toBeUndefined();
 
 			const stderr = errorSpy.mock.calls.map(([message]) => String(message)).join("\n");
 			const stdout = logSpy.mock.calls.map(([message]) => String(message)).join("\n");
-			expect(stderr).toContain("Did you mean npm:pi-formatter?");
-			expect(stdout).not.toContain("Updated pi-formatter");
+			expect(stderr).toContain("Did you mean npm:so-formatter?");
+			expect(stdout).not.toContain("Updated so-formatter");
 			expect(process.exitCode).toBe(1);
 
 			const settings = JSON.parse(readFileSync(settingsPath, "utf-8")) as { packages?: string[] };
-			expect(settings.packages).toContain("npm:pi-formatter");
+			expect(settings.packages).toContain("npm:so-formatter");
 		} finally {
 			errorSpy.mockRestore();
 			logSpy.mockRestore();

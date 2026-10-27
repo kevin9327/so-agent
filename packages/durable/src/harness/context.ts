@@ -1,5 +1,5 @@
-import type { Context } from "@earendil-works/chord";
-import type { AssistantMessage, Message, ToolCall, ToolResultMessage } from "@earendil-works/pi-ai";
+import type { Context } from "@so-agent/chord";
+import type { AssistantMessage, Message, ToolCall, ToolResultMessage } from "@so-agent/ai";
 import { SystemEntry } from "../entries.ts";
 import { idFromNumber } from "../ids.ts";
 import type { SessionImpl } from "../session/session.ts";
@@ -176,9 +176,9 @@ function extendRange(previous: ContextRange, bounds: ContextBounds, added: reado
 }
 
 /**
- * The baseline among `entries`, oldest first: the system message of the first `pi.system` entry after the head
+ * The baseline among `entries`, oldest first: the system message of the first `so.system` entry after the head
  * marker, or of the transcript without one, when generation wrote it with every section and tool in effect. After a
- * head marker it always does, and omits the retained `pi.system` entries. Without one it does when it saw no system
+ * head marker it always does, and omits the retained `so.system` entries. Without one it does when it saw no system
  * message before, which holds unless an earlier entry carries one, even if an edit omits it later. An edit that targets
  * the baseline contributes other messages, or none, so none leads; a later entry does not take its place.
  */

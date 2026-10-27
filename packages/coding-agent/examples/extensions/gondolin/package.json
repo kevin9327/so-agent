@@ -1,5 +1,5 @@
 {
-	"name": "pi-extension-gondolin",
+	"name": "so-extension-gondolin",
 	"private": true,
 	"version": "1.4.0",
 	"type": "module",
@@ -8,12 +8,12 @@
 		"build": "echo 'nothing to build'",
 		"check": "echo 'nothing to check'"
 	},
-	"pi": {
+	"so": {
 		"extensions": [
 			"./index.ts"
 		]
 	},
 	"dependencies": {
-		"@earendil-works/gondolin": "0.14.0"
+		"@so-agent/gondolin": "0.14.0"
 	}
 }

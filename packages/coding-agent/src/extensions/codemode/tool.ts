@@ -22,10 +22,10 @@
  */
 
 import { join } from "node:path";
-import type { AgentTool } from "@earendil-works/pi-agent-core";
-import type { CodemodeJsonSchema, CodemodeTool } from "@earendil-works/pi-codemode";
-import { renderToolOutputType, renderToolSample, toCodemodeIdentifier } from "@earendil-works/pi-codemode/declarations";
-import { CODEMODE_SOURCE_GRAMMAR } from "@earendil-works/pi-codemode/source";
+import type { AgentTool } from "@so-agent/agent-core";
+import type { CodemodeJsonSchema, CodemodeTool } from "@so-agent/codemode";
+import { renderToolOutputType, renderToolSample, toCodemodeIdentifier } from "@so-agent/codemode/declarations";
+import { CODEMODE_SOURCE_GRAMMAR } from "@so-agent/codemode/source";
 import { type Static, Type } from "typebox";
 import { getDocsPath } from "../../config.ts";
 import type { ToolDefinition, ToolLoadout, ToolLoadoutChanges, ToolNamespace } from "../../core/extensions/types.ts";

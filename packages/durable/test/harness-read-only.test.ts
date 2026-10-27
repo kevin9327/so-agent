@@ -3,8 +3,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { fauxAssistantMessage } from "@earendil-works/pi-ai";
-import { Harness, LiveDoc, ReadOnlySession, UserEntry, type Wake } from "@earendil-works/pi-durable";
+import { fauxAssistantMessage } from "@so-agent/ai";
+import { Harness, LiveDoc, ReadOnlySession, UserEntry, type Wake } from "@so-agent/durable";
 import { afterEach, describe, expect, it } from "vitest";
 import { openNodeSqliteStorage } from "../src/storage/sqlite/node.ts";
 import { allEntries, type ChatSetup, chatSetup, openChat, unanswered } from "./chat-support.ts";
@@ -18,7 +18,7 @@ afterEach(async () => {
 });
 
 async function sqlitePath(): Promise<string> {
-	const directory = await mkdtemp(join(tmpdir(), "pi-durable-read-only-"));
+	const directory = await mkdtemp(join(tmpdir(), "so-durable-read-only-"));
 	directories.add(directory);
 	return join(directory, "session.sqlite");
 }

@@ -6,8 +6,8 @@
  */
 
 import { createInterface } from "node:readline";
-import { type ImageContent, modelsAreEqual } from "@earendil-works/pi-ai";
-import { setCapabilityOverrides } from "@earendil-works/pi-tui";
+import { type ImageContent, modelsAreEqual } from "@so-agent/ai";
+import { setCapabilityOverrides } from "@so-agent/tui";
 import chalk from "chalk";
 import { type Args, type Mode, normalizeSessionName, parseArgs, printHelp } from "./cli/args.ts";
 import {
@@ -576,10 +576,10 @@ export async function main(args: string[], options?: MainOptions) {
 	// Commands and startup selectors can load user-authored themes before runtime creation.
 	setThemeJsonValidator(validateThemeJson);
 	const extensionFactories = [...builtInExtensions, ...(options?.extensionFactories ?? [])];
-	const offlineMode = args.includes("--offline") || isTruthyEnvFlag(process.env.PI_OFFLINE);
+	const offlineMode = args.includes("--offline") || isTruthyEnvFlag(process.env.SO_OFFLINE);
 	if (offlineMode) {
-		process.env.PI_OFFLINE = "1";
-		process.env.PI_SKIP_VERSION_CHECK = "1";
+		process.env.SO_OFFLINE = "1";
+		process.env.SO_SKIP_VERSION_CHECK = "1";
 	}
 
 	if (await runAuthCommand(args)) {
@@ -602,7 +602,7 @@ export async function main(args: string[], options?: MainOptions) {
 		if (process.platform === "win32" && exitCode === 0 && args[0] === "update") {
 			// We normally prefer process.exit(0) for package commands so bad extensions cannot keep
 			// one-shot commands alive. On Windows, Node can assert after fetch() if process.exit(0)
-			// runs during teardown; let successful `pi update` drain naturally instead.
+			// runs during teardown; let successful `so update` drain naturally instead.
 			// https://github.com/nodejs/node/issues/56645
 			return;
 		}
@@ -931,9 +931,9 @@ export async function main(args: string[], options?: MainOptions) {
 		process.exit(1);
 	}
 
-	const startupBenchmark = isTruthyEnvFlag(process.env.PI_STARTUP_BENCHMARK);
+	const startupBenchmark = isTruthyEnvFlag(process.env.SO_STARTUP_BENCHMARK);
 	if (startupBenchmark && appMode !== "interactive") {
-		console.error(chalk.red("Error: PI_STARTUP_BENCHMARK only supports interactive mode"));
+		console.error(chalk.red("Error: SO_STARTUP_BENCHMARK only supports interactive mode"));
 		process.exit(1);
 	}
 

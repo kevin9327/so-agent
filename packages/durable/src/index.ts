@@ -1,4 +1,4 @@
-export type { NativeWatchChange, WatchChange, WatchEnd, WatchHandle } from "@earendil-works/chord";
+export type { NativeWatchChange, WatchChange, WatchEnd, WatchHandle } from "@so-agent/chord";
 export { defineDoc, defineDocFamily } from "./documents.ts";
 export {
 	AssistantEntry,

@@ -31,7 +31,7 @@ import { parseArgs } from "node:util";
 import { MINIMUM_PI_VERSION } from "./model-catalog-minimum-version.mjs";
 import { compareModelCatalogPiVersions } from "./model-catalog-protocol.ts";
 
-const PI_AI_PACKAGE = "@earendil-works/pi-ai";
+const PI_AI_PACKAGE = "@so-agent/ai";
 
 /** Read a release's built-in model data (`dist/providers/data`) as model lists by provider. */
 function readBuiltinModels(dataDir) {
@@ -107,7 +107,7 @@ function main() {
 		run("npm", ["ci", "--ignore-scripts", "--no-audit", "--no-fund"], releaseDir);
 		// pi-ai's types depend on the declarations of its workspace dependencies.
 		const { dependencies } = JSON.parse(readFileSync(join(releaseDir, "packages/ai/package.json"), "utf8"));
-		for (const name of Object.keys(dependencies).filter((name) => name.startsWith("@earendil-works/"))) {
+		for (const name of Object.keys(dependencies).filter((name) => name.startsWith("@so-agent/"))) {
 			run("npm", ["run", "build", "--workspace", name], releaseDir);
 		}
 

@@ -22,24 +22,24 @@
  *   toggled the tool output open (via ctrl+e or clicking)
  *
  * Usage:
- *   pi -e ./built-in-tool-renderer.ts
+ *   so -e ./built-in-tool-renderer.ts
  */
 
-import type { BashToolDetails, EditToolDetails, ExtensionAPI, ReadToolDetails } from "@earendil-works/pi-coding-agent";
+import type { BashToolDetails, EditToolDetails, ExtensionAPI, ReadToolDetails } from "@so-agent/coding-agent";
 import {
 	createBashToolDefinition,
 	createEditToolDefinition,
 	createReadToolDefinition,
 	createWriteToolDefinition,
-} from "@earendil-works/pi-coding-agent";
-import { Text } from "@earendil-works/pi-tui";
+} from "@so-agent/coding-agent";
+import { Text } from "@so-agent/tui";
 
-export default function (pi: ExtensionAPI) {
+export default function (so: ExtensionAPI) {
 	const cwd = process.cwd();
 
 	// --- Read tool: show path and line count ---
 	const originalRead = createReadToolDefinition(cwd);
-	pi.registerTool({
+	so.registerTool({
 		...originalRead,
 
 		renderCall(args, theme, _context) {
@@ -91,7 +91,7 @@ export default function (pi: ExtensionAPI) {
 
 	// --- Bash tool: show command and exit code ---
 	const originalBash = createBashToolDefinition(cwd);
-	pi.registerTool({
+	so.registerTool({
 		...originalBash,
 
 		renderCall(args, theme, _context) {
@@ -143,7 +143,7 @@ export default function (pi: ExtensionAPI) {
 
 	// --- Edit tool: show path and diff stats ---
 	const originalEdit = createEditToolDefinition(cwd);
-	pi.registerTool({
+	so.registerTool({
 		...originalEdit,
 
 		renderCall(args, theme, _context) {
@@ -200,7 +200,7 @@ export default function (pi: ExtensionAPI) {
 
 	// --- Write tool: show path and size ---
 	const originalWrite = createWriteToolDefinition(cwd);
-	pi.registerTool({
+	so.registerTool({
 		...originalWrite,
 
 		renderCall(args, theme, _context) {

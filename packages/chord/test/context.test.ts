@@ -1,4 +1,4 @@
-import { InMemoryTelemetryContext, NOOP_TELEMETRY_CONTEXT } from "@earendil-works/pi-telemetry";
+import { InMemoryTelemetryContext, NOOP_TELEMETRY_CONTEXT } from "@so-agent/telemetry";
 import { describe, expect, it, vi } from "vitest";
 import {
 	awaitWithContext,

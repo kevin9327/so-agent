@@ -20,26 +20,26 @@ export interface CodemodeExtensionOptions {
 	models?: boolean;
 }
 
-function readMode(pi: ExtensionAPI): CodemodeMode {
-	return pi.getSettings().codemode?.mode === "only" ? "only" : SETTINGS_DEFAULTS.codemode.mode;
+function readMode(so: ExtensionAPI): CodemodeMode {
+	return so.getSettings().codemode?.mode === "only" ? "only" : SETTINGS_DEFAULTS.codemode.mode;
 }
 
-function readInlineBudget(pi: ExtensionAPI): number | undefined {
-	const budget = pi.getSettings().codemode?.inlineBudget;
+function readInlineBudget(so: ExtensionAPI): number | undefined {
+	const budget = so.getSettings().codemode?.inlineBudget;
 	return typeof budget === "number" && Number.isFinite(budget) && budget >= 0 ? budget : undefined;
 }
 
 export function createCodemodeExtension(options: CodemodeExtensionOptions = {}): ExtensionFactory {
-	return (pi) => {
-		pi.registerTool({
+	return (so) => {
+		so.registerTool({
 			...createCodemodeToolDefinition({
-				appendEntry: (customType, data) => pi.appendEntry(customType, data),
+				appendEntry: (customType, data) => so.appendEntry(customType, data),
 				models: options.models ?? true,
-				getToolNamespace: (name) => pi.getAllTools().find((tool) => tool.name === name)?.namespace,
+				getToolNamespace: (name) => so.getAllTools().find((tool) => tool.name === name)?.namespace,
 				getToolGuidelines: () =>
-					new Map(pi.getAllTools().map((tool) => [tool.name, tool.promptGuidelines ?? []] as const)),
-				getMode: () => options.mode ?? readMode(pi),
-				getInlineBudget: () => options.inlineBudget ?? readInlineBudget(pi),
+					new Map(so.getAllTools().map((tool) => [tool.name, tool.promptGuidelines ?? []] as const)),
+				getMode: () => options.mode ?? readMode(so),
+				getInlineBudget: () => options.inlineBudget ?? readInlineBudget(so),
 			}),
 			defaultActive: false,
 		});

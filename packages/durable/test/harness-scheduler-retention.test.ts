@@ -10,7 +10,7 @@ import {
 	LiveDoc,
 	type Storage,
 	type TaskId,
-} from "@earendil-works/pi-durable";
+} from "@so-agent/durable";
 import { afterEach, describe, expect, it } from "vitest";
 import { SCHEDULER_INDEX_SIZES } from "../src/harness/harness.ts";
 import { openNodeSqliteStorage } from "../src/storage/sqlite/node.ts";
@@ -119,7 +119,7 @@ afterEach(async () => {
 });
 
 async function sqlitePath(): Promise<string> {
-	const directory = await mkdtemp(join(tmpdir(), "pi-durable-retention-"));
+	const directory = await mkdtemp(join(tmpdir(), "so-durable-retention-"));
 	directories.push(directory);
 	return join(directory, "session.sqlite");
 }

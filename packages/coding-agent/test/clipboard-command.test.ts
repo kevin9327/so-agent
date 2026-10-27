@@ -8,7 +8,7 @@ describe("clipboard commands", () => {
 		).toEqual(Buffer.from([0, 255, 10]));
 		expect(await runClipboardCommand(process.execPath, ["-e", ""])).toEqual(Buffer.alloc(0));
 		expect(await runClipboardCommand(process.execPath, ["-e", "process.exit(1)"])).toBeUndefined();
-		expect(await runClipboardCommand("pi-clipboard-command-does-not-exist", [])).toBeUndefined();
+		expect(await runClipboardCommand("so-clipboard-command-does-not-exist", [])).toBeUndefined();
 	});
 	test("sends Unicode input to clipboard writers", async () => {
 		const script =
@@ -29,8 +29,8 @@ describe("clipboard commands", () => {
 			clearInterval(timer);
 		}
 	});
-	// #11179: clipboard daemons must not share pi's process group, or Ctrl+Z suspend stops them.
-	test.skipIf(process.platform === "win32")("runs commands outside pi's process group", async () => {
+	// #11179: clipboard daemons must not share so's process group, or Ctrl+Z suspend stops them.
+	test.skipIf(process.platform === "win32")("runs commands outside so's process group", async () => {
 		const childPgid = (await runClipboardCommand("sh", ["-c", "ps -o pgid= -p $$"]))?.toString("utf8").trim();
 		const ownPgid = (await runClipboardCommand("ps", ["-o", "pgid=", "-p", String(process.pid)]))
 			?.toString("utf8")

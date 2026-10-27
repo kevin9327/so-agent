@@ -1,7 +1,7 @@
-import type { Context, Draft } from "@earendil-works/chord";
-import type { AssistantMessage, Message, ModelThinkingLevel, SimpleStreamOptions } from "@earendil-works/pi-ai";
-import { calculateContextTokens, estimateMessageTokens } from "@earendil-works/pi-ai/utils/estimate";
-import { isRetryableAssistantError, retryDelayMs } from "@earendil-works/pi-ai/utils/retry";
+import type { Context, Draft } from "@so-agent/chord";
+import type { AssistantMessage, Message, ModelThinkingLevel, SimpleStreamOptions } from "@so-agent/ai";
+import { calculateContextTokens, estimateMessageTokens } from "@so-agent/ai/utils/estimate";
+import { isRetryableAssistantError, retryDelayMs } from "@so-agent/ai/utils/retry";
 import { CompactionEntry } from "../entries.ts";
 import { defineTask } from "../tasks.ts";
 import type {
@@ -110,7 +110,7 @@ Keep each section concise. Preserve exact file paths, function names, and error 
  * conversation-owned one places its summary through a write submission.
  */
 export const CompactionTask = defineTask<CompactionInput, CompactionCheckpoint, CompactionResult, CompactionHooks>({
-	name: "pi.compaction",
+	name: "so.compaction",
 	version: 1,
 	initial: () => ({ phase: "select" }),
 	phases: {

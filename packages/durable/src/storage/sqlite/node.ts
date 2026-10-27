@@ -1,12 +1,12 @@
-import { validateSqliteSchemaPrefix } from "@earendil-works/chord/sqlite";
-import { type NodeSqliteDatabaseOptions, openNodeSqliteDatabase } from "@earendil-works/chord/sqlite/node";
+import { validateSqliteSchemaPrefix } from "@so-agent/chord/sqlite";
+import { type NodeSqliteDatabaseOptions, openNodeSqliteDatabase } from "@so-agent/chord/sqlite/node";
 import { SqliteStorage, type SqliteStorageOptions } from "./storage.ts";
 
 export {
 	NodeSqliteDatabase,
 	type NodeSqliteDatabaseOptions,
 	openNodeSqliteDatabase,
-} from "@earendil-works/chord/sqlite/node";
+} from "@so-agent/chord/sqlite/node";
 
 /** Node SQLite connection settings plus durable storage options. */
 export type NodeSqliteStorageOptions = NodeSqliteDatabaseOptions & SqliteStorageOptions;

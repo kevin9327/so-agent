@@ -1,4 +1,4 @@
-import { ModelThinkingLevelSchema } from "@earendil-works/pi-ai/providers/model-schema";
+import { ModelThinkingLevelSchema } from "@so-agent/ai/providers/model-schema";
 import { type Static, type TSchemaOptions, Type } from "typebox";
 import { SETTINGS_DEFAULTS } from "./settings-defaults.ts";
 
@@ -392,7 +392,7 @@ export const SettingsSchema = Type.Object(
 			}),
 		),
 		httpProxy: Type.Optional(
-			Type.String({ description: "Proxy URL applied as HTTP_PROXY and HTTPS_PROXY for Pi-managed HTTP clients." }),
+			Type.String({ description: "Proxy URL applied as HTTP_PROXY and HTTPS_PROXY for So-managed HTTP clients." }),
 		),
 		httpIdleTimeoutMs: Type.Optional(
 			timeoutSetting({

@@ -13,7 +13,7 @@ import type {
 	ToolResultMessage,
 	TranscriptContext,
 	Usage,
-} from "@earendil-works/pi-ai";
+} from "@so-agent/ai";
 import type { Static, TSchema } from "typebox";
 
 /**
@@ -344,7 +344,7 @@ export interface AgentLoopConfig extends SimpleStreamOptions {
 /**
  * Thinking/reasoning level for models that support it.
  * Note: "xhigh" and "max" are only supported by selected model families. Use model
- * thinking-level metadata from @earendil-works/pi-ai to detect support for a concrete model.
+ * thinking-level metadata from @so-agent/ai to detect support for a concrete model.
  */
 export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "max";
 
@@ -354,7 +354,7 @@ export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhi
  *
  * @example
  * ```typescript
- * declare module "@mariozechner/agent" {
+ * declare module "@so-agent/agent" {
  *   interface CustomAgentMessages {
  *     artifact: ArtifactMessage;
  *     notification: NotificationMessage;

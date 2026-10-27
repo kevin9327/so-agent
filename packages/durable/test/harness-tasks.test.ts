@@ -1,6 +1,6 @@
-import type { Context } from "@earendil-works/chord";
-import { withAbortSignal, withCancel } from "@earendil-works/chord/context";
-import { createModels, Type } from "@earendil-works/pi-ai";
+import type { Context } from "@so-agent/chord";
+import { withAbortSignal, withCancel } from "@so-agent/chord/context";
+import { createModels, Type } from "@so-agent/ai";
 import {
 	type CommitPublication,
 	type Conversation,
@@ -17,8 +17,8 @@ import {
 	type StorageWrite,
 	type TaskId,
 	type TaskRuntime,
-} from "@earendil-works/pi-durable";
-import { InMemoryTelemetryContext } from "@earendil-works/pi-telemetry";
+} from "@so-agent/durable";
+import { InMemoryTelemetryContext } from "@so-agent/telemetry";
 import { describe, expect, it } from "vitest";
 import { addHooks, addTask, addTool, user } from "./harness-support.ts";
 import { ControlledStorage, context, flush, LateResolvingStorage, observeCommits } from "./session-support.ts";
@@ -1492,7 +1492,7 @@ describe("publication at adoption", () => {
 		expect(seen).toEqual(["terminal"]);
 		expect(await harness.closed).toEqual({ reason: "failed", error: new Error("reclaim failed") });
 		expect(infos).toContainEqual({ type: "session_failed" });
-		const active = telemetry.getMetrics().filter((metric) => metric.name === "pi.durable.tasks.active");
+		const active = telemetry.getMetrics().filter((metric) => metric.name === "so.durable.tasks.active");
 		expect(active.map((metric) => metric.value)).toEqual([1, -1]);
 	});
 
@@ -1504,7 +1504,7 @@ describe("publication at adoption", () => {
 		storage.rejectAfterAdopt = (writes) => writes.some((write) => write.type === "task");
 		await expect(start(root, Idle)).rejects.toThrow("reclaim failed");
 		expect(await harness.closed).toMatchObject({ reason: "failed" });
-		const active = telemetry.getMetrics().filter((metric) => metric.name === "pi.durable.tasks.active");
+		const active = telemetry.getMetrics().filter((metric) => metric.name === "so.durable.tasks.active");
 		expect(active.map((metric) => metric.value)).toEqual([1, -1]);
 	});
 

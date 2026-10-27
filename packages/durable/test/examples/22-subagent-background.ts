@@ -8,11 +8,11 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
-import { type AssistantMessage, type FauxResponseStep, Type } from "@earendil-works/pi-ai";
-import { createModels } from "@earendil-works/pi-ai/models";
-import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@earendil-works/pi-ai/providers/faux";
-import { openaiProvider } from "@earendil-works/pi-ai/providers/openai";
+import { BACKGROUND_CONTEXT } from "@so-agent/chord/context";
+import { type AssistantMessage, type FauxResponseStep, Type } from "@so-agent/ai";
+import { createModels } from "@so-agent/ai/models";
+import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
+import { openaiProvider } from "@so-agent/ai/providers/openai";
 import {
 	AssistantEntry,
 	type ConversationId,
@@ -255,7 +255,7 @@ if (process.env.OPENAI_API_KEY !== undefined) {
 }
 const registry = createRegistry();
 registry.install(SubagentTools);
-const directory = await mkdtemp(join(tmpdir(), "pi-durable-subagents-"));
+const directory = await mkdtemp(join(tmpdir(), "so-durable-subagents-"));
 const open = async () => {
 	const harness = await Harness.open(
 		await openNodeSqliteStorage(join(directory, "session.sqlite")),

@@ -68,13 +68,13 @@ import { splitErrorToolResultImages, transformMessages } from "./transform-messa
 
 /**
  * Resolve cache retention preference.
- * Defaults to "short" and uses PI_CACHE_RETENTION for backward compatibility.
+ * Defaults to "short" and uses SO_CACHE_RETENTION for backward compatibility.
  */
 function resolveCacheRetention(cacheRetention?: CacheRetention, env?: ProviderEnv): CacheRetention {
 	if (cacheRetention) {
 		return cacheRetention;
 	}
-	if (getProviderEnvValue("PI_CACHE_RETENTION", env) === "long") {
+	if (getProviderEnvValue("SO_CACHE_RETENTION", env) === "long") {
 		return "long";
 	}
 	return "short";
@@ -210,7 +210,7 @@ const INLINE_TOOLS_BETA = "inline-tools-2026-09-15";
  * activated and the model cannot see it.
  */
 const DEFERRED_TOOL_PLACEHOLDER: BetaTool = {
-	name: "__pi_deferred_placeholder__",
+	name: "__so_deferred_placeholder__",
 	description: "Reserved placeholder. Never available. Never call this.",
 	input_schema: { type: "object", properties: {}, required: [] },
 	defer_loading: true,
@@ -334,9 +334,9 @@ function assertRequestAuth(provider: string, apiKey: string | undefined, headers
  * Anthropic SDK client that never runs the SDK's own credential chain
  * (ANTHROPIC_PROFILE config files, federation env vars). Without this, every
  * client built with `apiKey: null, authToken: null` for header-owned auth would
- * also resolve and exchange SDK credentials behind pi's auth resolver.
+ * also resolve and exchange SDK credentials behind so's auth resolver.
  */
-class PiAnthropic extends Anthropic {
+class SoAnthropic extends Anthropic {
 	protected override _shouldResolveDefaultCredentials(): boolean {
 		return false;
 	}
@@ -374,7 +374,7 @@ function getAnthropicFederation(
 }
 
 /**
- * The SDK caches the federated access token per client, but pi creates a client
+ * The SDK caches the federated access token per client, but so creates a client
  * per request. Keep one client for the current federation config and fetch, and
  * clone it per request with `withOptions()`, which shares the token cache.
  */
@@ -1019,7 +1019,7 @@ function createClient(
 ): { client: Anthropic; isOAuthToken: boolean } {
 	// Copilot: Bearer auth.
 	if (model.provider === "github-copilot") {
-		const client = new PiAnthropic({
+		const client = new SoAnthropic({
 			apiKey: null,
 			authToken: apiKey ?? null,
 			baseURL: model.baseUrl,
@@ -1042,7 +1042,7 @@ function createClient(
 
 	// OAuth: Bearer auth, Claude Code identity headers instead of the client identity.
 	if (apiKey && isOAuthToken(apiKey)) {
-		const client = new PiAnthropic({
+		const client = new SoAnthropic({
 			apiKey: null,
 			authToken: apiKey,
 			baseURL: model.baseUrl,
@@ -1083,7 +1083,7 @@ function createClient(
 	if (federation) {
 		const key = JSON.stringify([model.baseUrl, federation]);
 		if (federationClient?.key !== key || federationClient.fetch !== fetch) {
-			const client = new PiAnthropic({
+			const client = new SoAnthropic({
 				apiKey: null,
 				authToken: null,
 				config: federation,
@@ -1096,7 +1096,7 @@ function createClient(
 		return { client: federationClient.client.withOptions({ defaultHeaders }), isOAuthToken: false };
 	}
 
-	const client = new PiAnthropic({
+	const client = new SoAnthropic({
 		apiKey: apiKey ?? null,
 		authToken: null,
 		baseURL: model.baseUrl,

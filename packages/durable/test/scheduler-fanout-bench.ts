@@ -5,9 +5,9 @@
  *
  *   node --conditions=source --experimental-strip-types test/scheduler-fanout-bench.ts [calls...]
  */
-import { BACKGROUND_CONTEXT as context } from "@earendil-works/chord/context";
-import { createModels } from "@earendil-works/pi-ai/models";
-import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@earendil-works/pi-ai/providers/faux";
+import { BACKGROUND_CONTEXT as context } from "@so-agent/chord/context";
+import { createModels } from "@so-agent/ai/models";
+import { fauxAssistantMessage, fauxProvider, fauxText, fauxToolCall } from "@so-agent/ai/providers/faux";
 import { Type } from "typebox";
 import { createRegistry, defineExtension, defineTool, Harness, ToolResultEntry } from "../src/index.ts";
 import { MemoryStorage } from "../src/storage/memory.ts";

@@ -1,7 +1,7 @@
-import { type Context, type JsonValue, Watch } from "@earendil-works/chord";
-import { awaitWithContext, BACKGROUND_CONTEXT, withoutAbortSignal } from "@earendil-works/chord/context";
-import { type Op, PendingOps, track } from "@earendil-works/chord/delta";
-import type { SpanAttributes } from "@earendil-works/pi-telemetry";
+import { type Context, type JsonValue, Watch } from "@so-agent/chord";
+import { awaitWithContext, BACKGROUND_CONTEXT, withoutAbortSignal } from "@so-agent/chord/context";
+import { type Op, PendingOps, track } from "@so-agent/chord/delta";
+import type { SpanAttributes } from "@so-agent/telemetry";
 import {
 	type AnyDocToken,
 	addressId,
@@ -1050,13 +1050,13 @@ export class SessionImpl implements Session {
 		for (const write of writes) {
 			switch (write.type) {
 				case "entry":
-					this.#event("pi.durable.entry", { "entry.id": write.value.id, "entry.kind": write.value.kind }, context);
+					this.#event("so.durable.entry", { "entry.id": write.value.id, "entry.kind": write.value.kind }, context);
 					changes?.push(write);
 					break;
 				case "submission":
 					if (write.value.status === "done" || write.value.status === "unanswered") {
 						this.#event(
-							"pi.durable.submission",
+							"so.durable.submission",
 							{
 								"submission.id": write.value.id,
 								status: write.value.status,

@@ -247,7 +247,7 @@ export function convertResponsesMessages<TApi extends Api>(
 		}
 		if (toolSupport !== "additions") return;
 		const names = tools.map((tool) => tool.name);
-		const callId = `pi_tool_load_${shortHash(`${seed}:${names.join(",")}`)}`;
+		const callId = `so_tool_load_${shortHash(`${seed}:${names.join(",")}`)}`;
 		messages.push({
 			type: "tool_search_call",
 			call_id: callId,
@@ -341,7 +341,7 @@ export function convertResponsesMessages<TApi extends Api>(
 					const textBlock = block as TextContent;
 					const parsedSignature = parseTextSignature(textBlock.textSignature);
 					const fallbackMessageId =
-						textBlockIndex === 0 ? `msg_pi_${msgIndex}` : `msg_pi_${msgIndex}_${textBlockIndex}`;
+						textBlockIndex === 0 ? `msg_so_${msgIndex}` : `msg_so_${msgIndex}_${textBlockIndex}`;
 					textBlockIndex++;
 					// OpenAI requires id to be max 64 characters
 					let msgId = parsedSignature?.id;

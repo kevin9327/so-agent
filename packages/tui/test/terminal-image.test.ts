@@ -45,9 +45,9 @@ const ENV_KEYS = [
 	"CMUX_WORKSPACE_ID",
 	"WARP_SESSION_ID",
 	"WARP_TERMINAL_SESSION_UUID",
-	"PI_HYPERLINKS",
-	"PI_IMAGE_PROTOCOL",
-	"PI_TRUE_COLOR",
+	"SO_HYPERLINKS",
+	"SO_IMAGE_PROTOCOL",
+	"SO_TRUE_COLOR",
 ] as const;
 
 function withEnv<T>(overrides: Record<string, string | undefined>, fn: () => T): T {
@@ -227,11 +227,11 @@ describe("detectCapabilities", () => {
 
 	it("applies environment overrides", () => {
 		assert.deepStrictEqual(
-			withEnv({ PI_HYPERLINKS: "1", PI_IMAGE_PROTOCOL: "kitty", PI_TRUE_COLOR: "1" }, () => detectCapabilities()),
+			withEnv({ SO_HYPERLINKS: "1", SO_IMAGE_PROTOCOL: "kitty", SO_TRUE_COLOR: "1" }, () => detectCapabilities()),
 			{ images: "kitty", trueColor: true, hyperlinks: true },
 		);
 		assert.deepStrictEqual(
-			withEnv({ TERM_PROGRAM: "iterm.app", PI_HYPERLINKS: "0", PI_IMAGE_PROTOCOL: "none", PI_TRUE_COLOR: "0" }, () =>
+			withEnv({ TERM_PROGRAM: "iterm.app", SO_HYPERLINKS: "0", SO_IMAGE_PROTOCOL: "none", SO_TRUE_COLOR: "0" }, () =>
 				detectCapabilities(),
 			),
 			{ images: null, trueColor: false, hyperlinks: false },
@@ -243,9 +243,9 @@ describe("detectCapabilities", () => {
 			withEnv(
 				{
 					TERM_PROGRAM: "ghostty",
-					PI_HYPERLINKS: "auto",
-					PI_IMAGE_PROTOCOL: "auto",
-					PI_TRUE_COLOR: "auto",
+					SO_HYPERLINKS: "auto",
+					SO_IMAGE_PROTOCOL: "auto",
+					SO_TRUE_COLOR: "auto",
 				},
 				() => detectCapabilities(),
 			),
@@ -254,7 +254,7 @@ describe("detectCapabilities", () => {
 	});
 
 	it("applies and clears programmatic overrides", () => {
-		withEnv({ PI_HYPERLINKS: "1", PI_IMAGE_PROTOCOL: "kitty", PI_TRUE_COLOR: "1" }, () => {
+		withEnv({ SO_HYPERLINKS: "1", SO_IMAGE_PROTOCOL: "kitty", SO_TRUE_COLOR: "1" }, () => {
 			setCapabilityOverrides({ images: null, trueColor: false, hyperlinks: false });
 			try {
 				assert.deepStrictEqual(getCapabilities(), { images: null, trueColor: false, hyperlinks: false });
@@ -270,7 +270,7 @@ describe("detectCapabilities", () => {
 	it("bypasses the tmux probe when hyperlinks are overridden", () => {
 		let probed = false;
 		const caps = withEnv(
-			{ TMUX: "/tmp/tmux-1000/default,1234,0", PI_HYPERLINKS: "1", PI_IMAGE_PROTOCOL: "kitty" },
+			{ TMUX: "/tmp/tmux-1000/default,1234,0", SO_HYPERLINKS: "1", SO_IMAGE_PROTOCOL: "kitty" },
 			() =>
 				detectCapabilities(() => {
 					probed = true;
@@ -325,7 +325,7 @@ describe("detectCapabilities", () => {
 			assert.strictEqual(caps.images, "kitty");
 			assert.strictEqual(caps.trueColor, true);
 		});
-		withEnv({ TERM_PROGRAM: "herdr", PI_HYPERLINKS: "0" }, () => {
+		withEnv({ TERM_PROGRAM: "herdr", SO_HYPERLINKS: "0" }, () => {
 			assert.strictEqual(detectCapabilities().hyperlinks, false);
 		});
 	});
@@ -338,7 +338,7 @@ describe("detectCapabilities", () => {
 			assert.strictEqual(caps.images, "kitty");
 			assert.strictEqual(caps.trueColor, true);
 		});
-		withEnv({ TERM_PROGRAM: "rex", PI_HYPERLINKS: "0" }, () => {
+		withEnv({ TERM_PROGRAM: "rex", SO_HYPERLINKS: "0" }, () => {
 			assert.strictEqual(detectCapabilities().hyperlinks, false);
 		});
 	});
@@ -804,9 +804,9 @@ describe("imageFallback", () => {
 	it("shortens home-prefixed absolute paths without hyperlinks", () => {
 		setCapabilities({ images: null, trueColor: false, hyperlinks: false });
 		try {
-			const abs = join(homedir(), ".pi", "agent", "shot.png");
+			const abs = join(homedir(), ".so", "agent", "shot.png");
 			const result = imageFallback("image/png", { widthPx: 1280, heightPx: 720 }, abs);
-			assert.strictEqual(result, "[Image: ~/.pi/agent/shot.png [image/png] 1280x720]");
+			assert.strictEqual(result, "[Image: ~/.so/agent/shot.png [image/png] 1280x720]");
 		} finally {
 			resetCapabilitiesCache();
 		}
@@ -815,7 +815,7 @@ describe("imageFallback", () => {
 	it("wraps shortened absolute paths in OSC 8 file links when hyperlinks are enabled", () => {
 		setCapabilities({ images: null, trueColor: false, hyperlinks: true });
 		try {
-			const abs = join(homedir(), ".pi", "agent", "shot.png");
+			const abs = join(homedir(), ".so", "agent", "shot.png");
 			const result = imageFallback("image/png", { widthPx: 10, heightPx: 10 }, abs);
 			assert.ok(result.includes("\x1b]8;;file://"), "expected OSC 8 file link");
 			assert.ok(
@@ -824,7 +824,7 @@ describe("imageFallback", () => {
 			);
 			// Visible text must use ~/... not the expanded home path.
 			const visible = result.replace(/\x1b\]8;;.*?\x1b\\/g, "");
-			assert.strictEqual(visible, "[Image: ~/.pi/agent/shot.png [image/png] 10x10]");
+			assert.strictEqual(visible, "[Image: ~/.so/agent/shot.png [image/png] 10x10]");
 		} finally {
 			resetCapabilitiesCache();
 		}

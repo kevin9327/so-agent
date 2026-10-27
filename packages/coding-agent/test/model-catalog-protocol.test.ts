@@ -10,8 +10,8 @@ import {
 	parseModelCatalogRequest,
 	selectModelCatalog,
 } from "../../../scripts/model-catalog-protocol.ts";
-import { VERSION } from "../src/config.ts";
 import { ModelRuntime } from "../src/core/model-runtime.ts";
+import { CATALOG_PROTOCOL_VERSION } from "../src/core/remote-catalog-provider.ts";
 import { allowNetwork } from "./test-network-env.ts";
 
 // Runs the current client against the catalog selection pi.dev performs, using
@@ -120,12 +120,11 @@ describe("model catalog protocol with the current client", () => {
 		expect([...refresh.errors]).toEqual([]);
 
 		const catalogUrl = "/api/models/providers/openrouter?types=chat%2Cimage%2Cclassifier";
-		// so identifies itself as `so/<version>`, which the upstream protocol does not negotiate by version, so there
-		// is a single request and no `pi-version` redirect.
-		expect(requests).toEqual([catalogUrl]);
+		// so announces itself as `so/<version>` and sends `pi-version` itself, so the server never has to redirect.
+		expect(requests).toEqual([`${catalogUrl}&pi-version=${CATALOG_PROTOCOL_VERSION}`]);
 
 		const expectedModel =
-			selectModelCatalog(index, VERSION)?.revision === legacyRevision ? legacyModel : mixedApiModel;
+			selectModelCatalog(index, CATALOG_PROTOCOL_VERSION)?.revision === legacyRevision ? legacyModel : mixedApiModel;
 		const model = runtime.getModel("openrouter", modelId);
 		expect(model).toMatchObject({ api: expectedModel.api, baseUrl: expectedModel.baseUrl });
 		if (!model) throw new Error(`Missing model: openrouter/${modelId}`);

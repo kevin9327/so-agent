@@ -5,6 +5,7 @@ import {
 	formatVersionCheckError,
 	getLatestSoRelease,
 	getLatestSoVersion,
+	getLatestVersionUrl,
 	isNewerPackageVersion,
 } from "../src/utils/version-check.ts";
 import { allowNetwork } from "./test-network-env.ts";
@@ -130,23 +131,53 @@ describe("version checks", () => {
 	});
 });
 
-describe("version checks without a configured feed", () => {
-	it("makes no request unless SO_UPDATE_URL is set", async () => {
+describe("the update feed", () => {
+	it("defaults to the npm registry entry of this package, never to the upstream Pi feed", async () => {
 		vi.stubEnv("SO_UPDATE_URL", "");
-		const fetchMock = vi.fn(async () => Response.json({ version: "9.9.9" }));
+		expect(getLatestVersionUrl({})).toBe("https://registry.npmjs.org/@so-agent%2fcoding-agent/latest");
+		const fetchMock = vi.fn(async () => Response.json({ name: "@so-agent/coding-agent", version: "1.0.1" }));
 		vi.stubGlobal("fetch", fetchMock);
 
-		await expect(getLatestSoRelease("1.0.0")).resolves.toBeUndefined();
-		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
-		expect(fetchMock).not.toHaveBeenCalled();
+		await expect(getLatestSoRelease("1.0.0")).resolves.toEqual({
+			version: "1.0.1",
+			packageName: "@so-agent/coding-agent",
+		});
+		expect(fetchMock).toHaveBeenCalledWith(
+			"https://registry.npmjs.org/@so-agent%2fcoding-agent/latest",
+			expect.anything(),
+		);
 	});
 
-	it("uses SO_UPDATE_URL when set", async () => {
+	it("stays silent while the package is not published", async () => {
+		vi.stubEnv("SO_UPDATE_URL", "");
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => new Response("{}", { status: 404 })),
+		);
+		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
+	});
+
+	it("uses SO_UPDATE_URL and the upstream feed shape when set", async () => {
 		vi.stubEnv("SO_UPDATE_URL", "https://updates.example.test/latest");
-		const fetchMock = vi.fn(async () => Response.json({ version: "1.0.1" }));
+		const fetchMock = vi.fn(async () => Response.json({ version: "1.0.1", packageName: "@other/so", note: "hi" }));
 		vi.stubGlobal("fetch", fetchMock);
 
-		await expect(getLatestSoVersion("1.0.0")).resolves.toBe("1.0.1");
+		await expect(getLatestSoRelease("1.0.0")).resolves.toEqual({
+			version: "1.0.1",
+			packageName: "@other/so",
+			note: "hi",
+		});
 		expect(fetchMock).toHaveBeenCalledWith("https://updates.example.test/latest", expect.anything());
+	});
+
+	it("makes no request with SO_OFFLINE or SO_SKIP_VERSION_CHECK", async () => {
+		const fetchMock = vi.fn(async () => Response.json({ version: "9.9.9" }));
+		vi.stubGlobal("fetch", fetchMock);
+		vi.stubEnv("SO_OFFLINE", "1");
+		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
+		vi.stubEnv("SO_OFFLINE", undefined);
+		process.env.SO_SKIP_VERSION_CHECK = "1";
+		await expect(checkForNewSoVersion("1.0.0")).resolves.toBeUndefined();
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });

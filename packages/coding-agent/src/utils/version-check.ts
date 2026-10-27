@@ -1,9 +1,17 @@
 import { compare, valid } from "semver";
+import { PACKAGE_NAME } from "../config.ts";
 import { fetchWithRetry } from "./management-http.ts";
 import { getSoUserAgent } from "./so-user-agent.ts";
 
-/** so has no hosted release feed. Set `SO_UPDATE_URL` to a JSON endpoint returning `{ version, packageName?, note? }`. */
-const getLatestVersionUrl = (): string | undefined => process.env.SO_UPDATE_URL?.trim() || undefined;
+/**
+ * Where the update check looks for the newest release. The upstream project's release feed would offer (and
+ * `so update --self` would install) upstream Pi, so the default is the npm registry entry of this package. Until the package is
+ * published the registry answers 404 and the check stays silent. `SO_UPDATE_URL` points at any other feed that
+ * returns `{ version, packageName?, note? }` (the shape upstream's feed uses); the registry's `{ name, version }` works too.
+ */
+export function getLatestVersionUrl(env: NodeJS.ProcessEnv = process.env): string {
+	return env.SO_UPDATE_URL?.trim() || `https://registry.npmjs.org/${PACKAGE_NAME.replace("/", "%2f")}/latest`;
+}
 const DEFAULT_VERSION_CHECK_TIMEOUT_MS = 10000;
 
 export interface LatestSoRelease {
@@ -53,11 +61,10 @@ export async function getLatestSoRelease(
 	currentVersion: string,
 	options: { timeoutMs?: number; retry?: boolean } = {},
 ): Promise<LatestSoRelease | undefined> {
-	const latestVersionUrl = getLatestVersionUrl();
-	if (process.env.SO_OFFLINE || !latestVersionUrl) return undefined;
+	if (process.env.SO_OFFLINE) return undefined;
 
 	const response = await fetchWithRetry(
-		latestVersionUrl,
+		getLatestVersionUrl(),
 		{
 			headers: {
 				"User-Agent": getSoUserAgent(currentVersion),
@@ -72,6 +79,7 @@ export async function getLatestSoRelease(
 	if (!response.ok) return undefined;
 
 	const data = (await response.json()) as {
+		name?: unknown;
 		packageName?: unknown;
 		version?: unknown;
 		note?: unknown;
@@ -79,8 +87,9 @@ export async function getLatestSoRelease(
 	if (typeof data.version !== "string" || !data.version.trim()) {
 		return undefined;
 	}
+	const feedPackageName = data.packageName ?? data.name;
 	const packageName =
-		typeof data.packageName === "string" && data.packageName.trim() ? data.packageName.trim() : undefined;
+		typeof feedPackageName === "string" && feedPackageName.trim() ? feedPackageName.trim() : undefined;
 	const note = typeof data.note === "string" && data.note.trim() ? data.note.trim() : undefined;
 	return {
 		version: data.version.trim(),

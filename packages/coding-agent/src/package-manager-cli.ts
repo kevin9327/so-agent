@@ -38,7 +38,12 @@ import { spawnProcess, spawnProcessSync, waitForChildProcess } from "./utils/chi
 import { canonicalizePath, getCwdRelativePath } from "./utils/paths.ts";
 import { getSoUserAgent } from "./utils/so-user-agent.ts";
 import { stripBom } from "./utils/text.ts";
-import { formatVersionCheckError, getLatestSoRelease, isNewerPackageVersion } from "./utils/version-check.ts";
+import {
+	formatVersionCheckError,
+	getLatestSoRelease,
+	getLatestVersionUrl,
+	isNewerPackageVersion,
+} from "./utils/version-check.ts";
 import {
 	cleanupWindowsSelfUpdateQuarantine,
 	quarantineWindowsNativeDependencies,
@@ -683,6 +688,23 @@ interface SelfUpdatePlan {
 	note?: string;
 }
 
+/**
+ * The shell command that migrates an npm install to a managed one, or undefined when no so installer is configured.
+ * The upstream project's installer would install Pi, so there is no default: set `SO_INSTALLER_URL` (shell script) or
+ * `SO_INSTALLER_PS1_URL` (PowerShell script on Windows).
+ */
+export function getManagedInstallerCommand(
+	platform: NodeJS.Platform = process.platform,
+	env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+	if (platform === "win32") {
+		const url = env.SO_INSTALLER_PS1_URL?.trim();
+		return url ? `powershell -c "irm ${url} | iex"` : undefined;
+	}
+	const url = env.SO_INSTALLER_URL?.trim();
+	return url ? `curl -fsSL ${url} | sh` : undefined;
+}
+
 async function getSelfUpdatePlan(force: boolean): Promise<SelfUpdatePlan> {
 	let latestRelease: Awaited<ReturnType<typeof getLatestSoRelease>>;
 	try {
@@ -693,7 +715,9 @@ async function getSelfUpdatePlan(force: boolean): Promise<SelfUpdatePlan> {
 		});
 	}
 	if (!latestRelease) {
-		throw new Error(`Could not determine latest ${APP_NAME} version. Set SO_UPDATE_URL to a release feed.`);
+		throw new Error(
+			`Could not determine latest ${APP_NAME} version (looked at ${getLatestVersionUrl()}; set SO_UPDATE_URL to use another release feed).`,
+		);
 	}
 
 	const packageName = latestRelease.packageName ?? PACKAGE_NAME;
@@ -1125,6 +1149,19 @@ export async function handlePackageCommand(
 						return true;
 					}
 					console.log(chalk.green(`Updated ${APP_NAME} from ${VERSION} to ${selfUpdatePlan.version}`));
+					// A managed installer migrates global npm installs to an install that pins all dependencies. It does not
+					// migrate pnpm, yarn, or bun installs. The upstream project's installer installs Pi, so the hint is
+					// shown only when SO_INSTALLER_URL (shell) / SO_INSTALLER_PS1_URL (PowerShell) names an so installer.
+					if (installMethod === "npm") {
+						const installerCommand = getManagedInstallerCommand();
+						if (installerCommand) {
+							console.log();
+							console.log(chalk.yellow(`This npm installation of ${APP_NAME} does not pin its dependencies.`));
+							console.log(chalk.yellow("Run the installer to migrate to a managed installation that does:"));
+							console.log();
+							console.log(`  ${chalk.bold(installerCommand)}`);
+						}
+					}
 				}
 				return true;
 			}

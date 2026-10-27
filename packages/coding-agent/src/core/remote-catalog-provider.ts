@@ -11,11 +11,25 @@ import { VERSION } from "../config.ts";
 import { fetchWithRetry } from "../utils/management-http.ts";
 import { getSoUserAgent } from "../utils/so-user-agent.ts";
 
+const DEFAULT_CATALOG_BASE_URL = "https://pi.dev";
 /**
- * so does not talk to the upstream model catalog service by default. Set `SO_CATALOG_URL` (for example to
- * the upstream catalog host listed in docs/UPSTREAM-ENDPOINTS.md) to opt in to the remote overlay.
+ * The catalog service is the upstream project's public, read-only model list. It stays on by default so model data
+ * stays current. `SO_CATALOG_URL` points so at another catalog host with the same protocol; `off` (also `0`,
+ * `false`, `none`) disables the overlay. `SO_OFFLINE` already disables every network request.
  */
-const DEFAULT_CATALOG_BASE_URL: string | undefined = process.env.SO_CATALOG_URL?.trim() || undefined;
+export function getCatalogBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
+	const configured = env.SO_CATALOG_URL?.trim();
+	if (!configured) return DEFAULT_CATALOG_BASE_URL;
+	return /^(off|0|false|none)$/i.test(configured) ? "" : configured;
+}
+/**
+ * The upstream Pi release whose catalog protocol this client implements (so is based on upstream Pi 1.4.0). The catalog
+ * server picks the catalog revision a client can read from the `pi-version` query parameter; it redirects clients with
+ * the user agent `pi/<version>` (upstream Pi) to it. so announces itself as `so/<version>`, so it sends the parameter itself:
+ * that pins the revision to one this code understands and saves the redirect round trip. Bump this when merging a
+ * newer upstream Pi release.
+ */
+export const CATALOG_PROTOCOL_VERSION = "1.4.0";
 const REMOTE_CATALOG_ATTEMPT_TIMEOUT_MS = 4_000;
 export const REMOTE_CATALOG_REFRESH_INTERVAL_MS = 4 * 60 * 60 * 1000;
 /**
@@ -84,6 +98,7 @@ function requestCatalog(
 ): Promise<Response> {
 	const url = new URL(`/api/models/providers/${encodeURIComponent(providerId)}`, catalogBaseUrl);
 	url.searchParams.set("types", REMOTE_CATALOG_MODEL_TYPES.join(","));
+	url.searchParams.set("pi-version", CATALOG_PROTOCOL_VERSION);
 	return fetchWithRetry(
 		url,
 		{
@@ -107,7 +122,7 @@ export type PersonalizeCatalog = (
 /** Add a persisted pi.dev catalog overlay to a static built-in provider. */
 export function withRemoteCatalog(
 	provider: Provider,
-	catalogBaseUrl: string | undefined = DEFAULT_CATALOG_BASE_URL,
+	catalogBaseUrl: string = getCatalogBaseUrl(),
 	localGeneratedAt?: number,
 ): Provider {
 	if (!catalogBaseUrl) return provider;
@@ -200,7 +215,7 @@ export function withRemoteCatalog(
 export function withPersonalizedCatalog(
 	provider: Provider,
 	personalize: PersonalizeCatalog,
-	catalogBaseUrl: string | undefined = DEFAULT_CATALOG_BASE_URL,
+	catalogBaseUrl: string = getCatalogBaseUrl(),
 	localGeneratedAt?: number,
 ): Provider {
 	let personalModels: readonly AnyModel[] = [];

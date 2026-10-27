@@ -82,7 +82,11 @@ These variables are read by So itself:
 | `SO_CODING_AGENT_SESSION_DIR` | Override session storage; overridden by `--session-dir` |
 | `SO_PACKAGE_DIR` | Override the package directory, useful for Nix/Guix store paths |
 | `SO_OFFLINE` | Disable automatic network activity, including model catalog refreshes |
-| `SO_SKIP_VERSION_CHECK` | Disable the `pi.dev` latest-version request |
+| `SO_SKIP_VERSION_CHECK` | Disable the latest-version request made at startup |
+| `SO_UPDATE_URL` | Release feed for the update check and `so update --self`. Default: the npm registry entry of the installed package. Accepts `{ "version", "packageName"?, "note"? }` or a registry `{ "name", "version" }` |
+| `SO_CATALOG_URL` | Model catalog host. Default: `https://pi.dev` (the upstream project's public model list). `off` disables the remote catalog overlay |
+| `SO_INSTALL_REPORT_URL` | Endpoint for the anonymous install counter (`enableInstallTelemetry`). No default, so nothing is sent unless set |
+| `SO_INSTALLER_URL`, `SO_INSTALLER_PS1_URL` | Installer script URLs printed as a hint after `so update --self` on npm installs. No default |
 | `SO_TELEMETRY` | Override install/update telemetry and provider attribution headers: `1`/`true`/`yes` or `0`/`false`/`no` |
 | `SO_CODEMODE_MAX_WORKERS` | Maximum codemode workers alive at once across all sessions in the process; default `2`. Each worker's script may use up to 256 MB. Raise it when one process runs several sessions, such as in-process subagents. Further scripts wait for a free worker. See [Codemode](codemode.md) |
 | `SO_CACHE_RETENTION` | Set to `long` for extended provider prompt caching where supported |

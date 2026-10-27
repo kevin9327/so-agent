@@ -244,11 +244,24 @@ if (dirname(configOutput) !== dirname(bedrockLoaderOutput)) {
 
 const metafiles = [mainResult.metafile, lazyResult.metafile, codemodeWorkerResult.metafile];
 validateExternalImports(metafiles);
+// `so --version` prints the package version without evaluating the application module graph (about 8x faster).
 const cliLauncher = `#!/usr/bin/env node
+import { readFileSync } from "node:fs";
 import { createRequire, enableCompileCache } from "node:module";
 
-enableCompileCache();
-createRequire(import.meta.url)("./cli-runtime.js");
+const args = process.argv.slice(2);
+let version;
+if (args.length === 1 && (args[0] === "--version" || args[0] === "-v")) {
+	try {
+		version = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")).version;
+	} catch {}
+}
+if (typeof version === "string" && version) {
+	console.log(version);
+} else {
+	enableCompileCache();
+	createRequire(import.meta.url)("./cli-runtime.js");
+}
 `;
 writeFileSync(join(bundleDir, "cli.js"), cliLauncher);
 chmodSync(join(bundleDir, "cli.js"), 0o755);

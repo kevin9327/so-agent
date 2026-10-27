@@ -64,7 +64,6 @@ import { hasTrustRequiringProjectResources, ProjectTrustStore } from "./core/tru
 import { builtInExtensions } from "./extensions/index.ts";
 import { loadMcpCommand } from "./extensions/mcp/cli.lazy.ts";
 import { runMigrations, showDeprecationWarnings } from "./migrations.ts";
-import { InteractiveMode, runPrintMode, runRpcMode } from "./modes/index.ts";
 import { initTheme, setThemeJsonValidator, stopThemeWatcher } from "./modes/interactive/theme/theme.ts";
 import { validateThemeJson } from "./modes/interactive/theme/theme-schema.ts";
 import { cleanupManagedInstall, handleConfigCommand, handlePackageCommand } from "./package-manager-cli.ts";
@@ -947,10 +946,13 @@ export async function main(args: string[], options?: MainOptions) {
 			.finally(() => clearTimeout(timeout));
 	}
 
+	// Each mode is imported on demand: print and RPC runs never evaluate the interactive UI module graph.
 	if (appMode === "rpc") {
 		printTimings();
+		const { runRpcMode } = await import("./modes/rpc/rpc-mode.ts");
 		await runRpcMode(runtime);
 	} else if (appMode === "interactive") {
+		const { InteractiveMode } = await import("./modes/interactive/interactive-mode.ts");
 		const interactiveMode = new InteractiveMode(runtime, {
 			migratedProviders,
 			startupDiagnostics,
@@ -985,6 +987,7 @@ export async function main(args: string[], options?: MainOptions) {
 		await interactiveMode.run();
 	} else {
 		printTimings();
+		const { runPrintMode } = await import("./modes/print-mode.ts");
 		const exitCode = await runPrintMode(runtime, {
 			mode: toPrintOutputMode(appMode),
 			messages: parsed.messages,

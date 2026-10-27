@@ -2475,24 +2475,9 @@ index 0000000..430273b
 +`## [x.y.z]` entry above `[1.4.0]` in the changelog (required: the startup "what's new" and the install report only fire when the changelog has an entry newer than the last version seen), regenerate the install lock
 +(`node scripts/generate-coding-agent-install-lock.mjs`).
 diff --git a/package-lock.json b/package-lock.json
-index 9fa0552..7a1280c 100644
+index 9fa0552..d80f622 100644
 --- a/package-lock.json
 +++ b/package-lock.json
-@@ -1,12 +1,12 @@
- {
- 	"name": "so-agent-monorepo",
--	"version": "0.0.3",
-+	"version": "0.0.2",
- 	"lockfileVersion": 3,
- 	"requires": true,
- 	"packages": {
- 		"": {
- 			"name": "so-agent-monorepo",
--			"version": "0.0.3",
-+			"version": "0.0.2",
- 			"workspaces": [
- 				"packages/*",
- 				"apps/*",
 @@ -753,10 +753,6 @@
  				"node": ">=20"
  			}
@@ -2761,11 +2746,11 @@ index 9fa0552..7a1280c 100644
  		"packages/agent": {
  			"name": "@so-agent/agent-core",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
 -				"@so-agent/ai": "1.4.0",
-+				"@so-agent/ai": "0.0.2",
++				"@so-agent/ai": "0.0.3",
  				"typebox": "1.3.27"
  			},
  			"devDependencies": {
@@ -2774,7 +2759,7 @@ index 9fa0552..7a1280c 100644
  		"packages/ai": {
  			"name": "@so-agent/ai",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
  				"@anthropic-ai/sdk": "0.129.0",
@@ -2782,7 +2767,7 @@ index 9fa0552..7a1280c 100644
 -				"@so-agent/telemetry": "1.4.0",
  				"@google/genai": "2.21.0",
  				"@smithy/node-http-handler": "4.12.1",
-+				"@so-agent/telemetry": "0.0.2",
++				"@so-agent/telemetry": "0.0.3",
  				"http-proxy-agent": "9.1.0",
  				"https-proxy-agent": "9.1.0",
  				"openai": "7.19.0",
@@ -2791,11 +2776,11 @@ index 9fa0552..7a1280c 100644
  		"packages/chord": {
  			"name": "@so-agent/chord",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
 -				"@so-agent/telemetry": "1.4.0",
-+				"@so-agent/telemetry": "0.0.2",
++				"@so-agent/telemetry": "0.0.3",
  				"typebox": "1.3.27"
  			},
  			"devDependencies": {
@@ -2804,7 +2789,7 @@ index 9fa0552..7a1280c 100644
  		"packages/codemode": {
  			"name": "@so-agent/codemode",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
  				"quickjs-wasi": "3.6.2"
@@ -2813,7 +2798,7 @@ index 9fa0552..7a1280c 100644
  		"packages/coding-agent": {
  			"name": "@so-agent/coding-agent",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
 -				"@so-agent/agent-core": "1.4.0",
@@ -2822,11 +2807,11 @@ index 9fa0552..7a1280c 100644
 -				"@so-agent/mcp": "1.4.0",
 -				"@so-agent/tui": "1.4.0",
  				"@silvia-odwyer/photon-node": "0.3.4",
-+				"@so-agent/agent-core": "0.0.2",
-+				"@so-agent/ai": "0.0.2",
-+				"@so-agent/codemode": "0.0.2",
-+				"@so-agent/mcp": "0.0.2",
-+				"@so-agent/tui": "0.0.2",
++				"@so-agent/agent-core": "0.0.3",
++				"@so-agent/ai": "0.0.3",
++				"@so-agent/codemode": "0.0.3",
++				"@so-agent/mcp": "0.0.3",
++				"@so-agent/tui": "0.0.3",
  				"brace-expansion": "5.0.12",
  				"chalk": "6.0.0",
  				"cross-spawn": "7.0.6",
@@ -2835,7 +2820,7 @@ index 9fa0552..7a1280c 100644
  		"packages/coding-agent/examples/extensions/custom-provider-anthropic": {
  			"name": "so-extension-custom-provider-anthropic",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"dependencies": {
  				"@anthropic-ai/sdk": "0.52.0"
  			}
@@ -2843,12 +2828,12 @@ index 9fa0552..7a1280c 100644
  		"packages/coding-agent/examples/extensions/custom-provider-gitlab-duo": {
  			"name": "so-extension-custom-provider-gitlab-duo",
 -			"version": "1.4.0"
-+			"version": "0.0.2"
++			"version": "0.0.3"
  		},
  		"packages/coding-agent/examples/extensions/gondolin": {
  			"name": "so-extension-gondolin",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"dependencies": {
  				"@earendil-works/gondolin": "0.14.0"
  			}
@@ -2856,7 +2841,7 @@ index 9fa0552..7a1280c 100644
  		"packages/coding-agent/examples/extensions/sandbox": {
  			"name": "so-extension-sandbox",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"dependencies": {
  				"@anthropic-ai/sandbox-runtime": "0.0.26"
  			}
@@ -2864,7 +2849,7 @@ index 9fa0552..7a1280c 100644
  		"packages/coding-agent/examples/extensions/with-deps": {
  			"name": "so-extension-with-deps",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"dependencies": {
  				"ms": "2.1.3"
  			},
@@ -2873,7 +2858,7 @@ index 9fa0552..7a1280c 100644
  		"packages/durable": {
  			"name": "@so-agent/durable",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
 -				"@so-agent/chord": "1.4.0",
@@ -2881,10 +2866,10 @@ index 9fa0552..7a1280c 100644
 -				"@so-agent/codemode": "1.4.0",
 -				"@so-agent/telemetry": "1.4.0",
  				"@silvia-odwyer/photon": "0.3.3",
-+				"@so-agent/ai": "0.0.2",
-+				"@so-agent/chord": "0.0.2",
-+				"@so-agent/codemode": "0.0.2",
-+				"@so-agent/telemetry": "0.0.2",
++				"@so-agent/ai": "0.0.3",
++				"@so-agent/chord": "0.0.3",
++				"@so-agent/codemode": "0.0.3",
++				"@so-agent/telemetry": "0.0.3",
  				"diff": "8.0.4",
  				"typebox": "1.3.27"
  			},
@@ -2893,13 +2878,13 @@ index 9fa0552..7a1280c 100644
  		"packages/env": {
  			"name": "@so-agent/env",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
 -				"@so-agent/chord": "1.4.0",
 -				"@so-agent/durable": "1.4.0"
-+				"@so-agent/chord": "0.0.2",
-+				"@so-agent/durable": "0.0.2"
++				"@so-agent/chord": "0.0.3",
++				"@so-agent/durable": "0.0.3"
  			},
  			"devDependencies": {
  				"shx": "0.3.4",
@@ -2908,12 +2893,12 @@ index 9fa0552..7a1280c 100644
  		"packages/evals": {
  			"name": "@so-agent/evals",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"devDependencies": {
 -				"@so-agent/ai": "1.4.0",
 -				"@so-agent/coding-agent": "1.4.0",
-+				"@so-agent/ai": "0.0.2",
-+				"@so-agent/coding-agent": "0.0.2",
++				"@so-agent/ai": "0.0.3",
++				"@so-agent/coding-agent": "0.0.3",
  				"@types/node": "22.19.19",
  				"@vitest-evals/core": "0.15.0",
  				"shx": "0.3.4",
@@ -2922,7 +2907,7 @@ index 9fa0552..7a1280c 100644
  		"packages/mcp": {
  			"name": "@so-agent/mcp",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
  				"cross-spawn": "7.0.6"
@@ -2931,7 +2916,7 @@ index 9fa0552..7a1280c 100644
  		"packages/telemetry": {
  			"name": "@so-agent/telemetry",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"devDependencies": {
  				"@types/node": "22.19.19",
@@ -2940,32 +2925,19 @@ index 9fa0552..7a1280c 100644
  		"packages/tui": {
  			"name": "@so-agent/tui",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"license": "MIT",
  			"dependencies": {
  				"get-east-asian-width": "1.6.0",
-diff --git a/package.json b/package.json
-index b70c562..2884b46 100644
---- a/package.json
-+++ b/package.json
-@@ -71,7 +71,7 @@
- 	"engines": {
- 		"node": ">=22.19.0"
- 	},
--	"version": "0.0.3",
-+	"version": "0.0.2",
- 	"overrides": {
- 		"protobufjs": "7.6.6"
- 	}
 diff --git a/packages/agent/package.json b/packages/agent/package.json
-index 28d295b..45f0789 100644
+index 28d295b..d41c22d 100644
 --- a/packages/agent/package.json
 +++ b/packages/agent/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/agent-core",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "General-purpose agent with transport abstraction, state management, and attachment support",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -2974,7 +2946,7 @@ index 28d295b..45f0789 100644
  	},
  	"dependencies": {
 -		"@so-agent/ai": "1.4.0",
-+		"@so-agent/ai": "0.0.2",
++		"@so-agent/ai": "0.0.3",
  		"typebox": "1.3.27"
  	},
  	"keywords": [
@@ -2987,15 +2959,43 @@ index 28d295b..45f0789 100644
  		"directory": "packages/agent"
  	},
  	"engines": {
+diff --git a/packages/agent/src/agent-loop.ts b/packages/agent/src/agent-loop.ts
+index 207f12b..2bb67d3 100644
+--- a/packages/agent/src/agent-loop.ts
++++ b/packages/agent/src/agent-loop.ts
+@@ -500,7 +500,7 @@ async function failToolCallsFromTruncatedMessage(
+ 		const finalized: FinalizedToolCallOutcome = {
+ 			toolCall,
+ 			result: createErrorToolResult(
+-				`Tool call "${toolCall.name}" was not executed: the response hit the output token limit, so its arguments may be truncated. Re-issue the tool call with complete arguments.`,
++				`Tool call "${toolCall.name}" was not executed: the response hit the output token limit, so its arguments may be truncated. Re-issue the tool call with complete arguments. If responses keep hitting the limit, make one tool call per response and keep each call small: several smaller edits instead of one large one, or a large file written in parts.`,
+ 			),
+ 			isError: true,
+ 		};
+diff --git a/packages/agent/test/agent-loop.test.ts b/packages/agent/test/agent-loop.test.ts
+index 5aa09ee..fbe7580 100644
+--- a/packages/agent/test/agent-loop.test.ts
++++ b/packages/agent/test/agent-loop.test.ts
+@@ -517,6 +517,10 @@ describe("agentLoop with AgentMessage", () => {
+ 			expect(toolEnd.isError).toBe(true);
+ 			const text = toolEnd.result.content.find((c: { type: string }) => c.type === "text");
+ 			expect(text && "text" in text ? text.text : "").toContain("output token limit");
++			// Original sentence kept; the retry guidance is appended after it.
++			expect(text && "text" in text ? text.text : "").toContain(
++				"Re-issue the tool call with complete arguments. If responses keep hitting the limit, make one tool call per response",
++			);
+ 		}
+ 
+ 		// The loop continues so the model can re-issue the tool call.
 diff --git a/packages/ai/package.json b/packages/ai/package.json
-index d6af526..28006b6 100644
+index d6af526..454f237 100644
 --- a/packages/ai/package.json
 +++ b/packages/ai/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/ai",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Unified LLM API with automatic model discovery and provider configuration",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -3004,7 +3004,7 @@ index d6af526..28006b6 100644
  		"@anthropic-ai/sdk": "0.129.0",
  		"@aws-sdk/client-bedrock-runtime": "3.1127.0",
 -		"@so-agent/telemetry": "1.4.0",
-+		"@so-agent/telemetry": "0.0.2",
++		"@so-agent/telemetry": "0.0.3",
  		"@google/genai": "2.21.0",
  		"@smithy/node-http-handler": "4.12.1",
  		"http-proxy-agent": "9.1.0",
@@ -3056,13 +3056,13 @@ index 7deecfc..21c6c3f 100644
  /**
   * How so-ai identifies the calling app to providers. Every field is optional; absent fields use so-ai's defaults:
 diff --git a/packages/ai/src/utils/version.ts b/packages/ai/src/utils/version.ts
-index 29becf4..bec39b0 100644
+index 29becf4..0266253 100644
 --- a/packages/ai/src/utils/version.ts
 +++ b/packages/ai/src/utils/version.ts
 @@ -1,2 +1,2 @@
  // The @so-agent/ai package version. scripts/sync-versions.js keeps it in sync with package.json.
 -export const SO_AI_VERSION = "1.4.0";
-+export const SO_AI_VERSION = "0.0.2";
++export const SO_AI_VERSION = "0.0.3";
 diff --git a/packages/ai/test/identity.test.ts b/packages/ai/test/identity.test.ts
 index d7ca6a0..c44a854 100644
 --- a/packages/ai/test/identity.test.ts
@@ -3177,14 +3177,14 @@ index 0000000..d20dd47
 +	});
 +});
 diff --git a/packages/chord/package.json b/packages/chord/package.json
-index a2f8856..1bd4773 100644
+index a2f8856..cf50561 100644
 --- a/packages/chord/package.json
 +++ b/packages/chord/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/chord",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Typed host runtime for plugins, contracts, replicated state, and RPC over JSON links",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -3201,19 +3201,19 @@ index a2f8856..1bd4773 100644
  	},
  	"dependencies": {
 -		"@so-agent/telemetry": "1.4.0",
-+		"@so-agent/telemetry": "0.0.2",
++		"@so-agent/telemetry": "0.0.3",
  		"typebox": "1.3.27"
  	},
  	"devDependencies": {
 diff --git a/packages/codemode/package.json b/packages/codemode/package.json
-index 0cc6ce0..4ab5f6f 100644
+index 0cc6ce0..18c7660 100644
 --- a/packages/codemode/package.json
 +++ b/packages/codemode/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/codemode",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Sandboxed JavaScript execution where the only capability is calling injected tools",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -3227,7 +3227,7 @@ index 0cc6ce0..4ab5f6f 100644
  	},
  	"engines": {
 diff --git a/packages/coding-agent/CHANGELOG.md b/packages/coding-agent/CHANGELOG.md
-index 59827b2..738b826 100644
+index 59827b2..9952dc3 100644
 --- a/packages/coding-agent/CHANGELOG.md
 +++ b/packages/coding-agent/CHANGELOG.md
 @@ -1,5 +1,7 @@
@@ -3238,10 +3238,16 @@ index 59827b2..738b826 100644
  ## [Unreleased]
  
  ### Added
-@@ -24,6 +26,22 @@
+@@ -24,6 +26,28 @@
  - Fixed streamed tool calls re-running their call renderer on every argument delta; the interactive mode now renders the latest arguments once per frame, so a large streamed `write` no longer re-highlights its whole content per delta ([#9265](https://github.com/earendil-works/pi/issues/9265))
  - Fixed the login dialog opening sign-in URLs that are not web URLs, and printing control characters from sign-in, device-code, and info URLs, which could end a terminal hyperlink and send escape sequences to the terminal
  
++## [0.0.3] - 2026-10-27
++
++### Changed
++
++- When a response hits the output token limit and its tool calls are not executed, the error now ends with retry guidance: make one tool call per response and keep each call small (several smaller edits instead of one large one, or a large file written in parts). The original sentence is unchanged. Seen in the local-model eval, where a model re-issued the same oversized edit three times in a row. Covered by `agent-loop.test.ts`. Effect on success rates is not measured.
++
 +## [0.0.2] - 2026-10-27
 +
 +### Fixed
@@ -3292,26 +3298,26 @@ index fc55c85..5324957 100644
  | `SO_CODEMODE_MAX_WORKERS` | Maximum codemode workers alive at once across all sessions in the process; default `2`. Each worker's script may use up to 256 MB. Raise it when one process runs several sessions, such as in-process subagents. Further scripts wait for a free worker. See [Codemode](codemode.md) |
  | `SO_CACHE_RETENTION` | Set to `long` for extended provider prompt caching where supported |
 diff --git a/packages/coding-agent/examples/extensions/custom-provider-anthropic/package-lock.json b/packages/coding-agent/examples/extensions/custom-provider-anthropic/package-lock.json
-index c0d10b9..d7d221f 100644
+index c0d10b9..57b3ae3 100644
 --- a/packages/coding-agent/examples/extensions/custom-provider-anthropic/package-lock.json
 +++ b/packages/coding-agent/examples/extensions/custom-provider-anthropic/package-lock.json
 @@ -1,12 +1,12 @@
  {
    "name": "so-extension-custom-provider",
 -  "version": "1.4.0",
-+  "version": "0.0.2",
++  "version": "0.0.3",
    "lockfileVersion": 3,
    "requires": true,
    "packages": {
      "": {
        "name": "so-extension-custom-provider",
 -      "version": "1.4.0",
-+      "version": "0.0.2",
++      "version": "0.0.3",
        "dependencies": {
          "@anthropic-ai/sdk": "^0.52.0"
        }
 diff --git a/packages/coding-agent/examples/extensions/custom-provider-anthropic/package.json b/packages/coding-agent/examples/extensions/custom-provider-anthropic/package.json
-index dae45ab..fde0f58 100644
+index dae45ab..7ca2331 100644
 --- a/packages/coding-agent/examples/extensions/custom-provider-anthropic/package.json
 +++ b/packages/coding-agent/examples/extensions/custom-provider-anthropic/package.json
 @@ -1,7 +1,7 @@
@@ -3319,12 +3325,12 @@ index dae45ab..fde0f58 100644
    "name": "so-extension-custom-provider-anthropic",
    "private": true,
 -  "version": "1.4.0",
-+  "version": "0.0.2",
++  "version": "0.0.3",
    "type": "module",
    "scripts": {
      "clean": "echo 'nothing to clean'",
 diff --git a/packages/coding-agent/examples/extensions/custom-provider-gitlab-duo/package.json b/packages/coding-agent/examples/extensions/custom-provider-gitlab-duo/package.json
-index f87cbe6..6c972db 100644
+index f87cbe6..1bf7ab1 100644
 --- a/packages/coding-agent/examples/extensions/custom-provider-gitlab-duo/package.json
 +++ b/packages/coding-agent/examples/extensions/custom-provider-gitlab-duo/package.json
 @@ -1,7 +1,7 @@
@@ -3332,31 +3338,31 @@ index f87cbe6..6c972db 100644
    "name": "so-extension-custom-provider-gitlab-duo",
    "private": true,
 -  "version": "1.4.0",
-+  "version": "0.0.2",
++  "version": "0.0.3",
    "type": "module",
    "scripts": {
      "clean": "echo 'nothing to clean'",
 diff --git a/packages/coding-agent/examples/extensions/gondolin/package-lock.json b/packages/coding-agent/examples/extensions/gondolin/package-lock.json
-index 00efe71..ea22d41 100644
+index 00efe71..2226f20 100644
 --- a/packages/coding-agent/examples/extensions/gondolin/package-lock.json
 +++ b/packages/coding-agent/examples/extensions/gondolin/package-lock.json
 @@ -1,12 +1,12 @@
  {
  	"name": "so-extension-gondolin",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"lockfileVersion": 3,
  	"requires": true,
  	"packages": {
  		"": {
  			"name": "so-extension-gondolin",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"dependencies": {
  				"@earendil-works/gondolin": "0.14.0"
  			}
 diff --git a/packages/coding-agent/examples/extensions/gondolin/package.json b/packages/coding-agent/examples/extensions/gondolin/package.json
-index 9ad8bee..5e8b61e 100644
+index 9ad8bee..479d520 100644
 --- a/packages/coding-agent/examples/extensions/gondolin/package.json
 +++ b/packages/coding-agent/examples/extensions/gondolin/package.json
 @@ -1,7 +1,7 @@
@@ -3364,31 +3370,31 @@ index 9ad8bee..5e8b61e 100644
  	"name": "so-extension-gondolin",
  	"private": true,
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"type": "module",
  	"scripts": {
  		"clean": "echo 'nothing to clean'",
 diff --git a/packages/coding-agent/examples/extensions/sandbox/package-lock.json b/packages/coding-agent/examples/extensions/sandbox/package-lock.json
-index c36cc2f..4eaa308 100644
+index c36cc2f..5ca2c7c 100644
 --- a/packages/coding-agent/examples/extensions/sandbox/package-lock.json
 +++ b/packages/coding-agent/examples/extensions/sandbox/package-lock.json
 @@ -1,12 +1,12 @@
  {
  	"name": "so-extension-sandbox",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"lockfileVersion": 3,
  	"requires": true,
  	"packages": {
  		"": {
  			"name": "so-extension-sandbox",
 -			"version": "1.4.0",
-+			"version": "0.0.2",
++			"version": "0.0.3",
  			"dependencies": {
  				"@anthropic-ai/sandbox-runtime": "^0.0.26"
  			}
 diff --git a/packages/coding-agent/examples/extensions/sandbox/package.json b/packages/coding-agent/examples/extensions/sandbox/package.json
-index 3119d70..f033547 100644
+index 3119d70..ee306ae 100644
 --- a/packages/coding-agent/examples/extensions/sandbox/package.json
 +++ b/packages/coding-agent/examples/extensions/sandbox/package.json
 @@ -1,7 +1,7 @@
@@ -3396,31 +3402,31 @@ index 3119d70..f033547 100644
  	"name": "so-extension-sandbox",
  	"private": true,
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"type": "module",
  	"scripts": {
  		"clean": "echo 'nothing to clean'",
 diff --git a/packages/coding-agent/examples/extensions/with-deps/package-lock.json b/packages/coding-agent/examples/extensions/with-deps/package-lock.json
-index ab3831e..2f1e266 100644
+index ab3831e..910b6f1 100644
 --- a/packages/coding-agent/examples/extensions/with-deps/package-lock.json
 +++ b/packages/coding-agent/examples/extensions/with-deps/package-lock.json
 @@ -1,12 +1,12 @@
  {
    "name": "so-extension-with-deps",
 -  "version": "1.4.0",
-+  "version": "0.0.2",
++  "version": "0.0.3",
    "lockfileVersion": 3,
    "requires": true,
    "packages": {
      "": {
        "name": "so-extension-with-deps",
 -      "version": "1.4.0",
-+      "version": "0.0.2",
++      "version": "0.0.3",
        "dependencies": {
          "ms": "^2.1.3"
        },
 diff --git a/packages/coding-agent/examples/extensions/with-deps/package.json b/packages/coding-agent/examples/extensions/with-deps/package.json
-index f9fd80a..73cfc5e 100644
+index f9fd80a..cc9bf5e 100644
 --- a/packages/coding-agent/examples/extensions/with-deps/package.json
 +++ b/packages/coding-agent/examples/extensions/with-deps/package.json
 @@ -1,7 +1,7 @@
@@ -3428,36 +3434,36 @@ index f9fd80a..73cfc5e 100644
    "name": "so-extension-with-deps",
    "private": true,
 -  "version": "1.4.0",
-+  "version": "0.0.2",
++  "version": "0.0.3",
    "type": "module",
    "scripts": {
      "clean": "echo 'nothing to clean'",
 diff --git a/packages/coding-agent/install-lock/package.json b/packages/coding-agent/install-lock/package.json
-index 17ce1ac..7598ea0 100644
+index 17ce1ac..510a8ca 100644
 --- a/packages/coding-agent/install-lock/package.json
 +++ b/packages/coding-agent/install-lock/package.json
 @@ -1,10 +1,10 @@
  {
  	"name": "@so-agent/coding-agent-install",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"private": true,
  	"description": "Lockfile root used by the So installer and updater.",
  	"dependencies": {
 -		"@so-agent/coding-agent": "1.4.0"
-+		"@so-agent/coding-agent": "0.0.2"
++		"@so-agent/coding-agent": "0.0.3"
  	},
  	"overrides": {
  		"protobufjs": "7.6.6"
 diff --git a/packages/coding-agent/package.json b/packages/coding-agent/package.json
-index 2e4c0d9..bccc0aa 100644
+index 2e4c0d9..947d60b 100644
 --- a/packages/coding-agent/package.json
 +++ b/packages/coding-agent/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/coding-agent",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Coding agent CLI with read, bash, edit, write tools and session management",
  	"type": "module",
  	"soConfig": {
@@ -3470,11 +3476,11 @@ index 2e4c0d9..bccc0aa 100644
 -		"@so-agent/codemode": "1.4.0",
 -		"@so-agent/mcp": "1.4.0",
 -		"@so-agent/tui": "1.4.0",
-+		"@so-agent/agent-core": "0.0.2",
-+		"@so-agent/ai": "0.0.2",
-+		"@so-agent/codemode": "0.0.2",
-+		"@so-agent/mcp": "0.0.2",
-+		"@so-agent/tui": "0.0.2",
++		"@so-agent/agent-core": "0.0.3",
++		"@so-agent/ai": "0.0.3",
++		"@so-agent/codemode": "0.0.3",
++		"@so-agent/mcp": "0.0.3",
++		"@so-agent/tui": "0.0.3",
  		"@silvia-odwyer/photon-node": "0.3.4",
  		"brace-expansion": "5.0.12",
  		"chalk": "6.0.0",
@@ -4242,14 +4248,14 @@ index 9acce6d..575afb3 100644
 +	});
 +});
 diff --git a/packages/durable/package.json b/packages/durable/package.json
-index 5d70e33..d62ccc4 100644
+index 5d70e33..6b974d3 100644
 --- a/packages/durable/package.json
 +++ b/packages/durable/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/durable",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Durable conversation, task, and document runtime for So",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -4269,22 +4275,22 @@ index 5d70e33..d62ccc4 100644
 -		"@so-agent/ai": "1.4.0",
 -		"@so-agent/codemode": "1.4.0",
 -		"@so-agent/telemetry": "1.4.0",
-+		"@so-agent/chord": "0.0.2",
-+		"@so-agent/ai": "0.0.2",
-+		"@so-agent/codemode": "0.0.2",
-+		"@so-agent/telemetry": "0.0.2",
++		"@so-agent/chord": "0.0.3",
++		"@so-agent/ai": "0.0.3",
++		"@so-agent/codemode": "0.0.3",
++		"@so-agent/telemetry": "0.0.3",
  		"@silvia-odwyer/photon": "0.3.3",
  		"diff": "8.0.4",
  		"typebox": "1.3.27"
 diff --git a/packages/env/package.json b/packages/env/package.json
-index 9bb6caf..f5da7e8 100644
+index 9bb6caf..8f78dc3 100644
 --- a/packages/env/package.json
 +++ b/packages/env/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/env",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Remote execution environments for So Durable: a small daemon deployed over SSH and its ExecutionEnv client",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -4302,20 +4308,20 @@ index 9bb6caf..f5da7e8 100644
  	"dependencies": {
 -		"@so-agent/chord": "1.4.0",
 -		"@so-agent/durable": "1.4.0"
-+		"@so-agent/chord": "0.0.2",
-+		"@so-agent/durable": "0.0.2"
++		"@so-agent/chord": "0.0.3",
++		"@so-agent/durable": "0.0.3"
  	},
  	"devDependencies": {
  		"shx": "0.3.4",
 diff --git a/packages/evals/package.json b/packages/evals/package.json
-index f722814..a06466a 100644
+index f722814..d605a36 100644
 --- a/packages/evals/package.json
 +++ b/packages/evals/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/evals",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"private": true,
  	"type": "module",
  	"scripts": {
@@ -4325,20 +4331,20 @@ index f722814..a06466a 100644
  	"devDependencies": {
 -		"@so-agent/ai": "1.4.0",
 -		"@so-agent/coding-agent": "1.4.0",
-+		"@so-agent/ai": "0.0.2",
-+		"@so-agent/coding-agent": "0.0.2",
++		"@so-agent/ai": "0.0.3",
++		"@so-agent/coding-agent": "0.0.3",
  		"@types/node": "22.19.19",
  		"@vitest-evals/core": "0.15.0",
  		"shx": "0.3.4",
 diff --git a/packages/mcp/package.json b/packages/mcp/package.json
-index 4d122e6..177a4a7 100644
+index 4d122e6..b750ee5 100644
 --- a/packages/mcp/package.json
 +++ b/packages/mcp/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/mcp",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Standalone Model Context Protocol client for so and other applications",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -4352,14 +4358,14 @@ index 4d122e6..177a4a7 100644
  	},
  	"engines": {
 diff --git a/packages/telemetry/package.json b/packages/telemetry/package.json
-index 8e02837..4746333 100644
+index 8e02837..5984894 100644
 --- a/packages/telemetry/package.json
 +++ b/packages/telemetry/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/telemetry",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Vendor-neutral telemetry contracts and typed schema utilities for so",
  	"type": "module",
  	"main": "./dist/index.js",
@@ -4373,14 +4379,14 @@ index 8e02837..4746333 100644
  	},
  	"engines": {
 diff --git a/packages/tui/package.json b/packages/tui/package.json
-index 99c3b90..ab87aeb 100644
+index 99c3b90..cd00b36 100644
 --- a/packages/tui/package.json
 +++ b/packages/tui/package.json
 @@ -1,6 +1,6 @@
  {
  	"name": "@so-agent/tui",
 -	"version": "1.4.0",
-+	"version": "0.0.2",
++	"version": "0.0.3",
  	"description": "Terminal User Interface library with differential rendering for efficient text-based applications",
  	"type": "module",
  	"main": "dist/index.js",

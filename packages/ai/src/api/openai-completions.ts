@@ -489,6 +489,16 @@ export const stream: StreamFunction<"openai-completions", OpenAICompletionsOptio
 				if (!block && toolCall.id) {
 					block = toolCallBlocksById.get(toolCall.id);
 				}
+				if (!block && streamIndex !== undefined && !toolCall.id && !name) {
+					// A chunk under a new index with neither id nor name cannot start a call: some gateways stream the
+					// tail of the previous call's arguments that way. Continue the most recent named call instead of
+					// creating a nameless call that fails to run and is rejected when the history is sent back.
+					const previous = blocks.findLast((candidate) => candidate.type === "toolCall");
+					if (previous?.name) {
+						block = previous;
+						toolCallBlocksByIndex.set(streamIndex, block);
+					}
+				}
 				if (!block) {
 					// Note: the "input" fallback here should/must not be taken.  in case the LLM makes up
 					// a tool we don't knwo about, we at least have a place to stash our stuff.

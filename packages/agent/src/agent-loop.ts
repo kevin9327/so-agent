@@ -500,7 +500,7 @@ async function failToolCallsFromTruncatedMessage(
 		const finalized: FinalizedToolCallOutcome = {
 			toolCall,
 			result: createErrorToolResult(
-				`Tool call "${toolCall.name}" was not executed: the response hit the output token limit, so its arguments may be truncated. Re-issue the tool call with complete arguments.`,
+				`Tool call "${toolCall.name}" was not executed: the response hit the output token limit, so its arguments may be truncated. Re-issue the tool call with complete arguments. If responses keep hitting the limit, make one tool call per response and keep each call small: several smaller edits instead of one large one, or a large file written in parts.`,
 			),
 			isError: true,
 		};

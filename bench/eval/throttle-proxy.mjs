@@ -1,9 +1,10 @@
 // Local pass-through for OpenAI-compatible endpoints with a hard per-IP rate limit (for example anonymous free tiers).
 // It spaces upstream calls by --min-interval-ms and, on a rate-limit answer before any bytes were streamed, waits and
 // retries, so the limit is respected instead of evaded. It never changes request bodies.
-//   node bench/eval/throttle-proxy.mjs --upstream https://host/openai --port 8787 --min-interval-ms 31000 [--log-errors errors.jsonl]
+//   node bench/eval/throttle-proxy.mjs --upstream https://host/openai --port 8787 --min-interval-ms 31000 [--log-errors errors.jsonl] [--log-all trace.jsonl] [--repair-tool-index]
 import { appendFileSync } from "node:fs";
 import { createServer } from "node:http";
+import { repairStream } from "./repair-stream.mjs";
 
 const arg = (n, d) => {
 	const i = process.argv.indexOf(`--${n}`);
@@ -14,6 +15,8 @@ const port = Number(arg("port", "8787"));
 const minInterval = Number(arg("min-interval-ms", "31000"));
 const maxRetries = Number(arg("max-retries", "6"));
 const ua = arg("user-agent", "so-agent-eval/0.0.1");
+const traceLog = arg("log-all"); // optional file: request body and raw answer of every call (debugging provider glitches)
+const repairIndex = process.argv.includes("--repair-tool-index"); // see repairStream below
 const errorLog = arg("log-errors"); // optional file: request body and answer of every non-2xx final response (no headers, so no keys)
 if (!upstream) throw new Error("--upstream is required");
 
@@ -49,6 +52,12 @@ createServer(async (req, res) => {
 			continue;
 		}
 		stats.forwarded++;
+		if (traceLog) {
+			const text = await r.text();
+			appendFileSync(traceLog, `${JSON.stringify({ at: new Date().toISOString(), status: r.status, request: body.toString("utf8"), response: text })}\n`);
+			res.writeHead(r.status, { "content-type": r.headers.get("content-type") ?? "application/json" }).end(text);
+			return;
+		}
 		if (errorLog && !r.ok) {
 			const text = await r.text();
 			appendFileSync(errorLog, `${JSON.stringify({ at: new Date().toISOString(), status: r.status, request: body.toString("utf8"), response: text })}\n`);
@@ -56,7 +65,12 @@ createServer(async (req, res) => {
 			return;
 		}
 		res.writeHead(r.status, { "content-type": r.headers.get("content-type") ?? "application/json" });
-		if (r.body) for await (const c of r.body) res.write(c);
+		if (r.body) {
+			const repair = repairIndex ? repairStream() : undefined;
+			const decoder = new TextDecoder();
+			for await (const c of r.body) res.write(repair ? repair(decoder.decode(c, { stream: true })) : c);
+			if (repair) res.write(repair("", true));
+		}
 		res.end();
 		return;
 	}

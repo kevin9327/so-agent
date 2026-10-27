@@ -6,7 +6,7 @@
 //     --build upstream=/path/to/baseline/packages/coding-agent/dist/bundle/cli.js:PI \
 //     --build so=/path/to/so/packages/coding-agent/dist/bundle/cli.js:SO \
 //     --base-url https://api.example.com/v1 --model some-model [--api-key-env EXAMPLE_API_KEY] \
-//     [--runs 3] [--tasks fix-off-by-one,add-function] [--reasoning] [--timeout-ms 600000] [--out results.json]
+//     [--runs 3] [--retry-invalid 2] [--tasks fix-off-by-one,add-function] [--reasoning] [--timeout-ms 600000] [--out results.json]
 //
 // The API key is read from the named environment variable and written only to a temp models.json that is deleted at the
 // end. Each build gets the same temp project (re-created per run); build order alternates per task to spread drift.
@@ -38,6 +38,9 @@ const wanted = one("tasks")?.split(",");
 const tasks = allTasks.filter((t) => !wanted || wanted.includes(t.id));
 const out = one("out", "eval-results.json");
 const thinking = one("thinking");
+// A run whose provider answered with an error is not evidence about the build (gateway glitches, rate limits). It is
+// repeated up to --retry-invalid times and, if it still errors, reported as invalid and left out of pass counts.
+const retryInvalid = Number(one("retry-invalid", "2"));
 
 function runOnce(build, task) {
 	const home = mkdtempSync(join(tmpdir(), "eval-home-"));
@@ -114,26 +117,35 @@ function runOnce(build, task) {
 }
 
 const results = [];
+const retried = [];
 let order = 0;
 for (let r = 0; r < runs; r++) {
 	for (const task of tasks) {
 		const ordered = order++ % 2 === 0 ? builds : [...builds].reverse();
 		for (const build of ordered) {
-			const res = await runOnce(build, task);
+			let res;
+			let attempts = 0;
+			do {
+				res = await runOnce(build, task);
+				attempts++;
+				console.error(`[${build.label}] ${task.id} run ${r} attempt ${attempts}: ${res.success ? "PASS" : "FAIL"} turns=${res.turns} tools=${res.toolCalls} in=${res.inputTokens} out=${res.outputTokens} ${(res.wallMs / 1000).toFixed(0)}s${res.errors.length ? ` PROVIDER-ERROR ${res.errors[0].slice(0, 80)}` : ""}`);
+				if (res.errors.length) retried.push({ build: build.label, task: task.id, run: r, attempt: attempts, errors: res.errors, turns: res.turns, success: res.success });
+			} while (res.errors.length && attempts <= retryInvalid);
 			res.run = r;
+			res.attempts = attempts;
+			res.invalid = res.errors.length > 0;
 			results.push(res);
-			console.error(`[${build.label}] ${task.id} run ${r}: ${res.success ? "PASS" : "FAIL"} turns=${res.turns} tools=${res.toolCalls} in=${res.inputTokens} out=${res.outputTokens} ${(res.wallMs / 1000).toFixed(0)}s${res.errors.length ? ` errors=${res.errors.length}` : ""}`);
-			writeFileSync(out, JSON.stringify({ baseUrl: baseUrl.replace(/\/\/[^/@]*@/, "//"), model, runs, results }, null, 2));
+			writeFileSync(out, JSON.stringify({ baseUrl: baseUrl.replace(/\/\/[^/@]*@/, "//"), model, runs, results, retried }, null, 2));
 		}
 	}
 }
 
 const summary = {};
 for (const b of builds) {
-	const rs = results.filter((x) => x.build === b.label);
+	const rs = results.filter((x) => x.build === b.label && !x.invalid);
 	const n = rs.length;
 	const avg = (k) => (n ? rs.reduce((a, x) => a + x[k], 0) / n : 0);
-	summary[b.label] = { runs: n, passed: rs.filter((x) => x.success).length, avgTurns: avg("turns"), avgToolCalls: avg("toolCalls"), avgInputTokens: Math.round(avg("inputTokens")), avgOutputTokens: Math.round(avg("outputTokens")), avgWallS: Math.round(avg("wallMs") / 100) / 10, firstTurnInputTokens: rs[0]?.firstTurnInputTokens ?? 0 };
+	summary[b.label] = { runs: n, invalid: results.filter((x) => x.build === b.label && x.invalid).length, providerErrorsRetried: retried.filter((x) => x.build === b.label).length, passed: rs.filter((x) => x.success).length, avgTurns: avg("turns"), avgToolCalls: avg("toolCalls"), avgInputTokens: Math.round(avg("inputTokens")), avgOutputTokens: Math.round(avg("outputTokens")), avgWallS: Math.round(avg("wallMs") / 100) / 10, firstTurnInputTokens: rs[0]?.firstTurnInputTokens ?? 0 };
 }
 console.log(JSON.stringify(summary, null, 2));
-writeFileSync(out, JSON.stringify({ baseUrl, model, runs, summary, results }, null, 2));
+writeFileSync(out, JSON.stringify({ baseUrl, model, runs, summary, results, retried }, null, 2));

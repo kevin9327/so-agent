@@ -45,3 +45,27 @@ test("throttle proxy spaces calls, waits out a rate-limit answer and forwards th
 		upstream.close();
 	}
 });
+
+test("repairStream moves a nameless continuation chunk back to the open tool call and leaves normal streams alone", async () => {
+	const { repairStream } = await import("../bench/eval/repair-stream.mjs");
+	const chunk = (tool_calls, extra = {}) => `data: ${JSON.stringify({ choices: [{ index: 0, delta: { tool_calls }, ...extra }] })}\n\n`;
+	const broken = [
+		chunk([{ index: 0, id: "c1", type: "function", function: { name: "read", arguments: "" } }]),
+		chunk([{ index: 0, function: { arguments: '{"path":"a.js","limit":' } }]),
+		chunk([{ index: 1, function: { arguments: "200}" } }], { finish_reason: "tool_calls" }),
+		"data: [DONE]\n\n",
+	].join("");
+	const repair = repairStream();
+	// feed in arbitrary slices: chunk boundaries must not matter
+	let out = "";
+	for (let i = 0; i < broken.length; i += 37) out += repair(broken.slice(i, i + 37));
+	out += repair("", true);
+	const indexes = out.split("\n").filter((l) => l.startsWith("data: {")).map((l) => JSON.parse(l.slice(6)).choices[0].delta.tool_calls[0].index);
+	assert.deepEqual(indexes, [0, 0, 0]);
+	assert.match(out, /data: \[DONE\]/);
+
+	// two genuine parallel calls (second has id and name) are untouched
+	const parallel = [chunk([{ index: 0, id: "a", function: { name: "read", arguments: "{}" } }]), chunk([{ index: 1, id: "b", function: { name: "bash", arguments: "{}" } }])].join("");
+	const r2 = repairStream();
+	assert.equal(r2(parallel) + r2("", true), parallel + "\n");
+});

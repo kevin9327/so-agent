@@ -78,7 +78,7 @@ Only facts that can be checked in this repo or the linked projects; no benchmark
 
 so is not on npm yet. Requires Node.js 22.19 or newer.
 
-**One command** (clones to `~/.so-agent/src`, builds offline, puts a `so` launcher in `~/.local/bin`; read [install.sh](install.sh) first if you prefer):
+**One command** (clones to `~/.so-agent/src`, builds (fetches model data), puts a `so` launcher in `~/.local/bin`; read [install.sh](install.sh) first if you prefer):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kevin9327/so-agent/main/install.sh | bash

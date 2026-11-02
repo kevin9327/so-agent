@@ -30,7 +30,7 @@
 
 ### Added
 
-- `install.sh`: one-command install from source (clone, `npm ci --ignore-scripts`, offline build, `so` launcher in `~/.local/bin`). Checks for Node.js 22.19+.
+- `install.sh`: one-command install from source (clone, `npm ci --ignore-scripts`, build, `so` launcher in `~/.local/bin`). Checks for Node.js 22.19+.
 - README: a one-line hook, a demo GIF replaying the recorded run from `docs/demo.md` (`assets/demo.cast`, rendered with agg), and a so-vs-Pi table that uses only numbers already in `docs/EFFICIENCY.md`. All existing README content is kept.
 
 ## [0.0.3] - 2026-10-27

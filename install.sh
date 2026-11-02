@@ -18,7 +18,7 @@ else
 fi
 cd "$dir"
 npm ci --ignore-scripts --no-audit --no-fund
-npm run build:offline
+npm run build   # refreshes model data from the network
 mkdir -p "$bin"
 cat > "$bin/so" <<SH
 #!/usr/bin/env sh

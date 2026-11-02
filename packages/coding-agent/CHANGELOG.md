@@ -26,6 +26,13 @@
 - Fixed streamed tool calls re-running their call renderer on every argument delta; the interactive mode now renders the latest arguments once per frame, so a large streamed `write` no longer re-highlights its whole content per delta ([#9265](https://github.com/earendil-works/pi/issues/9265))
 - Fixed the login dialog opening sign-in URLs that are not web URLs, and printing control characters from sign-in, device-code, and info URLs, which could end a terminal hyperlink and send escape sequences to the terminal
 
+## [0.0.4] - 2026-11-02
+
+### Added
+
+- `install.sh`: one-command install from source (clone, `npm ci --ignore-scripts`, offline build, `so` launcher in `~/.local/bin`). Checks for Node.js 22.19+.
+- README: a one-line hook, a demo GIF replaying the recorded run from `docs/demo.md` (`assets/demo.cast`, rendered with agg), and a so-vs-Pi table that uses only numbers already in `docs/EFFICIENCY.md`. All existing README content is kept.
+
 ## [0.0.3] - 2026-10-27
 
 ### Changed

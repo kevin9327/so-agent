@@ -10,6 +10,17 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
 </p>
 
+<h3 align="center">A 4-tool coding agent for your terminal that answers `--version` in 23 ms (Pi: 171 ms), runs Pi extensions unchanged, and works with local models.</h3>
+
+<p align="center">
+  <img alt="so agent editing two files with a local Qwen3-4B model" src="assets/demo.gif" width="720"><br>
+  <sub>Replay of a real recorded run (so 0.0.2, local Qwen3-4B on CPU, 22 s real time, sped up). Transcript: <a href="docs/demo.md">docs/demo.md</a>. Source: <code>assets/demo.cast</code>.</sub>
+</p>
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kevin9327/so-agent/main/install.sh | bash   # Node.js 22.19+, builds from source
+```
+
 **so agent** is a terminal coding agent: a minimal harness with `read`, `write`, `edit` and `bash` tools that you extend with TypeScript extensions, skills, prompt templates, themes and packages instead of waiting for features. It is a **fork of [Pi](https://github.com/earendil-works/pi)** (MIT, by Mario Zechner and contributors; [ATTRIBUTION.md](ATTRIBUTION.md)), renamed, kept compatible with Pi's extension API, and tuned conservatively. Early (0.0.x), built from source for now.
 
 A real run (so 0.0.2, local Qwen3-4B model, [full transcript and how it was recorded](docs/demo.md)):
@@ -47,9 +58,34 @@ What else is different:
 
 What so is **not**: it is not faster in the work that matters (model latency), it has no new features over Pi yet, and it is not affiliated with the Pi authors. If you only want the original, use [Pi](https://github.com/earendil-works/pi).
 
+## At a glance: so vs Pi vs other terminal agents
+
+Only facts that can be checked in this repo or the linked projects; no benchmark scores are claimed.
+
+| | so agent | Pi 1.4.0 (upstream) |
+|---|---|---|
+| Built-in tools | `read`, `write`, `edit`, `bash` | same |
+| Extension API | Pi-compatible (`@earendil-works/pi-*`, `@mariozechner/pi-*` imports resolve) | native |
+| `--version` cold start (median of 31, `bench/run.mjs`) | 23.5 ms | 171.5 ms |
+| Peak memory, one print-mode run | 117 MiB | 122 MiB |
+| Local / OpenAI-compatible models | yes (`~/.so/agent/models.json`) | yes |
+| Upstream network endpoints | off or repointable ([list](docs/UPSTREAM-ENDPOINTS.md)) | upstream defaults |
+| Real-model eval harness | [bench/eval](bench/eval/README.md): 12/21 vs 11/21 valid runs on a local 4B model, within noise | baseline in the same eval |
+| Install | source / `install.sh` (npm not yet) | npm, installer |
+| License | MIT | MIT |
+
 ## Quick start (from source)
 
 so is not on npm yet. Requires Node.js 22.19 or newer.
+
+**One command** (clones to `~/.so-agent/src`, builds offline, puts a `so` launcher in `~/.local/bin`; read [install.sh](install.sh) first if you prefer):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kevin9327/so-agent/main/install.sh | bash
+so --version
+```
+
+Or step by step:
 
 ```bash
 git clone https://github.com/kevin9327/so-agent && cd so-agent
